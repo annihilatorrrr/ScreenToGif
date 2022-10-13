@@ -35,9 +35,9 @@
             </Grid.ColumnDefinitions>
 
             <c:ExCheckBox Grid.Column="0" x:Name="RunAfterDownloadCheckBox" Text="Start app after update" Margin="24" IsChecked="False"/>
-            
-            <c:ExButton Grid.Column="1" x:Name="DismissButton" Text="Update" Margin="24,24,4,24" IsAccented="True" IsDefault="True" Click="UpdateButton_Click"/>
-            <c:ExButton Grid.Column="2" x:Name="FeedbackButton" Text="Ignore" Margin="4,24,24,24" Click="DismissButton_Click"/>
+
+            <c:ExButton Grid.Column="1" x:Name="UpdateButton" Content="Update" Margin="24,24,4,24" IsAccented="True" IsDefault="True" Click="UpdateButton_Click"/>
+            <c:ExButton Grid.Column="2" x:Name="IgnoreButton" Content="Ignore" Margin="4,24,24,24" Click="DismissButton_Click"/>
         </Grid>
     </Grid>
 </c:ExWindow>

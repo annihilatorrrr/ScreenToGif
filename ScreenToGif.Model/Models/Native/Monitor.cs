@@ -1,8 +1,9 @@
+using ScreenToGif.Domain.Interfaces;
 using System.Windows;
 
 namespace ScreenToGif.Domain.Models.Native;
 
-public class Monitor
+public class Monitor : IMonitor
 {
     public IntPtr Handle { get; set; }
 

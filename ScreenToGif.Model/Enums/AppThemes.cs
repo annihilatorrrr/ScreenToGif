@@ -3,8 +3,8 @@ namespace ScreenToGif.Domain.Enums;
 public enum AppThemes
 {
     Light = 0,
-    Medium,
+    Medium, //TODO: Delete
     Dark,
-    VeryDark,
+    VeryDark, //TODO: Delete
     FollowSystem
 }

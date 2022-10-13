@@ -75,4 +75,9 @@ public static class BitHelper
 
         return !byte1.Where((t, i) => t != byte2[i]).Any();
     }
+
+    public static bool HasFlags(int current, int toCheck)
+    {
+        return (current & toCheck) != 0;
+    }
 }

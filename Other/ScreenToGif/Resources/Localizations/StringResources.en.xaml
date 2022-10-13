@@ -7,6 +7,9 @@
     <!--You can use the zero-width-divider to suggest where the word should be divided when there's no space &#8203;-->
     <!--Special texts like {0}, are place holders for dynamic values, such as numbers.-->
 
+    <!--Actions-->
+    
+
     <!--Dialogs-->
     <s:String x:Key="S.Dialog.Error.Header">Uh-oh. Something unexpected happened...</s:String>
     <s:String x:Key="S.Dialog.Error.Info">The app crashed due to an unforseen reason.&#10;Please send details via the feedback tool in order to help to get it fixed.</s:String>
@@ -18,6 +21,14 @@
     <!--TODO-->
     <s:String x:Key="S.Dialog.Exception.Header">Exception details</s:String>
     <s:String x:Key="S.Dialog.Exception.Copy">Copy Details</s:String>
+
+    <!--Dialogs • First Time-->
+    <s:String x:Key="S.Dialog.FirstTime.Title">ScreenToGif • Welcome</s:String>
+    <s:String x:Key="S.Dialog.FirstTime.Header">Welcome to ScreenToGif</s:String>
+    <s:String x:Key="S.Dialog.FirstTime.Subtitle">Looks like this is your first time using the app. Select the workflow that best suits your needs.</s:String>
+    <s:String x:Key="S.Dialog.FirstTime.Select">Select</s:String>
+    <s:String x:Key="S.Dialog.FirstTime.AskLater">Ask Later</s:String>
+
 
 
 

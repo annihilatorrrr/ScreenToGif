@@ -34,7 +34,7 @@ internal static class RegionSelectHelper
 
     #endregion
 
-    internal static Task<Selection> Select(ModeType mode, Rect previousRegion, Monitor currentMonitor, bool quickSelection = false)
+    internal static Task<Selection> Select(RegionSelectionModes mode, Rect previousRegion, Monitor currentMonitor, bool quickSelection = false)
     {
         _taskCompletionSource = new TaskCompletionSource<Selection>();
 
@@ -43,7 +43,7 @@ internal static class RegionSelectHelper
         var monitors = MonitorHelper.AllMonitorsGranular();
 
         //If in quick screen selection mode and there's just one screen, select that one.
-        if (quickSelection && mode == ModeType.Fullscreen && monitors.Count == 1)
+        if (quickSelection && mode == RegionSelectionModes.Fullscreen && monitors.Count == 1)
             return Task.FromResult(new Selection(monitors.FirstOrDefault(), monitors[0].Bounds));
 
         foreach (var monitor in monitors)

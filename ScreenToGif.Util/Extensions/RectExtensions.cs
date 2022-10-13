@@ -1,3 +1,4 @@
+using ScreenToGif.Domain.Models;
 using System.Windows;
 
 namespace ScreenToGif.Util.Extensions;
@@ -43,5 +44,13 @@ public static class RectExtensions
         var newHeight = newY + rect.Height > height ? height - newY : rect.Height;
 
         return new Rect(newX, newY, newWidth, newHeight);
+    }
+
+    public static List<DetectedRegion> AdjustPosition(this List<DetectedRegion> list, double x, double y)
+    {
+        foreach (var region in list)
+            region.Bounds = new Rect(new Point(region.Bounds.X - x, region.Bounds.Y - y), region.Bounds.Size);
+
+        return list;
     }
 }

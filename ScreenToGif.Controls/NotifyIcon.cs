@@ -393,6 +393,9 @@ public class NotifyIcon : FrameworkElement, IDisposable
         //Gets the handle from the context menu or from the message sink.
         var handle = ((HwndSource)PresentationSource.FromVisual(ContextMenu))?.Handle ?? _messageSink.MessageWindowHandle;
 
+        //TODO: Apply mica to context menu "window".
+        //TODO: Always follow system theme for the notification context menu.
+
         //This makes sure that the context menu can close if lost focus.
         User32.SetForegroundWindow(handle);
 
@@ -457,13 +460,8 @@ public class NotifyIcon : FrameworkElement, IDisposable
         NotifyToolTipElement.Background = ContextMenu.Background = TryFindResource("Element.Background") as SolidColorBrush;
             
         foreach (var menuItem in ContextMenu.Items.OfType<ExMenuItem>())
-        {
             menuItem.Foreground = TryFindResource("Element.Foreground.Medium") as SolidColorBrush;
 
-            if (menuItem.Name == "ExitButton")
-                menuItem.Icon = TryFindResource("Vector.Close") as System.Windows.Media.Brush;
-        }
-            
         if (NotifyToolTipElement is ToolTip tooltip)
         {
             tooltip.SetValue(TextBlock.ForegroundProperty, TryFindResource("Element.Foreground.Medium") as SolidColorBrush);

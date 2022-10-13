@@ -16,7 +16,7 @@ namespace ScreenToGif.Controls;
 /// <summary>
 /// Light Window used by some recorder windows.
 /// </summary>
-public class LightWindow : BaseScreenRecorder
+public class LightWindow : BaseScreenRecorderOld
 {
     private HwndSource _hwndSource;
 

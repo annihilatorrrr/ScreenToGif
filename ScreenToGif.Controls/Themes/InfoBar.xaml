@@ -4,91 +4,107 @@
 
     <Style TargetType="{x:Type n:InfoBar}">
         <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="MinHeight" Value="42"/>
+        <Setter Property="Background" Value="{DynamicResource Brush.InfoBar.Background}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type n:InfoBar}">
-                    <Grid x:Name="WarningGrid" Height="Auto" MinHeight="30">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30"/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="30"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.Resources>
-                            <Storyboard x:Key="HideWarningStoryboard">
-                                <DoubleAnimation Storyboard.TargetProperty="(Grid.Opacity)" From="{Binding ElementName=WarningGrid,Path=Opacity}" To="0" Duration="0:0:0.5">
+                    <Border x:Name="MainBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
+                        <Border.Resources>
+                            <Storyboard x:Key="HideStoryboard">
+                                <DoubleAnimation Storyboard.TargetProperty="(Border.Opacity)" From="{Binding ElementName=MainBorder,Path=Opacity}" To="0" Duration="0:0:0.5">
                                     <DoubleAnimation.EasingFunction>
                                         <PowerEase Power="8"/>
                                     </DoubleAnimation.EasingFunction>
                                 </DoubleAnimation>
 
-                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.Visibility)" Duration="0:0:0.5">
+                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Visibility)" Duration="0:0:0.5">
                                     <DiscreteObjectKeyFrame Value="{x:Static Visibility.Collapsed}" KeyTime="0:0:0.2"/>
                                 </ObjectAnimationUsingKeyFrames>
 
-                                <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.IsHitTestVisible)" Duration="0:0:0.0">
+                                <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.IsHitTestVisible)" Duration="0:0:0.0">
                                     <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0.0"/>
                                 </BooleanAnimationUsingKeyFrames>
                             </Storyboard>
 
-                            <Storyboard x:Key="ShowWarningStoryboard">
-                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.Visibility)" Duration="0:0:0" >
+                            <Storyboard x:Key="ShowStoryboard">
+                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Visibility)" Duration="0:0:0" >
                                     <DiscreteObjectKeyFrame Value="{x:Static Visibility.Visible}" KeyTime="0:0:0"/>
                                 </ObjectAnimationUsingKeyFrames>
 
-                                <DoubleAnimation Storyboard.TargetProperty="(Grid.Opacity)" From="0" To="1" Duration="0:0:0.5">
+                                <DoubleAnimation Storyboard.TargetProperty="(Border.Opacity)" From="0" To="1" Duration="0:0:0.5">
                                     <DoubleAnimation.EasingFunction>
                                         <PowerEase Power="8"/>
                                     </DoubleAnimation.EasingFunction>
                                 </DoubleAnimation>
 
-                                <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(Grid.IsHitTestVisible)" Duration="0:0:0.0">
+                                <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.IsHitTestVisible)" Duration="0:0:0.0">
                                     <DiscreteBooleanKeyFrame Value="True" KeyTime="0:0:0.0"/>
                                 </BooleanAnimationUsingKeyFrames>
                             </Storyboard>
-                        </Grid.Resources>
+                        </Border.Resources>
 
-                        <Border Grid.Column="0" x:Name="WarningBorder" Background="{DynamicResource Vector.Info}" Margin="3" Opacity="{DynamicResource Element.Opacity}"/>
+                        <Grid Margin="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="26"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="1" x:Name="WarningTextBlock" Text="{TemplateBinding Title}" FontSize="12" 
-                                   Foreground="{DynamicResource Element.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,0,5,0"/>
+                            <Border Grid.Column="0" Background="{DynamicResource Brush.InfoBar.Glyph.Foreground}" BorderThickness="0" Margin="5,9,5,9"
+                                    CornerRadius="9999" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <n:SymbolIcon x:Name="SymbolIcon" Symbol="InfoFilled" Foreground="{DynamicResource Brush.InfoBar.Glyph}"
+                                              VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            
+                            <TextBlock Grid.Column="1" Text="{TemplateBinding Title}" FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,9,5,9"/>
 
-                        <!--Action Button Here-->
+                            <TextBlock Grid.Column="2" Text="{TemplateBinding Description}" FontSize="14" 
+                                       Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,9,5,9"/>
 
-                        <n:ExButton Grid.Column="2" x:Name="SuppressButton" Icon="{DynamicResource Vector.Close}" IconWidth="16" IconHeight="16"
-                                    HorizontalContentAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource Style.Button.NoText}" MinWidth="30"
-                                    ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
-                            <!--<n:ExtendedButton.Triggers>
-                                <EventTrigger RoutedEvent="Button.Click">
-                                    <EventTrigger.Actions>
-                                        <BeginStoryboard Storyboard="{StaticResource HideWarningStoryboard}" Storyboard.TargetName="WarningGrid" HandoffBehavior="SnapshotAndReplace"/>
-                                    </EventTrigger.Actions>
-                                </EventTrigger>
-                            </n:ExtendedButton.Triggers>-->
-                        </n:ExButton>
-                    </Grid>
+                            <ContentPresenter Grid.Column="3" x:Name="ContentPresenter" Margin="0,0,5,0" Focusable="False" RecognizesAccessKey="True"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+
+                            <n:HyperlinkButton Grid.Column="4" x:Name="SuppressButton" MinWidth="30" ToolTip="{DynamicResource S.Suppress}"
+                                               ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                                <n:SymbolIcon Symbol="Dismiss"/>
+                            </n:HyperlinkButton>
+                        </Grid>
+                    </Border>
 
                     <ControlTemplate.Triggers>
-                        <Trigger Property="Type" Value="Update">
-                            <Setter TargetName="WarningGrid" Property="Background" Value="{DynamicResource Brush.StatusBand.Info}"/>
-                            <Setter TargetName="WarningBorder" Property="Background" Value="{DynamicResource Vector.Synchronize}"/>
-                        </Trigger>
-                        <Trigger Property="Type" Value="Info">
-                            <Setter TargetName="WarningGrid" Property="Background" Value="{DynamicResource Brush.StatusBand.Info}"/>
-                            <Setter TargetName="WarningBorder" Property="Background" Value="{DynamicResource Vector.Info}"/>
-                        </Trigger>
                         <Trigger Property="Type" Value="Warning">
-                            <Setter TargetName="WarningGrid" Property="Background" Value="{DynamicResource Brush.StatusBand.Warning}"/>
-                            <Setter TargetName="WarningBorder" Property="Background" Value="{DynamicResource Vector.Warning}"/>
+                            <Setter Property="Background" Value="{DynamicResource Brush.InfoBar.Background.Warning}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border.Warning}"/>
+                            <Setter TargetName="SymbolIcon" Property="Foreground" Value="{DynamicResource Brush.InfoBar.Glyph.Warning}"/>
+                            <Setter TargetName="SymbolIcon" Property="Symbol" Value="WarningFilled"/>
                         </Trigger>
+
                         <Trigger Property="Type" Value="Error">
-                            <Setter TargetName="WarningGrid" Property="Background" Value="{DynamicResource Brush.StatusBand.Error}"/>
-                            <Setter TargetName="WarningBorder" Property="Background" Value="{DynamicResource Vector.Cancel.Round}"/>
+                            <Setter Property="Background" Value="{DynamicResource Brush.InfoBar.Background.Error}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border.Error}"/>
+                            <Setter TargetName="SymbolIcon" Property="Foreground" Value="{DynamicResource Brush.InfoBar.Glyph.Error}"/>
+                            <Setter TargetName="SymbolIcon" Property="Symbol" Value="DismissCircleFilled"/>
                         </Trigger>
-                        <Trigger Property="IsLink" Value="True">
-                            <Setter TargetName="LinkTextBlock" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="WarningTextBlock" Property="Visibility" Value="Collapsed"/>
+
+                        <Trigger Property="Type" Value="Success">
+                            <Setter Property="Background" Value="{DynamicResource Brush.InfoBar.Background.Success}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border.Success}"/>
+                            <Setter TargetName="SymbolIcon" Property="Foreground" Value="{DynamicResource Brush.InfoBar.Glyph.Success}"/>
+                            <Setter TargetName="SymbolIcon" Property="Symbol" Value="CheckmarkFilled"/>
+                        </Trigger>
+
+                        <Trigger Property="Type" Value="Update">
+                            <Setter TargetName="SymbolIcon" Property="Symbol" Value="SyncFilled"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

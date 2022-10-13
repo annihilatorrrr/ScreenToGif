@@ -19,7 +19,7 @@ public partial class RegionSelection : Window
 
     public Rect Rect { get; set; }
         
-    public ModeType? Mode { get; set; }
+    public RegionSelectionModes? Mode { get; set; }
 
     public bool IsStatic { get; set; }
         
@@ -162,7 +162,7 @@ public partial class RegionSelection : Window
     }
 
 
-    public void Select(ModeType? mode, Rect region, Monitor monitor = null)
+    public void Select(RegionSelectionModes? mode, Rect region, Monitor monitor = null)
     {
         //TODO: Configurable border color.
 
@@ -189,8 +189,8 @@ public partial class RegionSelection : Window
 
         Mode = mode ?? Mode;
         Rect = region;
-        IsStatic = Mode is null or ModeType.Fullscreen || !UserSettings.All.EnableSelectionPanning;
-        Opacity = Mode is null or ModeType.Fullscreen ? 0 : 1;
+        IsStatic = Mode is null or RegionSelectionModes.Fullscreen || !UserSettings.All.EnableSelectionPanning;
+        Opacity = Mode is null or RegionSelectionModes.Fullscreen ? 0 : 1;
 
         DisplaySelection();
         DisplayThumbs();

@@ -14,7 +14,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Themes\FluentSystemIcons.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ScreenToGif.Util\ScreenToGif.Util.csproj" />
+    <ProjectReference Include="..\ScreenToGif.ViewModel\ScreenToGif.ViewModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Themes\FluentSystemIcons.ttf" />
   </ItemGroup>
 
   <ItemGroup>

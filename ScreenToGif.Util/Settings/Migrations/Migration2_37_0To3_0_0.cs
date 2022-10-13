@@ -19,6 +19,19 @@ internal class Migration2_37_0To3_0_0
             showNotificationIcon.Value = "true";
         }
 
+        /// 0 - Startup window.
+        /// 1 - Recorder window.
+        /// 2 - Webcam window.
+        /// 3 - Board window.
+        /// 4 - Editor window.
+        //Startup -> FirstWindow
+        /// 0: Screen recorder
+        /// 1: Webcam recorder
+        /// 2: Sketchboard recorder
+        /// 3: Editor
+        /// 4: Welcome
+        /// 5: Nothing
+
 
         //Update namespaces.
         //Remove settings.

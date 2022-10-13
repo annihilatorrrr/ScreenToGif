@@ -1,28 +1,26 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:s="clr-namespace:System;assembly=System.Runtime"
-                    xmlns:n="clr-namespace:ScreenToGif.Controls">
+                    xmlns:c="clr-namespace:ScreenToGif.Controls">
 
-    <!--Button • Horizontal • Text-->
-    <Style TargetType="{x:Type n:ExButton}" BasedOn="{StaticResource {x:Type Button}}">
+    <!--Button-->
+    <Style TargetType="{x:Type c:ExButton}" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="Background" Value="{DynamicResource Brush.Button.Background}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Button.Border}"/>
         <Setter Property="Foreground" Value="{DynamicResource Brush.Button.Foreground}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
-        <Setter Property="Padding" Value="3,1"/>
-        <Setter Property="IconWidth" Value="16"/>
-        <Setter Property="IconHeight" Value="16"/>
+        <Setter Property="Padding" Value="12,6"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="FocusVisualStyle" Value="{DynamicResource Style.FocusVisual}"/>
 
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type n:ExButton}">
+                <ControlTemplate TargetType="{x:Type c:ExButton}">
                     <Border x:Name="MainBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="4" MinHeight="{TemplateBinding MinHeight}" Background="{TemplateBinding Background}">
-                        <Grid>
+                            CornerRadius="4" MinHeight="{TemplateBinding MinHeight}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <Grid VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition Height="Auto"/>
@@ -32,12 +30,9 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
 
-                            <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" x:Name="IconBorder" Background="{TemplateBinding Icon}" Margin="5,3,0,3"
-                                    Height="{TemplateBinding IconHeight}" Width="{TemplateBinding IconWidth}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-
-                            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TextBlockInternal" MaxWidth="{Binding Path=ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
-                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" Foreground="{TemplateBinding Foreground}"
-                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Text="{TemplateBinding Text}" TextWrapping="{TemplateBinding TextWrapping}" Effect="{TemplateBinding Effect}"/>
+                            <ContentPresenter Grid.Row="0" Grid.Column="0" x:Name="ContentPresenter" Focusable="False" TextElement.Foreground="{TemplateBinding Foreground}"
+                                              RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
                             <TextBlock Grid.Row="1" Grid.Column="1" x:Name="KeyGestureTextBlock" Text="{TemplateBinding KeyGesture}" Foreground="{DynamicResource Brush.Button.Foreground}" 
                                        FontSize="10" HorizontalAlignment="Center" Margin="0" Padding="0" Opacity="0.8" Height="12"/>
@@ -48,8 +43,13 @@
                         <Trigger Property="KeyGesture" Value="{x:Static s:String.Empty}">
                             <Setter TargetName="KeyGestureTextBlock" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
-                        <Trigger Property="Icon" Value="{x:Null}">
-                            <Setter TargetName="IconBorder" Property="Visibility" Value="Collapsed"/>
+
+                        <Trigger Property="KeyGesture" Value="{x:Null}">
+                            <Setter TargetName="KeyGestureTextBlock" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{StaticResource Brush.Button.Foreground.Accent.Disabled}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -131,6 +131,76 @@
         </Style.Triggers>
     </Style>
 
-    <!--TODO Button • Borderless-->
+    <!--HyperlinkButton-->
+    <Style TargetType="{x:Type c:HyperlinkButton}" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.HyperlinkButton.Foreground}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource Style.FocusVisual}"/>
 
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type c:HyperlinkButton}">
+                    <Border x:Name="MainBorder" BorderBrush="Transparent" BorderThickness="0" Padding="{TemplateBinding Padding}"
+                            CornerRadius="4" MinHeight="{TemplateBinding MinHeight}" Background="{TemplateBinding Background}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <ContentPresenter Grid.Row="0" x:Name="ContentPresenter" Focusable="False" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+
+                            <TextBlock Grid.Row="1" x:Name="KeyGestureTextBlock" Text="{TemplateBinding KeyGesture}" Foreground="{DynamicResource Brush.Button.Foreground}" 
+                                       FontSize="10" HorizontalAlignment="Center" Margin="0" Padding="0" Opacity="0.8" Height="12"/>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="KeyGesture" Value="{x:Null}">
+                            <Setter TargetName="KeyGestureTextBlock" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="KeyGesture" Value="{x:Static s:String.Empty}">
+                            <Setter TargetName="KeyGestureTextBlock" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="{DynamicResource Brush.HyperlinkButton.Foreground.Icon.Hover}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="{DynamicResource Brush.HyperlinkButton.Foreground.Icon.Pressed}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="{DynamicResource Brush.HyperlinkButton.Foreground.Icon.Disabled}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.HyperlinkButton.Background.Hover}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.HyperlinkButton.Border.Hover}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.HyperlinkButton.Foreground.Hover}"/>
+            </Trigger>
+
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.HyperlinkButton.Background.Pressed}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.HyperlinkButton.Border.Pressed}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.HyperlinkButton.Foreground.Pressed}"/>
+            </Trigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource Brush.HyperlinkButton.Background.Disabled}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.HyperlinkButton.Foreground.Disabled}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

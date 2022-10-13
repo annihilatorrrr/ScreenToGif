@@ -41,6 +41,8 @@ public static class ThemeHelper
 
     public static void SelectGridTheme()
     {
+        //TODO: Maybe rework this.
+
         if (!UserSettings.All.GridColorsFollowSystem)
             return;
 

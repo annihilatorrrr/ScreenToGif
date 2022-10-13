@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using ScreenToGif.Controls;
 using ScreenToGif.Dialogs;
+using ScreenToGif.Domain.Enums;
 using ScreenToGif.Util;
 using ScreenToGif.Util.InterProcessChannel;
 using ScreenToGif.Util.Native;
@@ -13,9 +14,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -47,6 +48,8 @@ public partial class App : Application
 
         //Render mode.
         RenderOptions.ProcessRenderMode = UserSettings.All.DisableHardwareAcceleration ? RenderMode.SoftwareOnly : RenderMode.Default;
+
+        UserSettings.All.MainTheme = AppThemes.Light;
 
         await LocalizationHelper.SelectCulture(UserSettings.All.LanguageCode);
         ThemeHelper.SelectTheme(UserSettings.All.MainTheme);
@@ -144,8 +147,8 @@ public partial class App : Application
 
         #endregion
 
-        RegisterNotifyIconCommands();
         RegisterViewModelCommands();
+        RegisterNotifyIconCommands();
         RegisterShortcuts();
 
         //throw new Exception("Idk");
@@ -244,6 +247,11 @@ public partial class App : Application
         }
     }
 
+    private void App_Exit(object sender, ExitEventArgs e)
+    {
+        //TODO
+    }
+
     private void ShowException(Exception e, string source)
     {
         LogWriter.Log(e, source);
@@ -286,18 +294,25 @@ public partial class App : Application
 
         NotifyIcon.DataContext = ViewModel;
         NotifyIcon.Visibility = UserSettings.All.ShowNotificationIcon || UserSettings.All.StartMinimized ? Visibility.Visible : Visibility.Collapsed;
+
+        NotifyIcon.CommandBindings.Clear();
+        NotifyIcon.CommandBindings.AddRange(new[]
+        {
+            new CommandBinding(ViewModel.ScreenRecorderCommand, (sender, _) => OpenScreenRecorder(sender), (sender, args) => args.CanExecute = CanOpenRecorder(sender)),
+            new CommandBinding(ViewModel.WebcamRecorderCommand, (sender, _) => OpenWebcamRecorder(sender), (sender, args) => args.CanExecute = CanOpenRecorder(sender)),
+            new CommandBinding(ViewModel.BoardRecorderCommand, (sender, _) => OpenBoardRecorder(sender), (sender, args) => args.CanExecute = CanOpenRecorder(sender)),
+            new CommandBinding(ViewModel.EditorCommand, (sender, _) => OpenEditor(sender)),
+            new CommandBinding(ViewModel.OptionsCommand, (sender, _) => OpenOptions(sender)),
+            new CommandBinding(ViewModel.FeedbackCommand, (sender, _) => OpenFeedback(sender)),
+            new CommandBinding(ViewModel.TroubleshootCommand, (sender, _) => OpenTroubleshooter(sender)),
+            new CommandBinding(ViewModel.ExitCommand, (sender, _) => ExitApplication(sender), (sender, args) => args.CanExecute = CanExitApplication(sender)),
+        });
     }
 
     private void RegisterViewModelCommands()
     {
         //https://stackoverflow.com/a/30686620/1735672
         //CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(ViewModel.NewScreenRecordingCommand, OpenScreenRecorder, CanOpenRecorder));
-
-        //new CommandBinding(App.ViewModel.ScreenRecorderCommand, (sender, _) => App.OpenScreenRecorder(sender), (sender, _) => App.CanOpenRecorder(sender)),
-        //new CommandBinding(App.ViewModel.OpenWebcamRecorderCommand, (sender, _) => App.OpenWebcamRecorder(sender), (sender, _) => App.CanOpenRecorder(sender)),
-        //new CommandBinding(App.ViewModel.OpenBoardRecorderCommand, (sender, _) => App.OpenBoardRecorder(sender), (sender, _) => App.CanOpenRecorder(sender)),
-        //new CommandBinding(App.ViewModel.UpdateCommand, (sender, _) => App.OpenUpdater(sender), (sender, _) => App.CanOpenUpdater(sender)),
-        //new CommandBinding(App.ViewModel.OptionsCommand, (sender, _) => App.OpenOptions(sender)),
 
         ViewModel.LaunchCommand = new RelayCommand(Launch);
         ViewModel.ScreenRecorderCommand = new RelayCommand(CanOpenRecorder, OpenScreenRecorder);
@@ -308,11 +323,15 @@ public partial class App : Application
         ViewModel.StartupCommand = new RelayCommand(OpenStartup);
         ViewModel.EditorCommand = new RelayCommand(OpenEditor);
         ViewModel.OptionsCommand = new RelayCommand(OpenOptions);
+        ViewModel.FeedbackCommand = new RelayCommand(OpenFeedback);
+        ViewModel.TroubleshootCommand = new RelayCommand(OpenTroubleshooter);
 
         ViewModel.ClearCacheCommand = new RelayCommand(ClearCache);
         ViewModel.CheckCacheSpaceCommand = new RelayCommand(ClearCache);
         ViewModel.CheckForUpdatesCommand = new RelayCommand(ClearCache);
         ViewModel.SendFeedbackCommand = new RelayCommand(ClearCache);
+
+        ViewModel.ExitCommand = new RelayCommand(CanExitApplication, ExitApplication);
     }
 
     internal void RegisterShortcuts()

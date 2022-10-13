@@ -1,4 +1,5 @@
 using ScreenToGif.Domain.Enums.Native;
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models;
 using ScreenToGif.Domain.Models.Native;
 using ScreenToGif.Native.External;
@@ -9,23 +10,22 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Interop;
-using Monitor = ScreenToGif.Domain.Models.Native.Monitor;
 using Size = System.Windows.Size;
 
 namespace ScreenToGif.Util.Native
 {
     public static class Windows
     {
-        public static void MoveToScreen(this System.Windows.Window window, Monitor next, bool fullScreen = false)
+        public static void MoveToScreen(this Window window, IMonitor next, bool fullScreen = false)
         {
             if (fullScreen)
             {
-                User32.SetWindowPos(new System.Windows.Interop.WindowInteropHelper(window).Handle, (IntPtr)SpecialWindowHandles.Top,
+                User32.SetWindowPos(new WindowInteropHelper(window).Handle, (IntPtr)SpecialWindowHandles.Top,
                     (int)next.NativeBounds.Left, (int)next.NativeBounds.Top, (int)next.NativeBounds.Width, (int)next.NativeBounds.Height, SetWindowPosFlags.ShowWindow);
                 return;
             }
 
-            User32.SetWindowPos(new System.Windows.Interop.WindowInteropHelper(window).Handle, (IntPtr)SpecialWindowHandles.Top,
+            User32.SetWindowPos(new WindowInteropHelper(window).Handle, (IntPtr)SpecialWindowHandles.Top,
                 (int)next.NativeBounds.Left, (int)next.NativeBounds.Top, (int)window.Width, (int)window.Height, SetWindowPosFlags.ShowWindow);
         }
 
@@ -160,7 +160,7 @@ namespace ScreenToGif.Util.Native
         /// <returns>
         /// A dictionary that contains the handle and title of all the open windows.
         /// </returns>
-        public static List<DetectedRegion> EnumerateWindowsByMonitor(Monitor monitor)
+        public static List<DetectedRegion> EnumerateWindowsByMonitor(IMonitor monitor)
         {
             var shellWindow = User32.GetShellWindow();
 
@@ -317,7 +317,7 @@ namespace ScreenToGif.Util.Native
             return ExtendedFrameBounds(handle, out var rectangle) ? rectangle : GetWindowRect(handle);
         }
 
-        public static Size ScreenSizeFromWindow(System.Windows.Window window)
+        public static Size ScreenSizeFromWindow(Window window)
         {
             return ScreenSizeFromWindow(new WindowInteropHelper(window).Handle);
         }

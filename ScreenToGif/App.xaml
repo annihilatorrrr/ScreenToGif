@@ -176,7 +176,7 @@
                 </Setter>
             </Style>
 
-            <!--ToolTip-->
+            <!--ToolTip Done-->
             <Style TargetType="{x:Type ToolTip}">
                 <Setter Property="Foreground" Value="{DynamicResource Element.Foreground.Medium}"/>
                 <Setter Property="Background" Value="{DynamicResource Element.Background}"/>

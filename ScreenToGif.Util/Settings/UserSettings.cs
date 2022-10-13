@@ -506,61 +506,42 @@ public partial class UserSettings : INotifyPropertyChanged
 
     #region Properties
 
-    #region Startup
+    #region Delete
 
-    private const double StartupTopOriginal = double.NaN;
-    public double StartupTop
+    private const int StartUpOriginal = 0;
+    /// <summary>
+    /// The homepage of the app:
+    /// 0 - Startup window.
+    /// 1 - Recorder window.
+    /// 2 - Webcam window.
+    /// 3 - Board window.
+    /// 4 - Editor window.
+    /// </summary>
+    public int StartUp
     {
-        get => (double)GetValue(StartupTopOriginal);
-        set => SetValue(value, StartupTopOriginal);
+        get => (int)GetValue(StartUpOriginal);
+        set => SetValue(value, StartUpOriginal);
     }
 
-    private const double StartupLeftOriginal = double.NaN;
-    public double StartupLeft
+    #region Insert TODO: Delete them.
+
+    public Color InsertFillColor
     {
-        get => (double)GetValue(StartupLeftOriginal);
-        set => SetValue(value, StartupLeftOriginal);
+        get => (Color)GetValue(Colors.White);
+        set => SetValue(value, Colors.White);
     }
 
-    private const double StartupHeightOriginal = double.NaN;
-    public double StartupHeight
+    public int LatestFpsImport
     {
-        get => (double)GetValue(StartupHeightOriginal);
-        set => SetValue(value, StartupHeightOriginal);
-    }
-
-    private const double StartupWidthOriginal = double.NaN;
-    public double StartupWidth
-    {
-        get => (double)GetValue(StartupWidthOriginal);
-        set => SetValue(value, StartupWidthOriginal);
-    }
-
-    private const WindowState StartupWindowStateOriginal = WindowState.Normal;
-    public WindowState StartupWindowState
-    {
-        get => (WindowState)GetValue(StartupWindowStateOriginal);
-        set => SetValue(value, StartupWindowStateOriginal);
+        get => (int)GetValue(15);
+        set => SetValue(value, 15);
     }
 
     #endregion
-
+    
     #region Recorder
 
-    private readonly Rect _selectedRegionOriginal = Rect.Empty;
-    public Rect SelectedRegion
-    {
-        get => (Rect)GetValue(_selectedRegionOriginal);
-        set => SetValue(value, _selectedRegionOriginal);
-    }
-
-    private const double SelectedRegionScaleOriginal = 1d;
-    public double SelectedRegionScale
-    {
-        get => (double)GetValue(SelectedRegionScaleOriginal);
-        set => SetValue(value, SelectedRegionScaleOriginal);
-    }
-
+    //Delete.
     private const int RecorderModeIndexOriginal = 0;
     public int RecorderModeIndex
     {
@@ -568,13 +549,7 @@ public partial class UserSettings : INotifyPropertyChanged
         set => SetValue(value, RecorderModeIndexOriginal);
     }
 
-    private const int LatestFpsOriginal = 15;
-    public int LatestFps
-    {
-        get => (int)GetValue(LatestFpsOriginal);
-        set => SetValue(value, LatestFpsOriginal);
-    }
-
+    //Delete.
     private const double RecorderLeftOriginal = double.NaN;
     public double RecorderLeft
     {
@@ -582,6 +557,7 @@ public partial class UserSettings : INotifyPropertyChanged
         set => SetValue(value, RecorderLeftOriginal);
     }
 
+    //Delete.
     private const double RecorderTopOriginal = double.NaN;
     public double RecorderTop
     {
@@ -589,6 +565,7 @@ public partial class UserSettings : INotifyPropertyChanged
         set => SetValue(value, RecorderTopOriginal);
     }
 
+    //Delete.
     private const double RecorderWidthOriginal = 518d;
     public int RecorderWidth
     {
@@ -596,6 +573,7 @@ public partial class UserSettings : INotifyPropertyChanged
         set => SetValue(value, RecorderWidthOriginal);
     }
 
+    //Delete.
     private const double RecorderHeightOriginal = 269d;
     public int RecorderHeight
     {
@@ -604,6 +582,9 @@ public partial class UserSettings : INotifyPropertyChanged
     }
 
     #endregion
+
+    #endregion
+
 
     #region Board
 
@@ -685,23 +666,7 @@ public partial class UserSettings : INotifyPropertyChanged
     }
 
     #endregion
-
-    #region Insert TODO: Delete them.
-
-    public Color InsertFillColor
-    {
-        get => (Color)GetValue(Colors.White);
-        set => SetValue(value, Colors.White);
-    }
-
-    public int LatestFpsImport
-    {
-        get => (int)GetValue(15);
-        set => SetValue(value, 15);
-    }
-
-    #endregion
-
+    
     #region Video source
 
     private const int VideoImporterOriginal = 0;
@@ -725,8 +690,6 @@ public partial class UserSettings : INotifyPropertyChanged
 
 
     #region Options • Application
-
-    
 
     private const bool NotifyWhileClosingAppOriginal = true;
     public bool NotifyWhileClosingApp
@@ -783,10 +746,11 @@ public partial class UserSettings : INotifyPropertyChanged
         set => SetValue(value);
     }
 
+    private const bool ShowNotificationIconOriginal = true;
     public bool ShowNotificationIcon
     {
-        get => (bool)GetValue();
-        set => SetValue(value);
+        get => (bool)GetValue(ShowNotificationIconOriginal);
+        set => SetValue(value, ShowNotificationIconOriginal);
     }
 
     private const bool KeepOpenOriginal = false;
@@ -859,179 +823,77 @@ public partial class UserSettings : INotifyPropertyChanged
 
     #region Options • Recorder
 
+    //Delete
     public bool NewRecorder
     {
         get => (bool)GetValue();
         set => SetValue(value);
     }
 
+    //Delete
     public bool RecorderThinMode
     {
         get => (bool)GetValue();
         set => SetValue(value);
     }
 
-    public bool Magnifier
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
+    //Delete
     public bool AnimateRecorderBorder
     {
         get => (bool)GetValue();
         set => SetValue(value);
     }
 
-    public bool EnableSelectionPanning
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
+    //Delete
     public bool RecorderCompactMode
     {
         get => (bool)GetValue();
         set => SetValue(value);
     }
 
-    public bool RecorderDisplayDiscard
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool SelectionImprovement
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
+    //Delete
     public bool FallThroughOtherScreens
     {
         get => (bool)GetValue();
         set => SetValue(value);
     }
-
-    public CaptureFrequencies CaptureFrequency
-    {
-        get => (CaptureFrequencies)GetValue();
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// The placyback speed of the capture frame, in the "manual" mode.
-    /// </summary>
-    public int PlaybackDelayManual
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// The synthetic delay after trigger, in the "manual" capture mode.
-    /// </summary>
-    public int TriggerDelayManual
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// The placyback speed of the capture frame, in the "manual" mode.
-    /// </summary>
-    public int PlaybackDelayInteraction
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// The synthetic delay after trigger, in the "interaction" capture mode.
-    /// </summary>
-    public int TriggerDelayInteraction
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// The placyback speed of the capture frame, in the "per minute" mode.
-    /// </summary>
-    public int PlaybackDelayMinute
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// The placyback speed of the capture frame, in the "per hour" mode.
-    /// </summary>
-    public int PlaybackDelayHour
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool FixedFrameRate
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool OnlyCaptureChanges
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool UseDesktopDuplication
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
+    
+    //Delete
     public bool UseMemoryCache
     {
         get => (bool)GetValue();
         set => SetValue(value);
     }
 
-    public CompressionLevel CaptureCompression
-    {
-        get => (CompressionLevel)GetValue();
-        set => SetValue(value);
-    }
-
-    public int MemoryCacheSize
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool PreventBlackFrames
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public AppThemes MainTheme
-    {
-        get => (AppThemes)GetValue();
-        set => SetValue(value);
-    }
-
+    //Delete
     public Color RecorderBackground
     {
         get => (Color)GetValue();
         set => SetValue(value);
     }
 
+    //Delete
     public Color RecorderForeground
     {
         get => (Color)GetValue();
         set => SetValue(value);
     }
+
+    //Delete
+    public bool RecorderRememberSize
+    {
+        get => (bool)GetValue();
+        set => SetValue(value);
+    }
+
+    //Delete
+    public bool RecorderRememberPosition
+    {
+        get => (bool)GetValue();
+        set => SetValue(value);
+    }
+
+    #endregion
 
     public Color BoardGridBackground
     {
@@ -1062,124 +924,6 @@ public partial class UserSettings : INotifyPropertyChanged
         get => (Rect)GetValue();
         set => SetValue(value);
     }
-
-    public bool ShowCursor
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool UsePreStart
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public int PreStartValue
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool ForceGarbageCollection
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool RemoteImprovement
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    //Guidelines.
-    public bool DisplayThirdsGuideline
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public double ThirdsGuidelineThickness
-    {
-        get => (double)GetValue();
-        set => SetValue(value);
-    }
-
-    public Color ThirdsGuidelineColor
-    {
-        get => (Color)GetValue();
-        set => SetValue(value);
-    }
-
-    public DoubleCollection ThirdsGuidelineStrokeDashArray
-    {
-        get => (DoubleCollection)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool DisplayCrosshairGuideline
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public double CrosshairGuidelineThickness
-    {
-        get => (double)GetValue();
-        set => SetValue(value);
-    }
-
-    public Color CrosshairGuidelineColor
-    {
-        get => (Color)GetValue();
-        set => SetValue(value);
-    }
-
-    public DoubleCollection CrosshairGuidelineStrokeDashArray
-    {
-        get => (DoubleCollection)GetValue();
-        set => SetValue(value);
-    }
-
-    //Other.
-    public bool RecorderRememberSize
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool RecorderRememberPosition
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool CursorFollowing
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public int FollowBuffer
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public int FollowBufferInvisible
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public bool NotifyRecordingDiscard
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    #endregion
 
     #region Options • Editor
 
@@ -1243,10 +987,11 @@ public partial class UserSettings : INotifyPropertyChanged
         set => SetValue(value);
     }
 
+    private const bool TripleClickSelectionOriginal = false;
     public bool TripleClickSelection
     {
-        get => (bool)GetValue();
-        set => SetValue(value);
+        get => (bool)GetValue(TripleClickSelectionOriginal);
+        set => SetValue(value, TripleClickSelectionOriginal);
     }
 
     public bool DrawOutlineOutside
@@ -1489,10 +1234,11 @@ public partial class UserSettings : INotifyPropertyChanged
         set => SetValue(value, AutomaticCleanUpOriginal);
     }
 
+    private const int AutomaticCleanUpDaysOriginal = 5;
     public int AutomaticCleanUpDays
     {
-        get => (int)GetValue();
-        set => SetValue(value);
+        get => (int)GetValue(AutomaticCleanUpDaysOriginal);
+        set => SetValue(value, AutomaticCleanUpDaysOriginal);
     }
 
     #endregion

@@ -1,0 +1,73 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <DrawingBrush x:Key="Drawings.Editor"></DrawingBrush>
+
+    <DrawingBrush x:Key="Drawings.Recorder.Screen" Stretch="Uniform" AlignmentX="Center" AlignmentY="Center">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#ffffffff" Geometry="F1 M 36.375,36.875 L 8.375,36.875 L 8.375,27.375 L 36.375,27.375 L 36.375,36.875 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="0.8" Brush="#ffaaaaaa" MiterLimit="1.0"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Geometry="F1 M 36.375,25.375 L 0.375,25.375 L 0.375,0.375 L 36.375,0.375 L 36.375,25.375 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="0.8" Brush="#ffaaaaaa" MiterLimit="1.0">
+                            <Pen.DashStyle>
+                                <DashStyle Dashes="6.67,2.67"/>
+                            </Pen.DashStyle>
+                        </Pen>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#ff9f2821" Geometry="F1 M 29.375,33.875 C 29.375,34.703 28.703,35.375 27.875,35.375 C 27.047,35.375 26.375,34.703 26.375,33.875 C 26.375,33.047 27.047,32.375 27.875,32.375 C 28.703,32.375 29.375,33.047 29.375,33.875 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="0.3" Brush="#ffffffff" MiterLimit="1.0"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#ff3f7db7" Geometry="F1 M 34.375,35.375 L 31.375,35.375 L 31.375,32.375 L 34.375,32.375 L 34.375,35.375 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="0.3" Brush="#ffffffff" MiterLimit="1.0"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+
+                <GeometryDrawing Brush="#ff221e1f" Geometry="F1 M 34.512,31.475 L 32.125,29.088 L 32.238,28.975 L 34.625,31.362 L 34.512,31.475 Z"/>
+                <GeometryDrawing Brush="#ff221e1f" Geometry="F1 M 32.238,31.475 L 32.125,31.362 L 34.512,28.975 L 34.625,29.088 L 32.238,31.475 Z"/>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="Drawings.Recorder.Sketchboard"></DrawingBrush>
+
+    <DrawingBrush x:Key="Drawings.Recorder.Webcam"></DrawingBrush>
+
+    <DrawingBrush x:Key="Drawings.SaveDialog">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#ffffffff" Geometry="F1 M 40.375,40.875 L 8.375,40.875 L 8.375,27.375 L 40.375,27.375 L 40.375,40.875 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="0.8" Brush="#ffaaaaaa" MiterLimit="1.0"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+
+                <GeometryDrawing Brush="#ff9f2821" Geometry="F1 M 29.375,33.875 C 29.375,34.703 28.703,35.375 27.875,35.375 C 27.047,35.375 26.375,34.703 26.375,33.875 C 26.375,33.047 27.047,32.375 27.875,32.375 C 28.703,32.375 29.375,33.047 29.375,33.875 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="0.3" Brush="#ffffffff" MiterLimit="1.0"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#ff3f7db7" Geometry="F1 M 34.375,35.375 L 31.375,35.375 L 31.375,32.375 L 34.375,32.375 L 34.375,35.375 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="0.3" Brush="#ffffffff" MiterLimit="1.0"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+
+                <GeometryDrawing Brush="#ff221e1f" Geometry="F1 M 36.512,31.475 L 34.125,29.088 L 34.238,28.975 L 36.625,31.362 L 36.512,31.475 Z"/>
+                <GeometryDrawing Brush="#ff221e1f" Geometry="F1 M 32.238,31.475 L 32.125,31.362 L 34.512,28.975 L 34.625,29.088 L 32.238,31.475 Z"/>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="Drawings.SystemTray"></DrawingBrush>
+
+    <DrawingBrush x:Key="Drawings.Welcome"></DrawingBrush>
+</ResourceDictionary>

@@ -30,7 +30,7 @@ public partial class RegionSelector : Window
     }
 
 
-    public void Select(Monitor monitor, ModeType mode, Rect previousRegion, Action<Monitor, Rect> selected, Action<Monitor> changed, Action<Monitor> gotHover, Action aborted)
+    public void Select(Monitor monitor, RegionSelectionModes mode, Rect previousRegion, Action<Monitor, Rect> selected, Action<Monitor> changed, Action<Monitor> gotHover, Action aborted)
     {
         //Resize to fit given window.
         Left = monitor.Bounds.Left;
@@ -53,7 +53,7 @@ public partial class RegionSelector : Window
         SelectControl.ParentTop = Top;
         SelectControl.Mode = mode;
 
-        if (mode == ModeType.Region)
+        if (mode == RegionSelectionModes.Region)
         {
             SelectControl.BackImage = CaptureBackground();
 
@@ -67,7 +67,7 @@ public partial class RegionSelector : Window
             SelectControl.Selected = previousRegion.Translate(monitor.Bounds.Left * -1, monitor.Bounds.Top * -1);
             SelectControl.Windows.Clear();
         }
-        else if (mode == ModeType.Window)
+        else if (mode == RegionSelectionModes.Window)
         {
             //Get only the windows that are located inside the given screen.
             var win = Util.Native.Windows.EnumerateWindowsByMonitor(monitor);
@@ -75,7 +75,7 @@ public partial class RegionSelector : Window
             //Since each region selector is attached to a single screen, the list of positions must be translated.
             SelectControl.Windows = win.AdjustPosition(monitor.Bounds.Left, monitor.Bounds.Top);
         }
-        else if (mode == ModeType.Fullscreen)
+        else if (mode == RegionSelectionModes.Fullscreen)
         {
             //Each selector is the whole screen.
             SelectControl.Windows = new List<DetectedRegion>

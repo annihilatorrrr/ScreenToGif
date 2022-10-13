@@ -39,7 +39,7 @@ public partial class Recorder
     /// <summary>
     /// The view model of the recorder.
     /// </summary>
-    private readonly ScreenRecorderViewModel _viewModel;
+    private readonly ScreenRecorderViewModelOld _viewModel;
 
     /// <summary>
     /// The region's left edge position.
@@ -149,7 +149,7 @@ public partial class Recorder
 
         #region Model and commands
 
-        DataContext = _viewModel = new ScreenRecorderViewModel();
+        DataContext = _viewModel = new ScreenRecorderViewModelOld();
 
         RegisterCommands();
 

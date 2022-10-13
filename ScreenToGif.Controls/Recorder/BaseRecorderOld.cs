@@ -9,11 +9,11 @@ namespace ScreenToGif.Controls.Recorder;
 /// <summary>
 /// All recorders are derived from this class.
 /// </summary>
-public class BaseRecorder : Window
+public class BaseRecorderOld : ExWindow
 {
-    public static readonly DependencyProperty StageProperty = DependencyProperty.Register(nameof(Stage), typeof(RecorderStages), typeof(BaseRecorder), new FrameworkPropertyMetadata(RecorderStages.Stopped));
-    public static readonly DependencyProperty FrameCountProperty = DependencyProperty.Register(nameof(FrameCount), typeof(int), typeof(BaseRecorder), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender));
-    public static readonly DependencyProperty HasImpreciseCaptureProperty = DependencyProperty.Register(nameof(HasImpreciseCapture), typeof(bool), typeof(BaseRecorder), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
+    public static readonly DependencyProperty StageProperty = DependencyProperty.Register(nameof(Stage), typeof(RecorderStages), typeof(BaseRecorderOld), new FrameworkPropertyMetadata(RecorderStages.Stopped));
+    public static readonly DependencyProperty FrameCountProperty = DependencyProperty.Register(nameof(FrameCount), typeof(int), typeof(BaseRecorderOld), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender));
+    public static readonly DependencyProperty HasImpreciseCaptureProperty = DependencyProperty.Register(nameof(HasImpreciseCapture), typeof(bool), typeof(BaseRecorderOld), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
 
     /// <summary>
     /// The actual stage of the recorder.

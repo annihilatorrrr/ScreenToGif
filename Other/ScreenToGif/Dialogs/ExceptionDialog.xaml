@@ -29,9 +29,9 @@
                 <ColumnDefinition MaxWidth="200"/>
             </Grid.ColumnDefinitions>
 
-            <c:ExButton Grid.Column="1" x:Name="DismissButton" Text="{DynamicResource S.Dialog.Error.Dismiss}" Margin="24,24,4,24" IsAccented="True" IsDefault="True" Click="DismissButton_Click"/>
-            <c:ExButton Grid.Column="2" x:Name="CopyButton" Text="{DynamicResource S.Dialog.Exception.Copy}" Margin="4,24,4,24" Click="CopyButton_Click"/>
-            <c:ExButton Grid.Column="3" x:Name="FeedbackButton" Text="{DynamicResource S.Dialog.Error.SendFeedback}" Margin="4,24,24,24" Click="FeedbackButton_Click"/>
+            <c:ExButton Grid.Column="1" x:Name="DismissButton" Content="{DynamicResource S.Dialog.Error.Dismiss}" Margin="24,24,4,24" IsAccented="True" IsDefault="True" Click="DismissButton_Click"/>
+            <c:ExButton Grid.Column="2" x:Name="CopyButton" Content="{DynamicResource S.Dialog.Exception.Copy}" Margin="4,24,4,24" Click="CopyButton_Click"/>
+            <c:ExButton Grid.Column="3" x:Name="FeedbackButton" Content="{DynamicResource S.Dialog.Error.SendFeedback}" Margin="4,24,24,24" Click="FeedbackButton_Click"/>
         </Grid>
     </Grid>
 </c:ExWindow>

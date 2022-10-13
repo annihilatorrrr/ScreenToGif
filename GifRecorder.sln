@@ -37,9 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinUITest.Core", "Other\Win
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinUITest.WPF.Window", "Other\WinUITest.WPF.Window\WinUITest.WPF.Window.csproj", "{2A5EC5C3-931A-4662-9450-39C7F5F0070C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScreenToGif", "Other\ScreenToGif\ScreenToGif.csproj", "{D75C5680-6FB0-47E3-8F26-BDECD3431B1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScreenToGif", "Other\ScreenToGif\ScreenToGif.csproj", "{D75C5680-6FB0-47E3-8F26-BDECD3431B1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScreenToGif.Controls", "ScreenToGif.Controls\ScreenToGif.Controls.csproj", "{EA3A4ABF-C029-4AFE-B391-E6F7C40658B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScreenToGif.Controls", "ScreenToGif.Controls\ScreenToGif.Controls.csproj", "{EA3A4ABF-C029-4AFE-B391-E6F7C40658B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

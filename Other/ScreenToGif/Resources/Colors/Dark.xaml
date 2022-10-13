@@ -3,7 +3,8 @@
 
     <SolidColorBrush x:Key="Brush.Accent" Color="#60CDFF"/>
     <SolidColorBrush x:Key="Brush.Foreground" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="Brush.Foreground.Disabled" Color="#5dffffff"/>
+    <SolidColorBrush x:Key="Brush.Foreground.Medium" Color="#70ffffff"/>
+    <SolidColorBrush x:Key="Brush.Foreground.Disabled" Color="#5Dffffff"/>
     <SolidColorBrush x:Key="Brush.FocusVisual" Color="#FFFFFF"/>
 
     <SolidColorBrush x:Key="Brush.Window.Background" Color="#202020"/>
@@ -56,6 +57,20 @@
     <SolidColorBrush x:Key="Brush.Button.Background.Accent.Disabled" Color="#28ffffff"/>
     <SolidColorBrush x:Key="Brush.Button.Foreground.Accent.Disabled" Color="#87ffffff"/>
 
+    <!--Hyperlink Button-->
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Background" Color="Transparent"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground" Color="#99EBFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Icon" Color="#99EBFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Background.Hover" Color="#0FFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Hover" Color="#99EBFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Icon.Hover" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Background.Pressed" Color="#0BFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Pressed" Color="#60CDFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Icon.Pressed" Color="#60CDFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Background.Disabled" Color="Transparent"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Disabled" Color="#5DFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Icon.Disabled" Color="#5DFFFFFF"/>
+
     <!--CheckBox-->
     <SolidColorBrush x:Key="Brush.CheckBox.Background" Color="#1a000000"/>
     <SolidColorBrush x:Key="Brush.CheckBox.Border" Color="#8bffffff"/>
@@ -78,14 +93,34 @@
 
     <!--ContextMenu-->
     <SolidColorBrush x:Key="Brush.ContextMenu.Background" Color="#2E2E2E"/>
-    <SolidColorBrush x:Key="Brush.ContextMenu.BorderBrush" Color="#14FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.ContextMenu.Border" Color="#33000000"/>
     <DropShadowEffect x:Key="Brush.ContextMenu.Shadow" Color="#000000" BlurRadius="16" ShadowDepth="8" Opacity="0.26" RenderingBias="Performance"/>
 
-    <SolidColorBrush x:Key="Brush.Menu.Foreground" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="Brush.Menu.Foreground.Weak" Color="#c8ffffff"/>
-    <SolidColorBrush x:Key="Brush.Menu.Background.Hover" Color="#0fffffff"/>
+    <!--ComboBox-->
+    <DropShadowEffect x:Key="Brush.ComboBox.Shadow" Color="#000000" BlurRadius="8" ShadowDepth="0" Opacity="0.14" RenderingBias="Performance"/>
 
-    <SolidColorBrush x:Key="Brush.Separator.Background" Color="#1a000000"/>
+    <!--Tooltip-->
+    <DropShadowEffect x:Key="Brush.Tooltip.Shadow" Color="#000000" BlurRadius="6" ShadowDepth="0" Opacity="0.26" RenderingBias="Performance"/>
+
+    <!--ListItem • MenuItem-->
+    <SolidColorBrush x:Key="Brush.Item.Foreground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Background.Hover" Color="#0FFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Foreground.Hover" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Background.Pressed" Color="#0BFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Foreground.Pressed" Color="#C8FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Background.Disabled" Color="Transparent"/>
+    <SolidColorBrush x:Key="Brush.Item.Foreground.Disabled" Color="#5DFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Background.Selected" Color="#0FFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Background.Selected.Hover" Color="#0BFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Background.Selected.Pressed" Color="#0FFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Background.Selected.Disabled" Color="#0FFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Hint" Color="#C8FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Hint.Disabled" Color="#5DFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Glyph" Color="#60CDFF"/>
+    <SolidColorBrush x:Key="Brush.Item.Glyph.Disabled" Color="#28FFFFFF"/>
+
+    <!--Separator-->
+    <SolidColorBrush x:Key="Brush.Separator.Background" Color="#15FFFFFF"/>
 
     <!--Hyperlink-->
     <SolidColorBrush x:Key="Brush.Hyperlink.Foreground" Color="#99EBFF"/>
@@ -98,4 +133,19 @@
     <!--ScrollBar-->
     <SolidColorBrush x:Key="Brush.ScrollBar.Foreground" Color="#8bffffff"/>
     <SolidColorBrush x:Key="Brush.ScrollBar.Background" Color="#f52c2c2c"/>
+
+    <!--InfoBar-->
+    <SolidColorBrush x:Key="Brush.InfoBar.Background" Color="#08FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Border" Color="#1A000000"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Glyph" Color="#60CDFF"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Glyph.Foreground" Color="#000000"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Background.Warning" Color="#433519"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Border.Warning" Color="#433519"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Glyph.Warning" Color="#FCE100"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Background.Error" Color="#442726"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Border.Error" Color="#1A000000"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Glyph.Error" Color="#FF99A4"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Background.Success" Color="#393D1B"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Border.Success" Color="#1A000000"/>
+    <SolidColorBrush x:Key="Brush.InfoBar.Glyph.Success" Color="#6CCB5F"/>
 </ResourceDictionary>

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ScreenToGif.Controls.Recorder;
 
-public class BaseScreenRecorder : BaseRecorder, IDisposable
+public class BaseScreenRecorderOld : BaseRecorderOld, IDisposable
 {
     #region Variables
 
@@ -33,7 +33,7 @@ public class BaseScreenRecorder : BaseRecorder, IDisposable
 
     #endregion
     
-    public BaseScreenRecorder()
+    public BaseScreenRecorderOld()
     {
         GarbageTimer.Interval = 3000;
         GarbageTimer.Elapsed += GarbageTimer_Tick;

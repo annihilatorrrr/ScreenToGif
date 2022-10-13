@@ -36,10 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Recorders\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Resource Include="Resources\Logo.ico" />
   </ItemGroup>
 
@@ -51,6 +47,9 @@
     <Page Update="Resources\Colors\Light.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\Drawings.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Resources\Localizations\StringResources.ar.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

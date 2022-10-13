@@ -15,6 +15,8 @@ public static class BackdropHelper
 
     public static void SetBackdrop(this Window window, SystemBackdropTypes type)
     {
+        //TODO: Dispose somehow the handle?
+
         var handle = window.GetHandle();
 
         //Apply fallback color for titlebar.

@@ -140,14 +140,13 @@ public class SelectControl : Control
 
     public static readonly DependencyProperty FinishedSelectionProperty = DependencyProperty.Register(nameof(FinishedSelection), typeof(bool), typeof(SelectControl), new PropertyMetadata(false));
 
-    public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(nameof(Mode), typeof(ModeType), typeof(SelectControl), new PropertyMetadata(ModeType.Region));
+    public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(nameof(Mode), typeof(RegionSelectionModes), typeof(SelectControl), new PropertyMetadata(RegionSelectionModes.Region));
 
     public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register(nameof(Scale), typeof(double), typeof(SelectControl), new PropertyMetadata(1d));
 
     public static readonly DependencyProperty EmbeddedModeProperty = DependencyProperty.Register(nameof(EmbeddedMode), typeof(bool), typeof(SelectControl), new PropertyMetadata(false));
 
     public static readonly DependencyProperty AnimateBorderProperty = DependencyProperty.Register(nameof(AnimateBorder), typeof(bool), typeof(SelectControl), new PropertyMetadata(false));
-
 
     public static readonly RoutedEvent MouseHoveringEvent = EventManager.RegisterRoutedEvent(nameof(MouseHovering), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(SelectControl));
 
@@ -203,9 +202,9 @@ public class SelectControl : Control
         set => SetValue(FinishedSelectionProperty, value);
     }
 
-    public ModeType Mode
+    public RegionSelectionModes Mode
     {
-        get => (ModeType)GetValue(ModeProperty);
+        get => (RegionSelectionModes)GetValue(ModeProperty);
         set => SetValue(ModeProperty, value);
     }
 
@@ -336,7 +335,7 @@ public class SelectControl : Control
     {
         _startPoint = e.GetPosition(this);
 
-        if (Mode == ModeType.Region)
+        if (Mode == RegionSelectionModes.Region)
         {
             Selected = new Rect(e.GetPosition(this), new Size(0, 0));
             FinishedSelection = false;
@@ -351,7 +350,7 @@ public class SelectControl : Control
         {
             if (Selected.Width > 0 && Selected.Height > 0)
             {
-                if (Mode == ModeType.Window && _hitTestWindow != null)
+                if (Mode == RegionSelectionModes.Window && _hitTestWindow != null)
                     User32.SetForegroundWindow(_hitTestWindow.Handle);
 
                 Selected = Selected.Offset(-1);
@@ -365,7 +364,7 @@ public class SelectControl : Control
 
     protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
     {
-        if (Mode == ModeType.Region)
+        if (Mode == RegionSelectionModes.Region)
             Retry();
 
         e.Handled = true;
@@ -374,7 +373,7 @@ public class SelectControl : Control
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
-        if (Mode == ModeType.Region)
+        if (Mode == RegionSelectionModes.Region)
         {
             var current = e.GetPosition(this);
 
@@ -418,7 +417,7 @@ public class SelectControl : Control
 
     protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
     {
-        if (Mode == ModeType.Region)
+        if (Mode == RegionSelectionModes.Region)
         {
             ReleaseMouseCapture();
 
@@ -452,7 +451,7 @@ public class SelectControl : Control
         e.Handled = true;
         base.OnPreviewKeyDown(e);
 
-        if (Mode != ModeType.Region || Selected.IsEmpty)
+        if (Mode != RegionSelectionModes.Region || Selected.IsEmpty)
             return;
 
         var step = (Keyboard.Modifiers & ModifierKeys.Alt) != 0 ? 5 : 1;
@@ -596,7 +595,7 @@ public class SelectControl : Control
     private void AdjustZoomView(Point point)
     {
         //_bottom.IsVisible
-        if (BackImage == null || Mode != ModeType.Region || !UserSettings.All.Magnifier || (Selected.Width > 10 && Selected.Height > 10 && Selected.Offset(5).Contains(point)) || _blindSpots.Any(x => x.Contains(point)))
+        if (BackImage == null || Mode != RegionSelectionModes.Region || !UserSettings.All.Magnifier || (Selected.Width > 10 && Selected.Height > 10 && Selected.Offset(5).Contains(point)) || _blindSpots.Any(x => x.Contains(point)))
         {
             _zoomGrid.Visibility = Visibility.Hidden;
             return;
@@ -648,7 +647,7 @@ public class SelectControl : Control
     private void AdjustZoomViewDetached(Point point)
     {
         //If it should not display the zoom view.
-        if (BackImage == null || Mode != ModeType.Region || !UserSettings.All.Magnifier || (Selected.Width > 10 && Selected.Height > 10 && Selected.Offset(5).Contains(point)) || _blindSpots.Any(x => x.Contains(point)))
+        if (BackImage == null || Mode != RegionSelectionModes.Region || !UserSettings.All.Magnifier || (Selected.Width > 10 && Selected.Height > 10 && Selected.Offset(5).Contains(point)) || _blindSpots.Any(x => x.Contains(point)))
         {
             //_regionMagnifier.Hide();
             return;
@@ -923,7 +922,7 @@ public class SelectControl : Control
     {
         _blindSpots.Clear();
 
-        if (Mode != ModeType.Region || !UserSettings.All.Magnifier)
+        if (Mode != RegionSelectionModes.Region || !UserSettings.All.Magnifier)
             return;
 
         //If nothing selected, only the Close button will appear.
@@ -1109,7 +1108,7 @@ public class SelectControl : Control
 
         #endregion
 
-        if (Mode == ModeType.Fullscreen)
+        if (Mode == RegionSelectionModes.Fullscreen)
         {
             var viewBox = new Viewbox
             {
@@ -1138,7 +1137,7 @@ public class SelectControl : Control
             Canvas.SetTop(viewBox, 0);
             Panel.SetZIndex(viewBox, 0);
         }
-        else if (Mode == ModeType.Window)
+        else if (Mode == RegionSelectionModes.Window)
         {
             foreach (var window in Windows)
             {
@@ -1272,7 +1271,7 @@ public class SelectControl : Control
         }
 
         //In a predetermined selection mode (window or screen)
-        if (control.Mode == ModeType.Fullscreen || control.Mode == ModeType.Window)
+        if (control.Mode == RegionSelectionModes.Fullscreen || control.Mode == RegionSelectionModes.Window)
         {
             control.NonExpandedSelection = control.Selected.Offset(0); //In this case Offset is just rounding the selection points.
             control.NonExpandedNativeSelection = control.Selected.Scale(control.Scale);
@@ -1299,7 +1298,7 @@ public class SelectControl : Control
 
     private void Rectangle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (Mode != ModeType.Region)
+        if (Mode != RegionSelectionModes.Region)
             return;
 
         _startPoint = e.GetPosition(this);
@@ -1319,7 +1318,7 @@ public class SelectControl : Control
 
     private void Rectangle_MouseMove(object sender, MouseEventArgs e)
     {
-        if (Mode != ModeType.Region || !_rectangle.IsMouseCaptured || e.LeftButton != MouseButtonState.Pressed)
+        if (Mode != RegionSelectionModes.Region || !_rectangle.IsMouseCaptured || e.LeftButton != MouseButtonState.Pressed)
             return;
 
         //A quick double click will fire this event, when it should fire the OnMouseLeftButtonUp.
@@ -1358,7 +1357,7 @@ public class SelectControl : Control
 
     private void Rectangle_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (Mode != ModeType.Region)
+        if (Mode != RegionSelectionModes.Region)
             return;
 
         if (_rectangle.IsMouseCaptured)

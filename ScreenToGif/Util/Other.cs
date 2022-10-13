@@ -132,19 +132,19 @@ public static class Other
         return new Size(Math.Round(size.Width * scale, MidpointRounding.AwayFromZero), Math.Round(size.Height * scale, MidpointRounding.AwayFromZero));
     }
 
-    internal static Point Scale(this Point point, double scale)
-    {
-        return new Point(Math.Round(point.X * scale, MidpointRounding.AwayFromZero), Math.Round(point.Y * scale, MidpointRounding.AwayFromZero));
-    }
+    //internal static Point Scale(this Point point, double scale)
+    //{
+    //    return new Point(Math.Round(point.X * scale, MidpointRounding.AwayFromZero), Math.Round(point.Y * scale, MidpointRounding.AwayFromZero));
+    //}
 
     
-    public static List<DetectedRegion> AdjustPosition(this List<DetectedRegion> list, double x, double y)
-    {
-        foreach (var region in list)
-            region.Bounds = new Rect(new Point(region.Bounds.X - x, region.Bounds.Y - y), region.Bounds.Size);
+    //public static List<DetectedRegion> AdjustPosition(this List<DetectedRegion> list, double x, double y)
+    //{
+    //    foreach (var region in list)
+    //        region.Bounds = new Rect(new Point(region.Bounds.X - x, region.Bounds.Y - y), region.Bounds.Size);
 
-        return list;
-    }
+    //    return list;
+    //}
 
     [Obsolete("Use LocalizationHelper.Get() instead")]
     public static string TextResource(this FrameworkElement visual, string key, string defaultValue = "")

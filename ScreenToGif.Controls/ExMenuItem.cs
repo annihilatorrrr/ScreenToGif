@@ -1,89 +1,32 @@
-using System.ComponentModel;
+using ScreenToGif.Domain.Enums;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace ScreenToGif.Controls;
 
-/// <summary>
-/// MenuItem with an image to the left.
-/// </summary>
 public class ExMenuItem : MenuItem
 {
     #region Variables
 
-    public static new readonly DependencyProperty IconProperty = DependencyProperty.Register(nameof(Icon), typeof(Brush), typeof(ExMenuItem), new FrameworkPropertyMetadata(Icon_Changed));
-
-    public static readonly DependencyProperty ContentHeightProperty = DependencyProperty.Register(nameof(ContentHeight), typeof(double), typeof(ExMenuItem), new FrameworkPropertyMetadata(16d));
-
-    public static readonly DependencyProperty ContentWidthProperty = DependencyProperty.Register(nameof(ContentWidth), typeof(double), typeof(ExMenuItem), new FrameworkPropertyMetadata(16d));
+    public static new readonly DependencyProperty IconProperty = DependencyProperty.Register(nameof(Icon), typeof(FluentSymbols), typeof(ExMenuItem), new FrameworkPropertyMetadata(FluentSymbols.None));
 
     public static readonly DependencyProperty TextWrappingProperty = DependencyProperty.Register(nameof(TextWrapping), typeof(TextWrapping), typeof(ExMenuItem), new FrameworkPropertyMetadata(TextWrapping.NoWrap,
         FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
-
-    public static readonly DependencyProperty HasIconProperty = DependencyProperty.Register(nameof(HasIcon), typeof(bool), typeof(ExMenuItem), new FrameworkPropertyMetadata(false));
 
     #endregion
 
     #region Properties
 
-    /// <summary>
-    /// The icon of the button as a Brush.
-    /// </summary>
-    [Description("The icon of the button as a Brush.")]
-    public new Brush Icon
+    public new FluentSymbols Icon
     {
-        get => (Brush)GetValue(IconProperty);
-        set
-        {
-            SetCurrentValue(IconProperty, value);
-            SetCurrentValue(HasIconProperty, value != null);
-        }
-    }
-
-    /// <summary>
-    /// The height of the button content.
-    /// </summary>
-    [Description("The height of the button content."), Category("Common")]
-    public double ContentHeight
-    {
-        get => (double)GetValue(ContentHeightProperty);
-        set => SetCurrentValue(ContentHeightProperty, value);
-    }
-
-    /// <summary>
-    /// The width of the button content.
-    /// </summary>
-    [Description("The width of the button content."), Category("Common")]
-    public double ContentWidth
-    {
-        get => (double)GetValue(ContentWidthProperty);
-        set => SetCurrentValue(ContentWidthProperty, value);
+        get => (FluentSymbols)GetValue(IconProperty);
+        set => SetCurrentValue(IconProperty, value);
     }
 
     public TextWrapping TextWrapping
     {
         get => (TextWrapping)GetValue(TextWrappingProperty);
         set => SetCurrentValue(TextWrappingProperty, value);
-    }
-
-    /// <summary>
-    /// True if the menu item contains an icon.
-    /// </summary>
-    [Description("True if the menu item contains an icon.")]
-    public bool HasIcon
-    {
-        get => (bool)GetValue(HasIconProperty);
-        set => SetCurrentValue(HasIconProperty, value);
-    }
-    
-    #endregion
-
-    #region Property Changed
-
-    private static void Icon_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        ((ExMenuItem)d).HasIcon = e.NewValue != null;
     }
 
     #endregion

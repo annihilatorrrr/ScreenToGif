@@ -113,7 +113,7 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
         CanExecutePredicate = o =>
         {
             //True if all windows are not Recorders.
-            return Application.Current?.Windows.OfType<Window>().All(a => a is not BaseRecorder) ?? false;
+            return Application.Current?.Windows.OfType<Window>().All(a => a is not BaseRecorderOld) ?? false;
         },
         ExecuteAction = a =>
         {
@@ -147,7 +147,7 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
         CanExecutePredicate = o =>
         {
             //True if all windows are not Recorders.
-            return Application.Current?.Windows.OfType<Window>().All(a => a is not BaseRecorder) ?? false;
+            return Application.Current?.Windows.OfType<Window>().All(a => a is not BaseRecorderOld) ?? false;
         },
         ExecuteAction = a =>
         {
@@ -170,7 +170,7 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
         CanExecutePredicate = o =>
         {
             //True if all windows are not Recorders.
-            return Application.Current?.Windows.OfType<Window>().All(a => a is not BaseRecorder) ?? false;
+            return Application.Current?.Windows.OfType<Window>().All(a => a is not BaseRecorderOld) ?? false;
         },
         ExecuteAction = a =>
         {
@@ -334,7 +334,7 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
         CanExecutePredicate = o =>
         {
             //TODO: Check if there's anything open or anything happening with editors.
-            return Application.Current?.Windows.OfType<BaseRecorder>().All(a => a.Stage != RecorderStages.Recording) ?? false;
+            return Application.Current?.Windows.OfType<BaseRecorderOld>().All(a => a.Stage != RecorderStages.Recording) ?? false;
         },
         ExecuteAction = a =>
         {
@@ -354,7 +354,7 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
 
     private async Task RecorderCallback(Window caller, EditorEx editor, object sender, EventArgs args)
     {
-        var window = sender as BaseRecorder;
+        var window = sender as BaseRecorderOld;
 
         if (window?.Project != null && window.Project.Any)
         {
@@ -442,7 +442,7 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
                     {
                         if (!OpenRecorder.CanExecute(null))
                         {
-                            var rec = Application.Current.Windows.OfType<BaseRecorder>().FirstOrDefault();
+                            var rec = Application.Current.Windows.OfType<BaseRecorderOld>().FirstOrDefault();
 
                             if (rec != null)
                             {
@@ -462,7 +462,7 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
                     {
                         if (!OpenWebcamRecorder.CanExecute(null))
                         {
-                            var rec = Application.Current.Windows.OfType<BaseRecorder>().FirstOrDefault();
+                            var rec = Application.Current.Windows.OfType<BaseRecorderOld>().FirstOrDefault();
 
                             if (rec != null)
                             {
@@ -482,7 +482,7 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
                     {
                         if (!OpenBoardRecorder.CanExecute(null))
                         {
-                            var rec = Application.Current.Windows.OfType<BaseRecorder>().FirstOrDefault();
+                            var rec = Application.Current.Windows.OfType<BaseRecorderOld>().FirstOrDefault();
 
                             if (rec != null)
                             {

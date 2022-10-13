@@ -542,5 +542,11 @@ namespace ScreenToGif.Native.External
 
         [DllImport(Constants.User32, SetLastError = true)]
         public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        [DllImport(Constants.User32, SetLastError = true)]
+        public static extern bool EnableMenuItem(IntPtr hMenu, SysCommands uIdEnableItem, uint uEnable);
+
+        [DllImport(Constants.User32)]
+        public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
     }
 }

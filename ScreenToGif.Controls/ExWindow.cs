@@ -127,8 +127,10 @@ public class ExWindow : Window
         CommandBindings.Add(new CommandBinding(SystemCommands.CloseWindowCommand, (_, _) => SystemCommands.CloseWindow(this)));
 
         base.OnApplyTemplate();
-    }
 
+        this.SetResizeMode();
+    }
+    
     private IntPtr Window_Hook(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
     {
         switch ((WindowsMessages)msg)
@@ -257,9 +259,9 @@ public class ExWindow : Window
             return;
 
         if (window.ShowMinimizeButton)
-            window.DisableMinimize();
+            window.EnableMinimize(); 
         else
-            window.EnableMinimize();
+            window.DisableMinimize();
     }
 
     private static void ShowMaximizeButton_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -268,9 +270,9 @@ public class ExWindow : Window
             return;
 
         if (window.ShowMaximizeButton)
-            window.DisableMaximize();
-        else
             window.EnableMaximize();
+        else
+            window.DisableMaximize();
     }
 
     private static void WindowBackdrop_PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

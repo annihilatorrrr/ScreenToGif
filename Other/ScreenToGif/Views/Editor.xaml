@@ -53,7 +53,7 @@
 
             <!--Right: Special action buttons: Export, Update, etc.-->
             <Grid Grid.Column="2" Margin="3">
-                <c:ExButton Text="Export..." Command="{Binding ExportCommand}"/>
+                <c:ExButton Content="Export..." Command="{Binding ExportCommand}"/>
             </Grid>
         </Grid>
 

@@ -21,7 +21,7 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace ScreenToGif.Windows;
 
-public partial class Webcam : BaseRecorder
+public partial class Webcam : BaseRecorderOld
 {
     #region Variables
 

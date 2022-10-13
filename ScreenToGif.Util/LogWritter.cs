@@ -1,5 +1,5 @@
-using System.IO;
 using ScreenToGif.Util.Settings;
+using System.IO;
 
 namespace ScreenToGif.Util;
 

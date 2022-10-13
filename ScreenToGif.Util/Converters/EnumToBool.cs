@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Data;
 
 namespace ScreenToGif.Util.Converters;

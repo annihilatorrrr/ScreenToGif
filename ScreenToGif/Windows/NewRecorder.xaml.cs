@@ -31,7 +31,7 @@ using Size = System.Windows.Size;
 
 namespace ScreenToGif.Windows;
 
-public partial class NewRecorder : BaseScreenRecorder
+public partial class NewRecorder : BaseScreenRecorderOld
 {
     #region Variables
 
@@ -40,7 +40,7 @@ public partial class NewRecorder : BaseScreenRecorder
     /// <summary>
     /// The view model of the recorder.
     /// </summary>
-    private readonly ScreenRecorderViewModel _viewModel;
+    private readonly ScreenRecorderViewModelOld _viewModel;
 
     /// <summary>
     /// Keyboard and mouse hooks helper.
@@ -154,7 +154,7 @@ public partial class NewRecorder : BaseScreenRecorder
 
         #region Model and commands
 
-        DataContext = _viewModel = new ScreenRecorderViewModel();
+        DataContext = _viewModel = new ScreenRecorderViewModelOld();
 
         RegisterCommands();
 
@@ -534,17 +534,17 @@ public partial class NewRecorder : BaseScreenRecorder
 
     private async void RegionButton_Click(object sender, RoutedEventArgs e)
     {
-        await PickRegion(ModeType.Region);
+        await PickRegion(RegionSelectionModes.Region);
     }
 
     private async void WindowButton_Click(object sender, RoutedEventArgs e)
     {
-        await PickRegion(ModeType.Window);
+        await PickRegion(RegionSelectionModes.Window);
     }
 
     private async void FullScreenButton_Click(object sender, RoutedEventArgs e)
     {
-        await PickRegion(ModeType.Fullscreen);
+        await PickRegion(RegionSelectionModes.Fullscreen);
     }
 
 
@@ -890,7 +890,7 @@ public partial class NewRecorder : BaseScreenRecorder
         else
         {
             MoveCommandPanel();
-            DisplaySelection((ModeType)UserSettings.All.RecorderModeIndex);
+            DisplaySelection((RegionSelectionModes)UserSettings.All.RecorderModeIndex);
         }
 
         #endregion
@@ -909,8 +909,8 @@ public partial class NewRecorder : BaseScreenRecorder
         CommandBindings.Clear();
         CommandBindings.AddRange(new CommandBindingCollection
         {
-            new CommandBinding(_viewModel.CloseCommand, (_, _) => Close(),
-                (_, args) => args.CanExecute = Stage == RecorderStages.Stopped || (UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && (Project == null || !Project.Any))),
+            //new CommandBinding(_viewModel.CloseCommand, (_, _) => Close(),
+            //    (_, args) => args.CanExecute = Stage == RecorderStages.Stopped || (UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && (Project == null || !Project.Any))),
 
             new CommandBinding(_viewModel.OptionsCommand, ShowOptions,
                 (_, args) => args.CanExecute = (Stage != RecorderStages.Recording || UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction) && Stage != RecorderStages.PreStarting),
@@ -994,7 +994,7 @@ public partial class NewRecorder : BaseScreenRecorder
 
                     if (_viewModel.Region.IsEmpty)
                     {
-                        await PickRegion((ModeType)ReselectSplitButton.SelectedIndex, true);
+                        await PickRegion((RegionSelectionModes)ReselectSplitButton.SelectedIndex, true);
 
                         if (_viewModel.Region.IsEmpty)
                             return;
@@ -1137,7 +1137,7 @@ public partial class NewRecorder : BaseScreenRecorder
 
         if (_viewModel.Region.IsEmpty)
         {
-            await PickRegion((ModeType)ReselectSplitButton.SelectedIndex, true);
+            await PickRegion((RegionSelectionModes)ReselectSplitButton.SelectedIndex, true);
 
             if (_viewModel.Region.IsEmpty)
                 return;
@@ -1388,7 +1388,7 @@ public partial class NewRecorder : BaseScreenRecorder
         Capture.Start(IsAutomaticCapture(), GetCaptureInterval(), (int)CaptureRegion.X, (int)CaptureRegion.Y, (int)CaptureRegion.Width, (int)CaptureRegion.Height, _regionSelection.Scale, Project);
     }
 
-    private async Task PickRegion(ModeType mode, bool quickSelection = false)
+    private async Task PickRegion(RegionSelectionModes mode, bool quickSelection = false)
     {
         _regionSelection.Hide();
         Hide();
@@ -1422,7 +1422,7 @@ public partial class NewRecorder : BaseScreenRecorder
         Show();
     }
 
-    private void DisplaySelection(ModeType? mode = null, Monitor display = null)
+    private void DisplaySelection(RegionSelectionModes? mode = null, Monitor display = null)
     {
         if (_viewModel.Region.IsEmpty)
         {
@@ -1445,7 +1445,7 @@ public partial class NewRecorder : BaseScreenRecorder
     {
         switch (UserSettings.All.RecorderModeIndex)
         {
-            case (int)ModeType.Window:
+            case (int)RegionSelectionModes.Window:
             {
                 SizeTextBlock.ToolTip = null;
 
@@ -1462,7 +1462,7 @@ public partial class NewRecorder : BaseScreenRecorder
                 SizeTextBlock.Visibility = Visibility.Collapsed;
                 return;
             }
-            case (int)ModeType.Fullscreen:
+            case (int)RegionSelectionModes.Fullscreen:
             {
                 SizeGrid.Visibility = Visibility.Collapsed;
                 SizeTextBlock.Visibility = Visibility.Visible;

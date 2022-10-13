@@ -15,8 +15,16 @@
             <RowDefinition Height="80"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" x:Name="TitleTextBlock" Text="Title" FontWeight="SemiBold" FontSize="20" FontFamily="Segoe UI" TextWrapping="Wrap" Margin="24,24,24,6"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
+            <c:SymbolIcon Grid.Column="0" Symbol="HeartBrokenFilled" FontSize="30" Foreground="#880000" Margin="24,22,0,0"/>
+            <TextBlock Grid.Column="1" x:Name="TitleTextBlock" Text="Title" FontWeight="SemiBold" FontSize="20" FontFamily="Segoe UI" TextWrapping="Wrap" Margin="6,24,24,6"/>
+        </Grid>
+        
         <ScrollViewer Grid.Row="1" Margin="24,6,24,24" VerticalScrollBarVisibility="Auto">
             <TextBlock x:Name="DetailsTextBlock" FontWeight="Regular" FontSize="14" FontFamily="Segoe UI" TextWrapping="Wrap">
                 <Run x:Name="DetailsRun">Content</Run>
@@ -31,8 +39,8 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <c:ExButton Grid.Column="0" x:Name="DismissButton" Text="{DynamicResource S.Dialog.Error.Dismiss}" Margin="24,24,4,24" IsAccented="True" IsDefault="True" Click="DismissButton_Click"/>
-            <c:ExButton Grid.Column="1" x:Name="FeedbackButton" Text="{DynamicResource S.Dialog.Error.SendFeedback}" Margin="4,24,24,24" Click="FeedbackButton_Click"/>
+            <c:ExButton Grid.Column="0" x:Name="DismissButton" Content="{DynamicResource S.Dialog.Error.Dismiss}" Margin="24,24,4,24" IsAccented="True" IsDefault="True" Click="DismissButton_Click"/>
+            <c:ExButton Grid.Column="1" x:Name="FeedbackButton" Content="{DynamicResource S.Dialog.Error.SendFeedback}" Margin="4,24,24,24" Click="FeedbackButton_Click"/>
         </Grid>
     </Grid>
 </c:ExWindow>

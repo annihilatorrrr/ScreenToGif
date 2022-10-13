@@ -130,7 +130,7 @@ public class SelectControlOld : Control
 
     public static readonly DependencyProperty FinishedSelectionProperty = DependencyProperty.Register(nameof(FinishedSelection), typeof(bool), typeof(SelectControlOld), new PropertyMetadata(false));
 
-    public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(nameof(Mode), typeof(ModeType), typeof(SelectControlOld), new PropertyMetadata(ModeType.Region, Mode_Changed));
+    public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(nameof(Mode), typeof(RegionSelectionModes), typeof(SelectControlOld), new PropertyMetadata(RegionSelectionModes.Region, Mode_Changed));
 
     public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register(nameof(Scale), typeof(double), typeof(SelectControlOld), new PropertyMetadata(1d, Mode_Changed));
 
@@ -170,9 +170,9 @@ public class SelectControlOld : Control
         set => SetValue(FinishedSelectionProperty, value);
     }
 
-    public ModeType Mode
+    public RegionSelectionModes Mode
     {
-        get => (ModeType)GetValue(ModeProperty);
+        get => (RegionSelectionModes)GetValue(ModeProperty);
         set => SetValue(ModeProperty, value);
     }
 
@@ -302,7 +302,7 @@ public class SelectControlOld : Control
     {
         _startPoint = e.GetPosition(this);
 
-        if (Mode == ModeType.Region)
+        if (Mode == RegionSelectionModes.Region)
         {
             Selected = new Rect(e.GetPosition(this), new Size(0, 0));
             FinishedSelection = false;
@@ -315,7 +315,7 @@ public class SelectControlOld : Control
         }
         else
         {
-            if (Mode == ModeType.Window && _hitTestWindow != null)
+            if (Mode == RegionSelectionModes.Window && _hitTestWindow != null)
                 User32.SetForegroundWindow(_hitTestWindow.Handle);
 
             if (Selected.Width > 0 && Selected.Height > 0)
@@ -328,7 +328,7 @@ public class SelectControlOld : Control
 
     protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
     {
-        if (Mode == ModeType.Region)
+        if (Mode == RegionSelectionModes.Region)
             Retry();
 
         e.Handled = true;
@@ -337,7 +337,7 @@ public class SelectControlOld : Control
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
-        if (Mode == ModeType.Region)
+        if (Mode == RegionSelectionModes.Region)
         {
             var current = e.GetPosition(this);
 
@@ -377,7 +377,7 @@ public class SelectControlOld : Control
 
     protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
     {
-        if (Mode == ModeType.Region)
+        if (Mode == RegionSelectionModes.Region)
         {
             ReleaseMouseCapture();
 
@@ -411,7 +411,7 @@ public class SelectControlOld : Control
         e.Handled = true;
         base.OnPreviewKeyDown(e);
 
-        if (Mode != ModeType.Region || Selected.IsEmpty)
+        if (Mode != RegionSelectionModes.Region || Selected.IsEmpty)
             return;
 
         //Control + Shift: Expand both ways.
@@ -550,7 +550,7 @@ public class SelectControlOld : Control
 
     private void AdjustZoomView(Point point)
     {
-        if (BackImage == null || Mode != ModeType.Region || !UserSettings.All.Magnifier || (_bottom.IsVisible && Selected.Contains(point)) || _blindSpots.Any(x => x.Contains(point)))
+        if (BackImage == null || Mode != RegionSelectionModes.Region || !UserSettings.All.Magnifier || (_bottom.IsVisible && Selected.Contains(point)) || _blindSpots.Any(x => x.Contains(point)))
         {
             _zoomGrid.Visibility = Visibility.Hidden;
             return;
@@ -829,7 +829,7 @@ public class SelectControlOld : Control
     {
         _blindSpots.Clear();
 
-        if (Mode != ModeType.Region || !UserSettings.All.Magnifier)
+        if (Mode != RegionSelectionModes.Region || !UserSettings.All.Magnifier)
             return;
 
         //If nothing selected, only the Close button will appear.
@@ -903,9 +903,9 @@ public class SelectControlOld : Control
 
     public void AdjustMode()
     {
-        if (Mode == ModeType.Window)
+        if (Mode == RegionSelectionModes.Window)
             Windows = Util.Native.Windows.EnumerateWindows(Scale).AdjustPosition(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop);
-        else if (Mode == ModeType.Fullscreen)
+        else if (Mode == RegionSelectionModes.Fullscreen)
             Windows = MonitorHelper.AllMonitorsScaled(Scale, true).Select(x => new DetectedRegion(x.Handle, x.Bounds.Offset(-1), x.Name)).ToList();
         else
             Windows.Clear();
@@ -1012,7 +1012,7 @@ public class SelectControlOld : Control
 
         #endregion
 
-        if (Mode == ModeType.Fullscreen)
+        if (Mode == RegionSelectionModes.Fullscreen)
         {
             foreach (var monitor in Monitors)
             {
@@ -1044,7 +1044,7 @@ public class SelectControlOld : Control
                 Panel.SetZIndex(viewBox, 0);
             }
         }
-        else if (Mode == ModeType.Window)
+        else if (Mode == RegionSelectionModes.Window)
         {
             foreach (var window in Windows)
             {
@@ -1237,7 +1237,7 @@ public class SelectControlOld : Control
 
     private void Rectangle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (Mode != ModeType.Region)
+        if (Mode != RegionSelectionModes.Region)
             return;
 
         _startPoint = e.GetPosition(this);
@@ -1257,7 +1257,7 @@ public class SelectControlOld : Control
 
     private void Rectangle_MouseMove(object sender, MouseEventArgs e)
     {
-        if (Mode != ModeType.Region || !_rectangle.IsMouseCaptured || e.LeftButton != MouseButtonState.Pressed) return;
+        if (Mode != RegionSelectionModes.Region || !_rectangle.IsMouseCaptured || e.LeftButton != MouseButtonState.Pressed) return;
 
         //A quick double click will fire this event, when it should fire the OnMouseLeftButtonUp.
         if (Selected.IsEmpty || Selected.Width < 10 || Selected.Height < 10)
@@ -1294,7 +1294,7 @@ public class SelectControlOld : Control
 
     private void Rectangle_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (Mode != ModeType.Region)
+        if (Mode != RegionSelectionModes.Region)
             return;
 
         if (_rectangle.IsMouseCaptured)

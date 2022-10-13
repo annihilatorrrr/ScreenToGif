@@ -38,7 +38,7 @@ public partial class EditorEx : Window
         CommandBindings.Clear();
         CommandBindings.AddRange(new[]
         {
-            new CommandBinding(_viewModel.NewScreenRecordingCommand, NewScreenRecorderExecuted, (_, e) => e.CanExecute = !_viewModel.IsLoading && !e.Handled && Application.Current.Windows.OfType<Window>().All(a => a is not BaseRecorder)),
+            new CommandBinding(_viewModel.NewScreenRecordingCommand, NewScreenRecorderExecuted, (_, e) => e.CanExecute = !_viewModel.IsLoading && !e.Handled && Application.Current.Windows.OfType<Window>().All(a => a is not BaseRecorderOld)),
             new CommandBinding(_viewModel.ExportCommand, ExportExecuted, _viewModel.ExportCanExecute),
         });
     }

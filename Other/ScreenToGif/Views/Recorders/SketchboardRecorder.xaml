@@ -1,0 +1,14 @@
+<c:ExWindow x:Class="ScreenToGif.Views.Recorders.SketchboardRecorder"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:local="clr-namespace:ScreenToGif.Views.Recorders"
+            xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
+            mc:Ignorable="d"
+            Title="SketchboardRecorder" Height="450" Width="800" ResizeMode="CanMinimize">
+
+    <Grid>
+        
+    </Grid>
+</c:ExWindow>

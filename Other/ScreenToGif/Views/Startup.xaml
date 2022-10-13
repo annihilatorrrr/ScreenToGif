@@ -3,47 +3,89 @@
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
             xmlns:u="clr-namespace:ScreenToGif.Util.Settings;assembly=ScreenToGif.Util"
-            Title="{DynamicResource S.StartUp.Title}" Height="220" Width="500"
-            MinWidth="500" MinHeight="220" UseLayoutRounding="True"
-            ShowCustomCaptionButtons="True" ShowMaximizeButton="False" ShowMinimizeButton="False"
+            Title="{DynamicResource S.StartUp.Title}" Height="380" Width="700"
+            MinHeight="380" MinWidth="700" MaxHeight="600" MaxWidth="900" UseLayoutRounding="True"
+            ShowCustomCaptionButtons="True" WindowStyle="None" ShowMaximizeButton="False" ShowMinimizeButton="False"
             Initialized="Startup_Initialized" Loaded="Startup_Loaded" Closing="Startup_Closing">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="45"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition />
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="100"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" Background="{DynamicResource Brush.Dialog.Background.Alt}">
+            <Grid Margin="10,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
-            <TextBlock Grid.Column="0" Text="ScreenToGif" Margin="10,10,5,10" FontSize="18" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Foreground}"/>
-            <TextBlock Grid.Column="1" Text="{Binding Source={x:Static u:UserSettings.All}, Path=VersionText, Mode=OneWay}"
-                       Margin="0,10" FontSize="18" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Foreground}"/>
+                <TextBlock Grid.Row="0" Margin="0" FontSize="16" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Foreground}">
+                    <Run Text="ScreenToGif "/>
+                    <Run Text="{Binding Source={x:Static u:UserSettings.All}, Path=VersionText, Mode=OneWay}"/>
+                </TextBlock>
 
-            <c:ExButton Grid.Column="2" Command="{Binding OptionsCommand}" Icon="Aqua" Margin="5"/>
-        </Grid>
+                <c:ExButton Grid.Row="2" Command="{Binding ScreenRecorderCommand}" Margin="6,3" Padding="6,4" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:SymbolIcon Symbol="Desktop" FontSize="18"/>
+                        <TextBlock Text="Screen Recorder" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </c:ExButton>
 
-        <c:InfoBar Grid.Row="1" x:Name="InfoBar" Title="Update Available" Description="Version 3.1"/>
+                <c:ExButton Grid.Row="3" Command="{Binding WebcamRecorderCommand}" Margin="6,3" Padding="6,4" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:SymbolIcon Symbol="Camera" FontSize="18"/>
+                        <TextBlock Text="Webcam Recorder" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </c:ExButton>
 
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+                <c:ExButton Grid.Row="4" Command="{Binding BoardRecorderCommand}" Margin="6,3" Padding="6,4" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:SymbolIcon Symbol="InkStroke" FontSize="18"/>
+                        <TextBlock Text="Sketchboard Recorder" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </c:ExButton>
 
-            <c:ExButton Grid.Column="0" Command="{Binding ScreenRecorderCommand}" Text="Screen Recorder" Margin="10,10,5,10"/>
-            <c:ExButton Grid.Column="1" Command="{Binding WebcamRecorderCommand}" Text="Webcam Recorder" Margin="5,10,5,10"/>
-            <c:ExButton Grid.Column="2" Command="{Binding BoardRecorderCommand}" Text="Board Recorder" Margin="5,10,5,10"/>
-            <c:ExButton Grid.Column="3" Command="{Binding EditorCommand}" Text="Editor" Margin="5,10,10,10"/>
+                <c:ExButton Grid.Row="5" Command="{Binding EditorCommand}" Margin="6,3" Padding="6,4" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:SymbolIcon Symbol="WindowEdit" FontSize="18"/>
+                        <TextBlock Text="Editor" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </c:ExButton>
+
+                <c:ExButton Grid.Row="6" Command="{Binding OptionsCommand}" Margin="6,3" Padding="6,4" ToolTip="Options" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:SymbolIcon Symbol="Setting" FontSize="18"/>
+                        <TextBlock Text="Options" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </c:ExButton>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="10,30,10,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <c:InfoBar Grid.Row="0" x:Name="InfoBar" Title="Update Available" Description="Version 3.1" Margin="6" Visibility="Visible">
+                <c:ExButton Content="Update Now" Command="{Binding UpdateCommand}" TextWrapping="NoWrap"/>
+            </c:InfoBar>
+
+            <!--Maybe display the "No projects opened" centered, outside of the scrollviewer.-->
+
+            <ScrollViewer Grid.Row="1">
+                <StackPanel>
+                    <TextBlock Text="No recent projects or other files opened" Foreground="{DynamicResource Brush.Foreground.Medium}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,10" FontSize="13"/>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </c:ExWindow>

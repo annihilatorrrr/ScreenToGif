@@ -1,0 +1,62 @@
+<Window x:Class="ScreenToGif.Views.Recorders.RegionSelector"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
+        xmlns:v="clr-namespace:ScreenToGif.Util.Converters;assembly=ScreenToGif.Util"
+        xmlns:e="clr-namespace:ScreenToGif.Domain.Enums;assembly=ScreenToGif.Domain"
+        Title="ScreenToGif" Height="Auto" Width="Auto" WindowStyle="None" AllowsTransparency="True" Topmost="True"
+        ResizeMode="NoResize" UseLayoutRounding="True" SnapsToDevicePixels="True" Background="Transparent" ShowInTaskbar="False">
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <ThicknessAnimation Storyboard.TargetName="ControlsBorder" Storyboard.TargetProperty="Margin" From="0,-50,0,0" To="0,10,0,0" Duration="0:0:0.1" FillBehavior="HoldEnd"/>
+                    <DoubleAnimation Storyboard.TargetName="SelectElement" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.1" FillBehavior="HoldEnd"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <Window.Resources>
+        <v:EnumToBool x:Key="Converter.EnumToBool"/>
+    </Window.Resources>
+
+    <Grid>
+        <c:ScreenSelector x:Name="SelectElement" Opacity="0.5" Mode="{Binding SelectionMode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Focusable="False"
+                          SelectionChanged="SelectElement_SelectionChanged" MouseHovering="SelectElement_MouseHovering" SelectionAccepted="SelectElement_SelectionAccepted"/>
+
+        <Border x:Name="ControlsBorder" Background="{DynamicResource Brush.Dialog.Background.Alt}" Height="48" Width="179" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-40,0,0">
+            <Grid Margin="2,3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="42"/>
+                    <ColumnDefinition Width="42"/>
+                    <ColumnDefinition Width="42"/>
+                    <ColumnDefinition Width="7"/>
+                    <ColumnDefinition Width="42"/>
+                </Grid.ColumnDefinitions>
+
+                <ToggleButton Grid.Column="0" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}" ToolTip="R"
+                              IsChecked="{Binding SelectionMode, Converter={StaticResource Converter.EnumToBool}, ConverterParameter={x:Static e:RegionSelectionModes.Region}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding ChangeModeCommand}">
+                    <c:SymbolIcon Symbol="Hint"/>
+                </ToggleButton>
+
+                <ToggleButton Grid.Column="1" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}"
+                              IsChecked="{Binding SelectionMode, Converter={StaticResource Converter.EnumToBool}, ConverterParameter={x:Static e:RegionSelectionModes.Window}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding ChangeModeCommand}">
+                    <c:SymbolIcon Symbol="Window"/>
+                </ToggleButton>
+
+                <ToggleButton Grid.Column="2" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}"
+                              IsChecked="{Binding SelectionMode, Converter={StaticResource Converter.EnumToBool}, ConverterParameter={x:Static e:RegionSelectionModes.Fullscreen}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding ChangeModeCommand}">
+                    <c:SymbolIcon Symbol="Fit"/>
+                </ToggleButton>
+
+                <Separator Grid.Column="3" Width="1" Margin="2,0,0,0"/>
+
+                <c:ExButton Grid.Column="4" Margin="6" Width="30" Height="30" Command="{Binding CancelCommand}" Style="{StaticResource Style.Button.Borderless}">
+                    <c:SymbolIcon Symbol="Dismiss"/>
+                </c:ExButton>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
