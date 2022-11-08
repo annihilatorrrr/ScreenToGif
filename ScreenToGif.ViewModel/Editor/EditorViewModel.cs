@@ -1,3 +1,4 @@
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Domain.ViewModels;
 using ScreenToGif.Util.Project;
@@ -11,12 +12,12 @@ using System.Windows.Threading;
 
 namespace ScreenToGif.ViewModel.Editor;
 
-public partial class EditorViewModel : BaseViewModel
+public partial class EditorViewModel : BaseViewModel, IEditorViewModel
 {
     #region Variables
 
     private ProjectViewModel _project;
-    private TimeSpan _current = TimeSpan.Zero;
+    private long _current;
     private int _currentIndex = -1;
     private WriteableBitmap _renderedImage;
     private IntPtr _renderedImageBackBuffer;
@@ -53,7 +54,7 @@ public partial class EditorViewModel : BaseViewModel
         }
     }
 
-    public TimeSpan Current
+    public long Current
     {
         get => _current;
         set
@@ -172,6 +173,7 @@ public partial class EditorViewModel : BaseViewModel
         //  Pass the created progress reporter.
         //Cancelable.
         //  Pass token.
+        //TODO: The conversion is not that difficult anymore.
 
         var cached = await project.ConvertToCachedProject();
         Project = ProjectViewModel.FromModel(cached, this);
@@ -188,7 +190,7 @@ public partial class EditorViewModel : BaseViewModel
         Render();
     }
 
-    internal void Render()
+    public void Render()
     {
         if (RenderedImage == null)
             return;
@@ -274,7 +276,7 @@ public partial class EditorViewModel : BaseViewModel
         //Maybe simply store in a byte array and leave in memory.
     }
 
-    public void Seek(TimeSpan timeStamp)
+    public void Seek(long timeStamp)
     {
         //Display mode:
         //  By timestamp

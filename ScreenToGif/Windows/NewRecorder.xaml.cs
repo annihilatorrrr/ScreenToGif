@@ -3,6 +3,7 @@ using ScreenToGif.Controls.Recorder;
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Events;
 using ScreenToGif.Domain.Exceptions;
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models;
 using ScreenToGif.Domain.Models.Native;
 using ScreenToGif.Domain.Models.Project.Recording;
@@ -1422,7 +1423,7 @@ public partial class NewRecorder : BaseScreenRecorderOld
         Show();
     }
 
-    private void DisplaySelection(RegionSelectionModes? mode = null, Monitor display = null)
+    private void DisplaySelection(RegionSelectionModes? mode = null, IMonitor display = null)
     {
         if (_viewModel.Region.IsEmpty)
         {
@@ -1582,7 +1583,7 @@ public partial class NewRecorder : BaseScreenRecorderOld
         MovePanelTo(_viewModel.CurrentMonitor, _viewModel.Region.Left + _viewModel.Region.Width / 2 - ActualWidth / 2, _viewModel.Region.Top + _viewModel.Region.Height / 2 - ActualHeight / 2);
     }
 
-    private void MovePanelTo(Monitor monitor, double left, double top)
+    private void MovePanelTo(IMonitor monitor, double left, double top)
     {
         if (_viewModel.CurrentControlMonitor?.Handle != monitor.Handle || _viewModel.CurrentControlMonitor?.Scale != monitor.Scale)
         {

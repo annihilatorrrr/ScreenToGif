@@ -1,6 +1,6 @@
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Cached.Sequences;
 using ScreenToGif.Util;
-using ScreenToGif.ViewModel.Editor;
 using ScreenToGif.ViewModel.Project.Sequences.SubSequences;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
@@ -20,7 +20,7 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
         set => SetProperty(ref _cursorEvents, value);
     }
 
-    public static CursorSequenceViewModel FromModel(CursorSequence sequence, EditorViewModel baseViewModel)
+    public static CursorSequenceViewModel FromModel(CursorSequence sequence, IEditorViewModel baseViewModel)
     {
         return new CursorSequenceViewModel
         {
@@ -42,9 +42,9 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
         };
     }
 
-    public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, TimeSpan timestamp, double quality, string cachePath)
+    public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath)
     {
-        var ticks = (ulong)timestamp.Ticks;
+        var ticks = (ulong)timestamp;
 
         //Get first cursor after timestamp.
         var cursor = CursorEvents.FirstOrDefault(f => f.TimeStampInTicks >= ticks);

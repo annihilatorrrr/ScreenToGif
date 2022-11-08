@@ -7,10 +7,13 @@
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/CheckBox.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/ComboBox.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/DisplayTimer.xaml"/>
-        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/MenuItem.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Hyperlink.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/InfoBar.xaml"/>
+        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/MenuItem.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/ScreenSelector.xaml"/>
+        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/SplitButton.xaml"/>
+        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Stepper.xaml"/>
+        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/TextBox.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Timeline.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:s="clr-namespace:System;assembly=System.Runtime"
              xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
+             xmlns:v="clr-namespace:ScreenToGif.ViewModel;assembly=ScreenToGif.ViewModel"
              ShutdownMode="OnExplicitShutdown" Startup="App_Startup" Exit="App_Exit"
              DispatcherUnhandledException="App_DispatcherUnhandledException">
 
@@ -46,7 +47,8 @@
                 <ResourceDictionary Source="/Resources/Localizations/StringResources.en.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!--How to instantiate the notify icon and its inner props? and then bing everything-->
+            <v:AppViewModel x:Key="AppViewModel"/>
+
             <c:NotifyIcon x:Key="NotifyIcon" IconSource="/Resources/Logo.ico" NotifyToolTipText="ScreenToGif" Visibility="Collapsed"
                           LeftClickCommand="{Binding TrayLeftClick}" DoubleLeftClickCommand="{Binding TrayDoubleLeftClick}" MiddleClickCommand="{Binding TrayMiddleClick}">
                 <c:NotifyIcon.ContextMenu>
@@ -58,7 +60,7 @@
                         <c:ExMenuItem Header="{StaticResource S.StartUp.Editor}" Icon="WindowEdit" Command="{Binding EditorCommand}" InputGestureText="{Binding EditorGesture, UpdateSourceTrigger=PropertyChanged}" Tag="S.StartUp.Editor"/>
                         <c:ExMenuItem Header="{StaticResource S.StartUp.Options}" Icon="Setting" Command="{Binding OptionsCommand}" InputGestureText="{Binding OptionsGesture, UpdateSourceTrigger=PropertyChanged}" Tag="S.StartUp.Options"/>
                         <c:ExMenuItem Header="{StaticResource S.Feedback.Feedback}" Icon="HeartBroken" Command="{Binding FeedbackCommand}" Tag="S.Feedback.Feedback"/>
-                        <c:ExMenuItem Header="{StaticResource S.Troubleshoot.Title}" Icon="Sync" Command="{Binding TroubleshootCommand}" Tag="S.Troubleshoot.Title"/>
+                        <c:ExMenuItem Header="{StaticResource S.Troubleshoot.Title}" Icon="ArrowSyncCircle" Command="{Binding TroubleshootCommand}" Tag="S.Troubleshoot.Title"/>
                         <Separator/>
                         <c:ExMenuItem Header="{StaticResource S.Exit}" Icon="Dismiss" Command="{Binding ExitApplicationCommand}" InputGestureText="{Binding ExitGesture, UpdateSourceTrigger=PropertyChanged}" Tag="S.Exit"/>
                     </ContextMenu>
@@ -98,6 +100,8 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+
+            <!--Style for MenuItem-->
 
             <!--ComboBoxItem-->
             <Style TargetType="{x:Type ComboBoxItem}">
@@ -433,6 +437,103 @@
                 </Style.Triggers>
             </Style>
 
+            <ControlTemplate x:Key="Template.RepeatButton.Simple" TargetType="RepeatButton">
+                <Grid/>
+            </ControlTemplate>
+
+            <ControlTemplate x:Key="Template.Slider.Thumb" TargetType="{x:Type Thumb}">
+                <Border x:Name="OutterBorder" Background="{DynamicResource Brush.Fill.Control.Solid.Default}" Padding="4" BorderBrush="{DynamicResource Brush.Elevation.Circle.Border}" BorderThickness="1" CornerRadius="999">
+                    <Border x:Name="InnerBorder" Background="{DynamicResource Brush.Fill.Accent.Default}" CornerRadius="999"/>
+                </Border>
+
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="OutterBorder" Property="Padding" Value="3"/>
+                        <Setter TargetName="InnerBorder" Property="Background" Value="{DynamicResource Brush.Fill.Accent.Secondary}"/>
+                    </Trigger>
+
+                    <Trigger Property="IsDragging" Value="True">
+                        <Setter TargetName="OutterBorder" Property="Padding" Value="5"/>
+                        <Setter TargetName="OutterBorder" Property="BorderBrush" Value="{DynamicResource Brush.Stroke.Control.Default}"/>
+                        <Setter TargetName="InnerBorder" Property="Background" Value="{DynamicResource Brush.Fill.Accent.Tertiary}"/>
+                    </Trigger>
+
+                    <Trigger Property="IsDragging" Value="True">
+                        <Setter TargetName="OutterBorder" Property="Padding" Value="5"/>
+                        <Setter TargetName="OutterBorder" Property="BorderBrush" Value="{DynamicResource Brush.Stroke.Control.Default}"/>
+                        <Setter TargetName="InnerBorder" Property="Background" Value="{DynamicResource Brush.Fill.Accent.Tertiary}"/>
+                    </Trigger>
+
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter TargetName="InnerBorder" Property="Background" Value="{DynamicResource Brush.Fill.Accent.Disabled}"/>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+
+            <!--Slider-->
+            <Style TargetType="{x:Type Slider}">
+                <Setter Property="Background" Value="{DynamicResource Brush.Fill.Control.Strong.Default}"/>
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Slider">
+                            <Grid x:Name="HorizontalTemplate" Background="#01000000">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TickBar x:Name="TopTick" Grid.Row="0" Fill="{TemplateBinding BorderBrush}" TickFrequency="1" Height="4" Margin="0,0,0,2" Placement="Top" Visibility="Collapsed"/>
+                                <TickBar x:Name="BottomTick" Grid.Row="2" Fill="{TemplateBinding BorderBrush}" TickFrequency="1" Height="4" Margin="0,1,0,0" Placement="Bottom" Visibility="Collapsed"/>
+
+                                <Border x:Name="TrackBorder" Grid.Row="1" Background="{TemplateBinding Background}" BorderThickness="0" Height="3" CornerRadius="2" VerticalAlignment="Center" Margin="4,0">
+                                    <Canvas Margin="-6,-1">
+                                        <Rectangle x:Name="PART_SelectionRange" Fill="{DynamicResource Brush.Fill.Accent.Default}" Height="4.0" Visibility="Hidden"/>
+                                    </Canvas>
+                                </Border>
+
+                                <Track Grid.Row="1" x:Name="PART_Track">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton x:Name="HorizontalTrackLargeChangeDecreaseRepeatButton" Template="{StaticResource Template.RepeatButton.Simple}" Background="Transparent" IsTabStop="False" ClickMode="Release"/>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton x:Name="HorizontalTrackLargeChangeIncreaseRepeatButton" Template="{StaticResource Template.RepeatButton.Simple}" Background="Transparent" IsTabStop="False" ClickMode="Release"/>
+                                    </Track.IncreaseRepeatButton>
+
+                                    <Track.Thumb>
+                                        <Thumb x:Name="HorizontalThumb" Height="20" Width="20" Template="{StaticResource Template.Slider.Thumb}"/>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="TickPlacement" Value="BottomRight">
+                                    <Setter Property="Visibility" TargetName="BottomTick" Value="Visible"/>
+                                </Trigger>
+
+                                <Trigger Property="TickPlacement" Value="TopLeft">
+                                    <Setter Property="Visibility" TargetName="TopTick" Value="Visible"/>
+                                </Trigger>
+
+                                <Trigger Property="TickPlacement" Value="Both">
+                                    <Setter Property="Visibility" TargetName="TopTick" Value="Visible"/>
+                                    <Setter Property="Visibility" TargetName="BottomTick" Value="Visible"/>
+                                </Trigger>
+
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Background" Value="{DynamicResource Brush.Fill.Control.Solid.Default}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Elevation.Circle.Border}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--ExSlider-->
+            <Style TargetType="{x:Type c:ExSlider}" BasedOn="{StaticResource {x:Type Slider}}"></Style>
+
             <!--ToggleButton-->
             <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                 <Setter Property="Background" Value="{DynamicResource Brush.Button.Background}"/>
@@ -533,7 +634,7 @@
                 </Style.Triggers>
             </Style>
 
-            <!--Button • Borderless-->
+            <!--ToggleButton • Borderless-->
             <Style x:Key="Style.ToggleButton.Borderless" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Item.Foreground}"/>
@@ -685,6 +786,49 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
+            <!--ToggleButton • Borderless-->
+            <Style x:Key="Style.RepeatButton.Borderless" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource {x:Type RepeatButton}}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Item.Foreground}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="Padding" Value="2"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="FocusVisualStyle" Value="{DynamicResource Style.FocusVisual}"/>
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type RepeatButton}">
+                            <Border x:Name="MainBorder" BorderBrush="Transparent" BorderThickness="0" Padding="{TemplateBinding Padding}"
+                                    CornerRadius="4" MinHeight="{TemplateBinding MinHeight}" Background="{TemplateBinding Background}">
+                                <ContentPresenter x:Name="ContentPresenter" Focusable="False" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource Brush.Item.Background.Hover}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Item.Foreground.Hover}"/>
+                    </Trigger>
+
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource Brush.Item.Background.Pressed}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Item.Foreground.Pressed}"/>
+                    </Trigger>
+
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="{DynamicResource Brush.Item.Background.Disabled}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Item.Foreground.Disabled}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

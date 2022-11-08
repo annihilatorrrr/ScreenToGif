@@ -11,14 +11,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 
 namespace ScreenToGif.Views.Recorders;
 
 public partial class RegionSelector : Window
 {
     private readonly RegionSelectorViewModel _viewModel;
-    private Action<IMonitor, Rect> _selected;
+    private Action<RegionSelectionModes, IMonitor, Rect> _selected;
     private Action<IMonitor> _gotHover;
     private Action<RegionSelectionModes> _modeChanged;
     private Action _aborted;
@@ -37,7 +36,7 @@ public partial class RegionSelector : Window
         });
     }
 
-    public void Select(IMonitor monitor, Action<IMonitor, Rect> selected, Action<IMonitor> gotHover, Action<RegionSelectionModes> modeChanged, Action aborted)
+    public void Select(IMonitor monitor, RegionSelectionModes mode, Action<RegionSelectionModes, IMonitor, Rect> selected, Action<IMonitor> gotHover, Action<RegionSelectionModes> modeChanged, Action aborted)
     {
         //Resize to fit given window.
         Left = monitor.Bounds.Left;
@@ -46,6 +45,7 @@ public partial class RegionSelector : Window
         Height = monitor.Bounds.Height;
 
         _viewModel.Monitor = monitor;
+        _viewModel.SelectionMode = mode;
 
         _selected = selected;
         _gotHover = gotHover;
@@ -64,20 +64,28 @@ public partial class RegionSelector : Window
         }
 
         //Get only the windows that are located inside the given screen.
-        var win = Util.Native.Windows.EnumerateWindowsByMonitor(monitor);
-
+        var windows = WindowHelper.EnumerateWindowsByMonitor(monitor);
+         
         //Since each region selector is attached to a single screen, the list of positions must be translated.
-        _viewModel.Windows = win.AdjustPosition(monitor.Bounds.Left, monitor.Bounds.Top);
+        _viewModel.Windows = windows.AdjustPosition(monitor.Bounds.Left, monitor.Bounds.Top);
         _viewModel.Monitors = new List<DetectedRegion>
         {
             new(monitor.Handle, new Rect(new Size(monitor.Bounds.Width, monitor.Bounds.Height)), monitor.Name)
         };
 
-        ControlsBorder.MouseEnter += (sender, args) => SelectElement.HideZoom();
+        ControlsBorder.MouseEnter += (sender, args) =>
+        {
+            SelectElement.HideZoom();
+
+            if (SelectElement.Mode != RegionSelectionModes.Region)
+                SelectElement.Retry();
+        };
 
         Show();
 
         this.MoveToScreen(monitor, true);
+
+        UpdateToCurrentMode();
     }
 
     public void ClearHoverEffects()
@@ -85,7 +93,7 @@ public partial class RegionSelector : Window
         SelectElement.HideZoom();
     }
 
-    private void ChangeMode_Executed(object sender, ExecutedRoutedEventArgs e)
+    private void UpdateToCurrentMode()
     {
         switch (_viewModel.SelectionMode)
         {
@@ -109,6 +117,16 @@ public partial class RegionSelector : Window
                 break;
             }
         }
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        Activate();
+    }
+
+    private void ChangeMode_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        UpdateToCurrentMode();
 
         _modeChanged.Invoke(_viewModel.SelectionMode);
     }
@@ -146,7 +164,8 @@ public partial class RegionSelector : Window
 
     private void SelectElement_SelectionAccepted(object sender, RoutedEventArgs e)
     {
-        _selected.Invoke(_viewModel.Monitor, SelectElement.Selected.Translate(_viewModel.Monitor.Bounds.Left, _viewModel.Monitor.Bounds.Top)); //NonExpandedSelection
+        _selected.Invoke(_viewModel.SelectionMode, _viewModel.Monitor, SelectElement.Selected.Translate(_viewModel.Monitor.Bounds.Left, _viewModel.Monitor.Bounds.Top)); //NonExpandedSelection
+
         Close();
     }
 }

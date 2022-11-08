@@ -86,7 +86,7 @@ namespace ScreenToGif.Util.Native
 
         public static Image CaptureWindow(IntPtr handle, double scale)
         {
-            var rectangle = Windows.GetWindowRect(handle);
+            var rectangle = WindowHelper.GetWindowRect(handle);
             var posX = (int)((rectangle.X + Util.Constants.LeftOffset) * scale);
             var posY = (int)((rectangle.Y + Util.Constants.TopOffset) * scale);
             var width = (int)((rectangle.Width - Util.Constants.HorizontalOffset) * scale);

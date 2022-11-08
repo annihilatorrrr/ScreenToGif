@@ -303,17 +303,17 @@ internal class ApplicationViewModelOld : ApplicationBaseViewModel
 
     public ICommand TrayLeftClick => new RelayCommand
     {
-        ExecuteAction = a => Interact(UserSettings.All.LeftClickAction, UserSettings.All.LeftOpenWindow)
+        //ExecuteAction = a => Interact(UserSettings.All.LeftClickAction, UserSettings.All.LeftOpenWindow)
     };
 
     public ICommand TrayDoubleLeftClick => new RelayCommand
     {
-        ExecuteAction = a => Interact(UserSettings.All.DoubleLeftClickAction, UserSettings.All.DoubleLeftOpenWindow)
+        //ExecuteAction = a => Interact(UserSettings.All.DoubleLeftClickAction, UserSettings.All.DoubleLeftOpenWindow)
     };
 
     public ICommand TrayMiddleClick => new RelayCommand
     {
-        ExecuteAction = a => Interact(UserSettings.All.MiddleClickAction, UserSettings.All.MiddleOpenWindow)
+        //ExecuteAction = a => Interact(UserSettings.All.MiddleClickAction, UserSettings.All.MiddleOpenWindow)
     };
 
     public ICommand PromptUpdate => new RelayCommand

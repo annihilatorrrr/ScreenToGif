@@ -2,37 +2,108 @@
             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
-            Title="ScreenToGif • Update" MinHeight="280" MinWidth="600" Width="600" Height="400"
-            WindowStyle="None" Topmost="True" WindowStartupLocation="CenterScreen">
+            xmlns:m="clr-namespace:MdXaml;assembly=MdXaml"
+            xmlns:s="clr-namespace:System;assembly=System.Runtime"
+            Title="ScreenToGif • Update" MinHeight="400" MinWidth="750" Width="750" Height="400"
+            WindowStyle="None" Topmost="True" WindowStartupLocation="CenterScreen"
+            Loaded="Window_Loaded" Closing="Window_Closing">
+
+    <c:ExWindow.Resources>
+        <Style x:Key="Style.FlowDocument" TargetType="FlowDocument" BasedOn="{x:Static m:MarkdownStyle.Standard}">
+            <Style.Resources>
+                <Style TargetType="{x:Type Paragraph}">
+                    <Setter Property="Margin" Value="4,8,0,6"/>
+
+                    <Style.Triggers>
+                        <Trigger Property="Tag" Value="Heading1">
+                            <Setter Property="FontSize" Value="22"/>
+                            <Setter Property="FontWeight" Value="Medium"/>
+                            <Setter Property="Margin" Value="0"/>
+                        </Trigger>
+
+                        <Trigger Property="Tag" Value="Heading3">
+                            <Setter Property="FontSize" Value="18"/>
+                            <Setter Property="FontWeight" Value="Medium"/>
+                            <Setter Property="Margin" Value="0"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+
+                <Style TargetType="Hyperlink">
+                    <Setter Property="TextDecorations" Value="None" />
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Accent}"/>
+
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource Brush.Hyperlink.Background.Hover}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource Brush.Hyperlink.Foreground.Hover}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource Brush.Hyperlink.Foreground.Disabled}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Cursor" Value="No"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Style.Resources>
+        </Style>
+    </c:ExWindow.Resources>
 
     <Grid Background="{DynamicResource Brush.Dialog.Background.Alt}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="80"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" x:Name="TitleTextBlock" Text="Update available" FontWeight="SemiBold" FontSize="20" FontFamily="Segoe UI" Margin="24,24,24,6"/>
+        <TextBlock Grid.Row="0" x:Name="TitleTextBlock" Text="Update available" FontWeight="SemiBold" FontSize="20" FontFamily="Segoe UI" Margin="24,20,24,6"/>
 
-        <ScrollViewer Grid.Row="1" Margin="24,6,24,24" VerticalScrollBarVisibility="Auto">
-            <TextBlock x:Name="DetailsTextBlock" FontWeight="Regular" FontSize="14" FontFamily="Segoe UI">
-                <Run x:Name="DetailsRun">Content</Run>
+        <c:InfoBar x:Name="InfoBar" Grid.Row="1" Margin="3" IsClosable="False" IsLong="True"/>
 
-                <!--Parse content and display, including pictures and links (a simple markdown parser to FlowDocument).-->
+        <Grid Grid.Row="2" x:Name="VersionCardGrid" Margin="20,10,24,10" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <c:SymbolIcon Grid.Column="0" Symbol="ArrowSyncFilled" FontSize="54">
+                <c:SymbolIcon.Foreground>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="#1493DF" Offset="0"/>
+                        <GradientStop Color="#0669BC" Offset="1"/>
+                    </LinearGradientBrush>
+                </c:SymbolIcon.Foreground>
+            </c:SymbolIcon>
+
+            <TextBlock Grid.Column="1" Margin="5,8">
+                <Run x:Name="VersionRun" Text="{Binding VersionDescription, Mode=OneWay}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Foreground}"/>
+                <LineBreak/>
+                <Run x:Name="SizeRun" Text="{Binding SizeHumanized, Mode=OneWay}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                <Run Text="•" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                <Run x:Name="TypeRun" Text="{Binding TypeDescription, Mode=OneWay}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
             </TextBlock>
-        </ScrollViewer>
+        </Grid>
 
-        <!--Size, file type, version, etc. in a pill or elevated box-->
+        <m:MarkdownScrollViewer Grid.Row="3" x:Name="MarkdownScrollViewer" xml:space="preserve" Margin="30,6,24,30" VerticalScrollBarVisibility="Auto"
+                                Markdown="{Binding Description, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue={x:Static s:String.Empty}}"
+                                MarkdownStyle="{StaticResource Style.FlowDocument}" ClickAction="OpenBrowser"/>
 
-        <Separator Grid.Row="2" Height="1"/>
+        <Separator Grid.Row="4" Height="1"/>
 
-        <Grid Grid.Row="3" Background="{DynamicResource Brush.Window.Background}">
+        <Grid Grid.Row="5" Background="{DynamicResource Brush.Window.Background}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto" MinWidth="180"/>
                 <ColumnDefinition Width="Auto" MinWidth="180"/>
             </Grid.ColumnDefinitions>
+
+            <ProgressBar Grid.Column="0" x:Name="ProgressBar" Visibility="Collapsed" Height="4" Margin="10"/>
 
             <c:ExCheckBox Grid.Column="0" x:Name="RunAfterDownloadCheckBox" Text="Start app after update" Margin="24" IsChecked="False"/>
 

@@ -559,7 +559,7 @@ public partial class Recorder
             Util.Native.Other.DrawFrame(handle, scale);
         }
 
-        var rect = Util.Native.Windows.TrueWindowRectangle(handle);
+        var rect = Util.Native.WindowHelper.TrueWindowRectangle(handle);
 
         #endregion
 

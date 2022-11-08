@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ScreenToGif.Domain.Enums;
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models;
 using ScreenToGif.Domain.Models.Native;
 using ScreenToGif.Util;
@@ -15,11 +16,11 @@ namespace ScreenToGif.Windows.Other;
 
 public partial class RegionSelector : Window
 {
-    public Monitor Monitor { get; set; }
+    public IMonitor Monitor { get; set; }
 
-    private Action<Monitor, Rect> _selected;
-    private Action<Monitor> _changed;
-    private Action<Monitor> _gotHover;
+    private Action<IMonitor, Rect> _selected;
+    private Action<IMonitor> _changed;
+    private Action<IMonitor> _gotHover;
     private Action _aborted;
     private double _scale = 1;
 
@@ -30,7 +31,7 @@ public partial class RegionSelector : Window
     }
 
 
-    public void Select(Monitor monitor, RegionSelectionModes mode, Rect previousRegion, Action<Monitor, Rect> selected, Action<Monitor> changed, Action<Monitor> gotHover, Action aborted)
+    public void Select(IMonitor monitor, RegionSelectionModes mode, Rect previousRegion, Action<IMonitor, Rect> selected, Action<IMonitor> changed, Action<IMonitor> gotHover, Action aborted)
     {
         //Resize to fit given window.
         Left = monitor.Bounds.Left;
@@ -70,7 +71,7 @@ public partial class RegionSelector : Window
         else if (mode == RegionSelectionModes.Window)
         {
             //Get only the windows that are located inside the given screen.
-            var win = Util.Native.Windows.EnumerateWindowsByMonitor(monitor);
+            var win = Util.Native.WindowHelper.EnumerateWindowsByMonitor(monitor);
 
             //Since each region selector is attached to a single screen, the list of positions must be translated.
             SelectControl.Windows = win.AdjustPosition(monitor.Bounds.Left, monitor.Bounds.Top);

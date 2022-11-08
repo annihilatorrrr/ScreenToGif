@@ -4,7 +4,7 @@ namespace ScreenToGif.Domain.Interfaces;
 
 public interface IMonitor
 {
-    IntPtr Handle { get; set; }
+    IntPtr Handle { get; }
 
     Rect Bounds { get; set; }
 
@@ -23,4 +23,6 @@ public interface IMonitor
     double Scale { get; }
 
     bool IsPrimary { get; set; }
+
+
 }

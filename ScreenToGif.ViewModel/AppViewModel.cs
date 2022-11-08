@@ -1,5 +1,6 @@
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.ViewModels;
+using System.Windows;
 
 namespace ScreenToGif.ViewModel;
 
@@ -31,8 +32,15 @@ public class AppViewModel : BaseViewModel
     public UpdaterViewModel UpdaterViewModel
     {
         get => _updaterViewModel;
-        set => SetProperty(ref _updaterViewModel, value);
+        set
+        {
+            SetProperty(ref _updaterViewModel, value);
+
+            OnPropertyChanged(nameof(UpdateVisibility));
+        }
     }
+
+    public Visibility UpdateVisibility => UpdaterViewModel != null ? Visibility.Visible : Visibility.Collapsed;
 
     //Any other global info.
     //Updates

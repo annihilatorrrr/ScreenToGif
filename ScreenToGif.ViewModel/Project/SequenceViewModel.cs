@@ -3,7 +3,6 @@ using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Cached;
 using ScreenToGif.Domain.Models.Project.Cached.Sequences;
 using ScreenToGif.Domain.ViewModels;
-using ScreenToGif.ViewModel.Editor;
 using ScreenToGif.ViewModel.Project.Sequences;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
@@ -21,7 +20,7 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
     private ObservableCollection<object> _effects = new();
     private ulong _streamPosition = 0;
     private string _cachePath = "";
-    private EditorViewModel _editorViewModel = null;
+    private IEditorViewModel _editorViewModel = null;
 
     public int Id
     {
@@ -97,13 +96,13 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
         set => SetProperty(ref _cachePath, value);
     }
 
-    internal EditorViewModel EditorViewModel
+    internal IEditorViewModel EditorViewModel
     {
         get => _editorViewModel;
         set => SetProperty(ref _editorViewModel, value);
     }
 
-    public static SequenceViewModel FromModel(Sequence sequence, EditorViewModel baseViewModel)
+    public static SequenceViewModel FromModel(Sequence sequence, IEditorViewModel baseViewModel)
     {
         switch (sequence)
         {
@@ -122,5 +121,5 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
         return null;
     }
 
-    public abstract void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, TimeSpan timestamp, double quality, string cachePath);
+    public abstract void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath);
 }

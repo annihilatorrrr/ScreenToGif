@@ -32,8 +32,8 @@ public partial class App : Application
 
     internal static NotifyIcon NotifyIcon { get; private set; }
 
-    public static AppViewModel ViewModel { get; } = new();
-
+    public static AppViewModel ViewModel { get; private set; }
+    
     private async void App_Startup(object sender, StartupEventArgs e)
     {
         //Handle unhandled exceptions.
@@ -49,7 +49,7 @@ public partial class App : Application
         //Render mode.
         RenderOptions.ProcessRenderMode = UserSettings.All.DisableHardwareAcceleration ? RenderMode.SoftwareOnly : RenderMode.Default;
 
-        UserSettings.All.MainTheme = AppThemes.Light;
+        UserSettings.All.MainTheme = AppThemes.FollowSystem;
 
         await LocalizationHelper.SelectCulture(UserSettings.All.LanguageCode);
         ThemeHelper.SelectTheme(UserSettings.All.MainTheme);
@@ -114,7 +114,7 @@ public partial class App : Application
                         {
                             if (process != null)
                             {
-                                var handles = Util.Native.Windows.GetWindowHandlesFromProcess(process);
+                                var handles = Util.Native.WindowHelper.GetWindowHandlesFromProcess(process);
 
                                 //Show the window before setting focus.
                                 Native.External.User32.ShowWindow(handles.Count > 0 ? handles[0] : process.Handle, Domain.Enums.Native.ShowWindowCommands.Show);
@@ -146,6 +146,8 @@ public partial class App : Application
         }
 
         #endregion
+
+        ViewModel = (AppViewModel)FindResource("AppViewModel") ?? new AppViewModel();
 
         RegisterViewModelCommands();
         RegisterNotifyIconCommands();
@@ -306,6 +308,8 @@ public partial class App : Application
             new CommandBinding(ViewModel.FeedbackCommand, (sender, _) => OpenFeedback(sender)),
             new CommandBinding(ViewModel.TroubleshootCommand, (sender, _) => OpenTroubleshooter(sender)),
             new CommandBinding(ViewModel.ExitCommand, (sender, _) => ExitApplication(sender), (sender, args) => args.CanExecute = CanExitApplication(sender)),
+
+            //TODO: DoubleClick, LeftClick, MiddleClick
         });
     }
 
@@ -326,9 +330,13 @@ public partial class App : Application
         ViewModel.FeedbackCommand = new RelayCommand(OpenFeedback);
         ViewModel.TroubleshootCommand = new RelayCommand(OpenTroubleshooter);
 
+        ViewModel.TrayLeftClickCommand = new RelayCommand(TrayLeftClick);
+        ViewModel.TrayLeftDoubleClickCommand = new RelayCommand(TrayLeftDoubleClick);
+        ViewModel.TrayMiddleClickCommand = new RelayCommand(TrayMiddleClick);
+
         ViewModel.ClearCacheCommand = new RelayCommand(ClearCache);
         ViewModel.CheckCacheSpaceCommand = new RelayCommand(ClearCache);
-        ViewModel.CheckForUpdatesCommand = new RelayCommand(ClearCache);
+        ViewModel.CheckForUpdatesCommand = new RelayCommand(CheckForUpdates);
         ViewModel.SendFeedbackCommand = new RelayCommand(ClearCache);
 
         ViewModel.ExitCommand = new RelayCommand(CanExitApplication, ExitApplication);

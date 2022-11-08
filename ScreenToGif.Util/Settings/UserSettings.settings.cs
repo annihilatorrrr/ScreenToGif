@@ -1,6 +1,7 @@
 using ScreenToGif.Domain.Enums;
 using System.IO.Compression;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ScreenToGif.Util.Settings;
@@ -49,6 +50,87 @@ public partial class UserSettings
     {
         get => (AppThemes)GetValue(MainThemeOriginal);
         set => SetValue(value, MainThemeOriginal);
+    }
+
+    //Notification icon actions
+
+    private const NotificationIconActions LeftClickActionOriginal = NotificationIconActions.OpenWindow;
+    public NotificationIconActions LeftClickAction
+    {
+        get => (NotificationIconActions)GetValue(LeftClickActionOriginal);
+        set => SetValue(value, LeftClickActionOriginal);
+    }
+
+    private const StartupWindows LeftOpenWindowOriginal = StartupWindows.ScreenRecorder;
+    public StartupWindows LeftOpenWindow
+    {
+        get => (StartupWindows)GetValue(LeftOpenWindowOriginal);
+        set => SetValue(value, LeftOpenWindowOriginal);
+    }
+
+    private const NotificationIconActions DoubleLeftClickActionOriginal = NotificationIconActions.ToggleWindows;
+    public NotificationIconActions DoubleLeftClickAction
+    {
+        get => (NotificationIconActions)GetValue(DoubleLeftClickActionOriginal);
+        set => SetValue(value, LeftClickActionOriginal);
+    }
+
+    private const StartupWindows DoubleLeftOpenWindowOriginal = StartupWindows.None;
+    public StartupWindows DoubleLeftOpenWindow
+    {
+        get => (StartupWindows)GetValue(DoubleLeftOpenWindowOriginal);
+        set => SetValue(value, DoubleLeftOpenWindowOriginal);
+    }
+
+    private const NotificationIconActions MiddleClickActionOriginal = NotificationIconActions.ToggleWindows;
+    public NotificationIconActions MiddleClickAction
+    {
+        get => (NotificationIconActions)GetValue(MiddleClickActionOriginal);
+        set => SetValue(value, MiddleClickActionOriginal);
+    }
+
+    private const StartupWindows MiddleOpenWindowOriginal = StartupWindows.None;
+    public StartupWindows MiddleOpenWindow
+    {
+        get => (StartupWindows)GetValue(MiddleOpenWindowOriginal);
+        set => SetValue(value, MiddleOpenWindowOriginal);
+    }
+
+    //Updates
+
+    private const bool CheckForUpdatesOriginal = true;
+    public bool CheckForUpdates
+    {
+        get => (bool)GetValue(CheckForUpdatesOriginal);
+        set => SetValue(value, CheckForUpdatesOriginal);
+    }
+
+    private const bool PortableUpdateOriginal = false;
+    public bool PortableUpdate
+    {
+        get => (bool)GetValue(PortableUpdateOriginal);
+        set => SetValue(value, PortableUpdateOriginal);
+    }
+
+    private const bool ForceUpdateAsAdminOriginal = false;
+    public bool ForceUpdateAsAdmin
+    {
+        get => (bool)GetValue(ForceUpdateAsAdminOriginal);
+        set => SetValue(value, ForceUpdateAsAdminOriginal);
+    }
+
+    private const bool InstallUpdatesOriginal = false;
+    public bool InstallUpdates
+    {
+        get => (bool)GetValue(InstallUpdatesOriginal);
+        set => SetValue(value, InstallUpdatesOriginal);
+    }
+
+    private const bool PromptToInstallOriginal = true;
+    public bool PromptToInstall
+    {
+        get => (bool)GetValue(PromptToInstallOriginal);
+        set => SetValue(value, PromptToInstallOriginal);
     }
 
     #endregion
@@ -154,6 +236,16 @@ public partial class UserSettings
     {
         get => (int)GetValue(TriggerDelayInteractionOriginal);
         set => SetValue(value, TriggerDelayInteractionOriginal);
+    }
+
+    private const bool IgnoreMouseWheelInteractionOriginal = true;
+    /// <summary>
+    /// ignore mouse wheel events, in the "interaction" capture mode.
+    /// </summary>
+    public bool IgnoreMouseWheelInteraction
+    {
+        get => (bool)GetValue(IgnoreMouseWheelInteractionOriginal);
+        set => SetValue(value, IgnoreMouseWheelInteractionOriginal);
     }
 
     private const int PlaybackDelayMinuteOriginal = 66;
@@ -287,6 +379,13 @@ public partial class UserSettings
         get => (bool)GetValue(ForceGarbageCollectionOriginal);
         set => SetValue(value, ForceGarbageCollectionOriginal);
     }
+    
+    private readonly Color _regionSelectionColorOriginal = Color.FromArgb(255, 171, 171, 171);
+    public Color RegionSelectionColor
+    {
+        get => (Color)GetValue(_regionSelectionColorOriginal);
+        set => SetValue(value, _regionSelectionColorOriginal);
+    }
 
     //Guidelines.
     private const bool DisplayThirdsGuidelineOriginal = false;
@@ -350,6 +449,157 @@ public partial class UserSettings
     //Options • Webcam Recorder
     //Options • Sketchboard Recorder
     //Options • Editor
+
+    #region Options • Shortcuts
+
+    private const Key RecorderShortcutOriginal = Key.None;
+    public Key RecorderShortcut
+    {
+        get => (Key)GetValue(RecorderShortcutOriginal);
+        set => SetValue(value, RecorderShortcutOriginal);
+    }
+
+    private const ModifierKeys RecorderModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys RecorderModifiers
+    {
+        get => (ModifierKeys)GetValue(RecorderModifiersOriginal);
+        set => SetValue(value, RecorderModifiersOriginal);
+    }
+
+    private const Key WebcamRecorderShortcutOriginal = Key.None;
+    public Key WebcamRecorderShortcut
+    {
+        get => (Key)GetValue(WebcamRecorderShortcutOriginal);
+        set => SetValue(value, WebcamRecorderShortcutOriginal);
+    }
+
+    private const ModifierKeys WebcamRecorderModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys WebcamRecorderModifiers
+    {
+        get => (ModifierKeys)GetValue(WebcamRecorderModifiersOriginal);
+        set => SetValue(value, WebcamRecorderModifiersOriginal);
+    }
+
+    private const Key BoardRecorderShortcutOriginal = Key.None;
+    public Key BoardRecorderShortcut
+    {
+        get => (Key)GetValue(BoardRecorderShortcutOriginal);
+        set => SetValue(value, BoardRecorderShortcutOriginal);
+    }
+
+    private const ModifierKeys BoardRecorderModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys BoardRecorderModifiers
+    {
+        get => (ModifierKeys)GetValue(BoardRecorderModifiersOriginal);
+        set => SetValue(value, BoardRecorderModifiersOriginal);
+    }
+
+    private const Key EditorShortcutOriginal = Key.None;
+    public Key EditorShortcut
+    {
+        get => (Key)GetValue(EditorShortcutOriginal);
+        set => SetValue(value, EditorShortcutOriginal);
+    }
+
+    private const ModifierKeys EditorModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys EditorModifiers
+    {
+        get => (ModifierKeys)GetValue(EditorModifiersOriginal);
+        set => SetValue(value, EditorModifiersOriginal);
+    }
+
+    private const Key OptionsShortcutOriginal = Key.None;
+    public Key OptionsShortcut
+    {
+        get => (Key)GetValue(OptionsShortcutOriginal);
+        set => SetValue(value, OptionsShortcutOriginal);
+    }
+
+    private const ModifierKeys OptionsModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys OptionsModifiers
+    {
+        get => (ModifierKeys)GetValue(OptionsModifiersOriginal);
+        set => SetValue(value, OptionsModifiersOriginal);
+    }
+
+    private const Key ExitShortcutOriginal = Key.None;
+    public Key ExitShortcut
+    {
+        get => (Key)GetValue(ExitShortcutOriginal);
+        set => SetValue(value, ExitShortcutOriginal);
+    }
+
+    private const ModifierKeys ExitModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys ExitModifiers
+    {
+        get => (ModifierKeys)GetValue(ExitModifiersOriginal);
+        set => SetValue(value, ExitModifiersOriginal);
+    }
+
+    private const Key StartPauseShortcutOriginal = Key.F7;
+    public Key StartPauseShortcut
+    {
+        get => (Key)GetValue(StartPauseShortcutOriginal);
+        set => SetValue(value, StartPauseShortcutOriginal);
+    }
+
+    private const ModifierKeys StartPauseModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys StartPauseModifiers
+    {
+        get => (ModifierKeys)GetValue(StartPauseModifiersOriginal);
+        set => SetValue(value, StartPauseModifiersOriginal);
+    }
+
+    private const Key StopShortcutOriginal = Key.F8;
+    public Key StopShortcut
+    {
+        get => (Key)GetValue(StopShortcutOriginal);
+        set => SetValue(value, StopShortcutOriginal);
+    }
+
+    private const ModifierKeys StopModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys StopModifiers
+    {
+        get => (ModifierKeys)GetValue(StopModifiersOriginal);
+        set => SetValue(value, StopModifiersOriginal);
+    }
+
+    private const Key DiscardShortcutOriginal = Key.F9;
+    public Key DiscardShortcut
+    {
+        get => (Key)GetValue(DiscardShortcutOriginal);
+        set => SetValue(value, DiscardShortcutOriginal);
+    }
+
+    private const ModifierKeys DiscardModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys DiscardModifiers
+    {
+        get => (ModifierKeys)GetValue(DiscardModifiersOriginal);
+        set => SetValue(value, DiscardModifiersOriginal);
+    }
+
+    private const Key FollowShortcutOriginal = Key.None;
+    public Key FollowShortcut
+    {
+        get => (Key)GetValue(FollowShortcutOriginal);
+        set => SetValue(value, FollowShortcutOriginal);
+    }
+
+    private const ModifierKeys FollowModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys FollowModifiers
+    {
+        get => (ModifierKeys)GetValue(FollowModifiersOriginal);
+        set => SetValue(value, FollowModifiersOriginal);
+    }
+
+    private const ModifierKeys DisableFollowModifiersOriginal = ModifierKeys.None;
+    public ModifierKeys DisableFollowModifiers
+    {
+        get => (ModifierKeys)GetValue(DisableFollowModifiersOriginal);
+        set => SetValue(value, DisableFollowModifiersOriginal);
+    }
+
+    #endregion
 
     #region Startup
 
@@ -419,5 +669,91 @@ public partial class UserSettings
     //Recorder
     //Webcam Recorder
     //Sketchboard Recorder
+
+    #region Exporter
+
+    private const double ExporterTopOriginal = double.NaN;
+    public double ExporterTop
+    {
+        get => (double)GetValue(ExporterTopOriginal);
+        set => SetValue(value, ExporterTopOriginal);
+    }
+
+    private const double ExporterLeftOriginal = double.NaN;
+    public double ExporterLeft
+    {
+        get => (double)GetValue(ExporterLeftOriginal);
+        set => SetValue(value, ExporterLeftOriginal);
+    }
+
+    private const double ExporterHeightOriginal = double.NaN;
+    public double ExporterHeight
+    {
+        get => (double)GetValue(ExporterHeightOriginal);
+        set => SetValue(value, ExporterHeightOriginal);
+    }
+
+    private const double ExporterWidthOriginal = double.NaN;
+    public double ExporterWidth
+    {
+        get => (double)GetValue(ExporterWidthOriginal);
+        set => SetValue(value, ExporterWidthOriginal);
+    }
+
+    private const WindowState ExporterWindowStateOriginal = WindowState.Normal;
+    public WindowState ExporterWindowState
+    {
+        get => (WindowState)GetValue(ExporterWindowStateOriginal);
+        set => SetValue(value, ExporterWindowStateOriginal);
+    }
+
+    #endregion
+
     //Editor
+
+    #region Editor
+
+    private const double EditorTopOriginal = double.NaN;
+    public double EditorTop
+    {
+        get => (double)GetValue(EditorTopOriginal);
+        set => SetValue(value, EditorTopOriginal);
+    }
+
+    private const double EditorLeftOriginal = double.NaN;
+    public double EditorLeft
+    {
+        get => (double)GetValue(EditorLeftOriginal);
+        set => SetValue(value, EditorLeftOriginal);
+    }
+
+    private const double EditorHeightOriginal = double.NaN;
+    public double EditorHeight
+    {
+        get => (double)GetValue(EditorHeightOriginal);
+        set => SetValue(value, EditorHeightOriginal);
+    }
+
+    private const double EditorWidthOriginal = double.NaN;
+    public double EditorWidth
+    {
+        get => (double)GetValue(EditorWidthOriginal);
+        set => SetValue(value, EditorWidthOriginal);
+    }
+
+    private const WindowState EditorWindowStateOriginal = WindowState.Normal;
+    public WindowState EditorWindowState
+    {
+        get => (WindowState)GetValue(EditorWindowStateOriginal);
+        set => SetValue(value, EditorWindowStateOriginal);
+    }
+
+    private const double TimelineHeightOriginal = 120;
+    public double TimelineHeight
+    {
+        get => (double)GetValue(TimelineHeightOriginal);
+        set => SetValue(value, TimelineHeightOriginal);
+    }
+
+    #endregion
 }

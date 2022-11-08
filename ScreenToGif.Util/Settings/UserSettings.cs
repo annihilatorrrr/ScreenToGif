@@ -712,39 +712,6 @@ public partial class UserSettings : INotifyPropertyChanged
         set => SetValue(value, CheckForTranslationUpdatesOriginal);
     }
 
-    private const bool CheckForUpdatesOriginal = true;
-    public bool CheckForUpdates
-    {
-        get => (bool)GetValue(CheckForUpdatesOriginal);
-        set => SetValue(value, CheckForUpdatesOriginal);
-    }
-
-    private const bool PortableUpdateOriginal = false;
-    public bool PortableUpdate
-    {
-        get => (bool)GetValue(PortableUpdateOriginal);
-        set => SetValue(value, PortableUpdateOriginal);
-    }
-
-    private const bool ForceUpdateAsAdminOriginal = false;
-    public bool ForceUpdateAsAdmin
-    {
-        get => (bool)GetValue(ForceUpdateAsAdminOriginal);
-        set => SetValue(value, ForceUpdateAsAdminOriginal);
-    }
-
-    private const bool InstallUpdatesOriginal = false;
-    public bool InstallUpdates
-    {
-        get => (bool)GetValue(InstallUpdatesOriginal);
-        set => SetValue(value, InstallUpdatesOriginal);
-    }
-
-    public bool PromptToInstall
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
 
     private const bool ShowNotificationIconOriginal = true;
     public bool ShowNotificationIcon
@@ -758,57 +725,6 @@ public partial class UserSettings : INotifyPropertyChanged
     {
         get => (bool)GetValue(KeepOpenOriginal);
         set => SetValue(value, KeepOpenOriginal);
-    }
-
-    /// <summary>
-    /// 0: Do nothing.
-    /// 1: Open a new window.
-    /// 2: Toggle Minimize/Maximize all windows.
-    /// 3: Minimize all windows.
-    /// 4: Maximize all windows.
-    /// </summary>
-    public int LeftClickAction
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// 0: None.
-    /// 1: Startup
-    /// 2: Screen recorder
-    /// 3: Webcam recorder
-    /// 4: Board recorder
-    /// 5: Editor
-    /// </summary>
-    public int LeftOpenWindow
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public int DoubleLeftClickAction
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public int DoubleLeftOpenWindow
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public int MiddleClickAction
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
-    }
-
-    public int MiddleOpenWindow
-    {
-        get => (int)GetValue();
-        set => SetValue(value);
     }
 
     //Workarounds.
@@ -1047,137 +963,7 @@ public partial class UserSettings : INotifyPropertyChanged
     }
 
     #endregion
-
-    #region Options • Shortcuts
-
-    public Key RecorderShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys RecorderModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public Key WebcamRecorderShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys WebcamRecorderModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public Key BoardRecorderShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys BoardRecorderModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public Key EditorShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys EditorModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public Key OptionsShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys OptionsModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public Key ExitShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys ExitModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-
-    public Key StartPauseShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys StartPauseModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public Key StopShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys StopModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public Key DiscardShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys DiscardModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public Key FollowShortcut
-    {
-        get => (Key)GetValue(Key.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys FollowModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    public ModifierKeys DisableFollowModifiers
-    {
-        get => (ModifierKeys)GetValue(ModifierKeys.None);
-        set => SetValue(value);
-    }
-
-    #endregion
+    
 
     #region Options • Language
 
@@ -1304,35 +1090,7 @@ public partial class UserSettings : INotifyPropertyChanged
 
     #region Editor
 
-    public double EditorTop
-    {
-        get => (double)GetValue();
-        set => SetValue(value);
-    }
-
-    public double EditorLeft
-    {
-        get => (double)GetValue();
-        set => SetValue(value);
-    }
-
-    public double EditorHeight
-    {
-        get => (double)GetValue();
-        set => SetValue(value);
-    }
-
-    public double EditorWidth
-    {
-        get => (double)GetValue();
-        set => SetValue(value);
-    }
-
-    public WindowState EditorWindowState
-    {
-        get => (WindowState)GetValue();
-        set => SetValue(value);
-    }
+    
 
     public PasteBehaviors PasteBehavior
     {
@@ -1348,15 +1106,7 @@ public partial class UserSettings : INotifyPropertyChanged
 
     #endregion
 
-    #region Editor • Timeline
 
-    public double TimelineHeight
-    {
-        get => (double)GetValue();
-        set => SetValue(value);
-    }
-    
-    #endregion
 
     #region Editor • New Animation
 

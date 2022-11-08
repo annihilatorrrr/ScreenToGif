@@ -14,6 +14,9 @@ public class InfoBar : ContentControl
     public static readonly DependencyProperty TypeProperty = DependencyProperty.Register(nameof(Type), typeof(StatusTypes), typeof(InfoBar), new PropertyMetadata(default(StatusTypes)));
     public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string), typeof(InfoBar), new PropertyMetadata(default(string)));
     public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description), typeof(string), typeof(InfoBar), new PropertyMetadata(default(string)));
+    public static readonly DependencyProperty IsLongProperty = DependencyProperty.Register(nameof(IsLong), typeof(bool), typeof(InfoBar), new PropertyMetadata(false));
+    public static readonly DependencyProperty IsClosableProperty = DependencyProperty.Register(nameof(IsClosable), typeof(bool), typeof(InfoBar), new PropertyMetadata(true));
+    public static readonly DependencyProperty IsIconVisibleProperty = DependencyProperty.Register(nameof(IsIconVisible), typeof(bool), typeof(InfoBar), new PropertyMetadata(true));
 
     public static readonly RoutedEvent DismissedEvent = EventManager.RegisterRoutedEvent(nameof(Dismissed), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(InfoBar));
 
@@ -33,6 +36,24 @@ public class InfoBar : ContentControl
     {
         get => (string)GetValue(DescriptionProperty);
         set => SetValue(DescriptionProperty, value);
+    }
+
+    public bool IsLong
+    {
+        get => (bool)GetValue(IsLongProperty);
+        set => SetValue(IsLongProperty, value);
+    }
+
+    public bool IsClosable
+    {
+        get => (bool)GetValue(IsClosableProperty);
+        set => SetValue(IsClosableProperty, value);
+    }
+
+    public bool IsIconVisible
+    {
+        get => (bool)GetValue(IsIconVisibleProperty);
+        set => SetValue(IsIconVisibleProperty, value);
     }
 
     /// <summary>
@@ -59,7 +80,7 @@ public class InfoBar : ContentControl
             _suppressButton.Click += (_, _) => Hide();
     }
 
-    public void Show(StatusTypes type, string title, string description)
+    public void Show(StatusTypes type, string title, string description, bool isLong)
     {
         //Collapsed-by-default elements do not apply templates.
         //http://stackoverflow.com/a/2115873/1735672
@@ -69,27 +90,28 @@ public class InfoBar : ContentControl
         Type = type;
         Title = title;
         Description = description;
+        IsLong = isLong;
         Visibility = Visibility.Visible;
     }
 
-    public void Update(string title, string description)
+    public void Update(string title, string description, bool isLong = false)
     {
-        Show(StatusTypes.Update, title, description);
+        Show(StatusTypes.Update, title, description, isLong);
     }
 
-    public void Info(string title, string description)
+    public void Info(string title, string description, bool isLong = false)
     {
-        Show(StatusTypes.Info, title, description);
+        Show(StatusTypes.Info, title, description, isLong);
     }
 
-    public void Warning(string title, string description)
+    public void Warning(string title, string description, bool isLong = false)
     {
-        Show(StatusTypes.Warning, title, description);
+        Show(StatusTypes.Warning, title, description, isLong);
     }
 
-    public void Error(string title, string description)
+    public void Error(string title, string description, bool isLong = false)
     {
-        Show(StatusTypes.Error, title, description);
+        Show(StatusTypes.Error, title, description, isLong);
     }
 
     public void Hide()

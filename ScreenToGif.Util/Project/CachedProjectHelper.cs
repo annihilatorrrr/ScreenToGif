@@ -71,7 +71,7 @@ public static class CachedProjectHelper
         {
             Id = 1,
             StartTime = TimeSpan.Zero,
-            EndTime = TimeSpan.FromTicks(lastFrame.Ticks) + TimeSpan.FromMilliseconds(lastFrame.Delay), //Delay is empty for now.
+            EndTime = TimeSpan.FromTicks((long) lastFrame.Ticks), //TODO: Decide for how long to display last frame.
             //Opacity = 1,
             //Background = null,
             //Effects = new(),
@@ -140,8 +140,7 @@ public static class CachedProjectHelper
                 VerticalDpi = sequence.VerticalDpi,
                 ChannelCount = sequence.ChannelCount,
                 BitsPerChannel = sequence.BitsPerChannel,
-                DataLength = frame.DataLength,
-                Delay = frame.Delay
+                DataLength = frame.DataLength
             };
 
             //Sub-sequence.
@@ -170,8 +169,8 @@ public static class CachedProjectHelper
             if (sub.DataStreamPosition != (ulong)writeStream.Position + 16)
                 System.Diagnostics.Debugger.Break();
 
-            //Delay, Data size, Pixels = 8 + 8 + X bytes.
-            await using (var subStream = new SubStream(deflateStream, 16L + (long)sub.DataLength))
+            //Data size, Pixels = 8 + X bytes.
+            await using (var subStream = new SubStream(deflateStream, 8L + (long)sub.DataLength))
                 await subStream.CopyToAsync(writeStream);
             
             sequence.Frames.Add(sub);
@@ -183,7 +182,7 @@ public static class CachedProjectHelper
 
     public static async Task CreateCursorTrack(RecordingProject recording, CachedProject project)
     {
-        var lastEvent = recording.Events.LastOrDefault(l => l.EventType is RecordingEvents.Cursor or RecordingEvents.CursorData);
+        var lastEvent = recording.MouseEvents.LastOrDefault(l => l.EventType is RecordingEvents.Cursor or RecordingEvents.CursorData);
 
         if (lastEvent == null)
             return;
@@ -194,7 +193,7 @@ public static class CachedProjectHelper
         {
             Id = 1,
             StartTime = TimeSpan.Zero,
-            EndTime = TimeSpan.FromTicks(lastEvent.TimeStampInTicks) + TimeSpan.FromMilliseconds(recording.Frames[0].Delay), //TODO: Decide for how long to display cursor.
+            EndTime = TimeSpan.FromTicks(lastEvent.TimeStampInTicks), //TODO: Decide for how long to display last cursor.
             //Opacity = 1,
             //Background = null,
             //Effects = new(),
@@ -228,11 +227,11 @@ public static class CachedProjectHelper
         writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(sequence.Angle))); //4 bytes.
 
         //Cursor sequence.
-        var cursorEvents = recording.Events.Where(w => w.EventType is RecordingEvents.Cursor or RecordingEvents.CursorData).ToList();
+        var cursorEvents = recording.MouseEvents.Where(w => w.EventType is RecordingEvents.Cursor or RecordingEvents.CursorData).ToList();
         
         writeStream.WriteUInt32((uint) cursorEvents.Count); //4 bytes.
 
-        await using var readStream = new FileStream(recording.EventsCachePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        await using var readStream = new FileStream(recording.MouseEventsCachePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
         var cursorData = cursorEvents.OfType<CursorDataEvent>().FirstOrDefault();
 
@@ -336,7 +335,7 @@ public static class CachedProjectHelper
 
     public static async Task CreateKeyTrack(RecordingProject recording, CachedProject project)
     {
-        var lastEvent = recording.Events.LastOrDefault(l => l.EventType == RecordingEvents.Key);
+        var lastEvent = recording.KeyboardEvents.LastOrDefault();
 
         if (lastEvent == null)
             return;
@@ -349,7 +348,7 @@ public static class CachedProjectHelper
             Width = project.Width,
             Height = project.Height,
             StartTime = TimeSpan.Zero,
-            EndTime = TimeSpan.FromTicks(lastEvent.TimeStampInTicks) + TimeSpan.FromMilliseconds(recording.Frames[0].Delay),
+            EndTime = TimeSpan.FromTicks(lastEvent.TimeStampInTicks),
             CachePath = Path.Combine(project.CacheRootPath, $"Sequence-{track.Id}-1.cache")
         };
 
@@ -374,12 +373,10 @@ public static class CachedProjectHelper
         writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(sequence.Angle))); //4 bytes.
 
         //Key sequence.
-        var keyEvents = recording.Events.OfType<KeyEvent>().ToList();
-
         //TODO: More details in here.
-        writeStream.WriteUInt32((uint)keyEvents.Count); //4 bytes.
+        writeStream.WriteUInt32((uint)recording.KeyboardEvents.Count); //4 bytes.
 
-        foreach (var keyEvent in keyEvents)
+        foreach (var keyEvent in recording.KeyboardEvents)
         {
             var sub = new KeySubSequence
             {

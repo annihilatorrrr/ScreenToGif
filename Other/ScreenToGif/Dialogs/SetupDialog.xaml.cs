@@ -22,28 +22,6 @@ public partial class SetupDialog : ExWindow
         return dialog.ShowDialog() ?? false;
     }
 
-    //Props:
-    //Show on system tray.
-    //First window: Nothing (needs system tray), Recorders, Editor, Startup/Welcome
-    //After recorder: Save, Editor
-
-    //Recorders:
-    //Opens: Recorders
-    //After recording, open: Save Dialog with simple editor, Advanced Editor
-
-    //Startup:
-    //Opens: Startup Window
-    //Then: Open any window
-    //After recording, open: Save Dialog with simple editor, Advanced Editor
-
-    //Editor:
-    //Opens: Editor
-
-    //Nothing:
-    //Opens: Nothing 
-    //Then: Open any window via command or via system tray icon
-    //After recording, open: Save Dialog with simple editor, Advanced Editor
-
     private void SelectButton_Click(object sender, System.Windows.RoutedEventArgs e)
     {
         UserSettings.All.StartupWindow = (StartupWindows)_viewModel.StartupWindow;

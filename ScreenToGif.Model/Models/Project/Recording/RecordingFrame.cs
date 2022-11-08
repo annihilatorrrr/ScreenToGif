@@ -3,16 +3,15 @@ namespace ScreenToGif.Domain.Models.Project.Recording;
 public class RecordingFrame
 {
     /// <summary>
+    /// The position of the frame in the stream.
+    /// </summary>
+    public ulong StreamPosition { get; set; }
+
+    /// <summary>
     /// Ticks since the start of the recording.
     /// </summary>
     public long Ticks { get; set; }
-
-    /// <summary>
-    /// Frame delay in milliseconds.
-    /// </summary>
-    [Obsolete("Use Ticks")]
-    public long Delay { get; set; }
-
+    
     /// <summary>
     /// The capture content.
     /// </summary>

@@ -1,3 +1,4 @@
+using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Enums.Native;
 using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Native.External;
@@ -78,7 +79,6 @@ public class GdiCapture : ScreenCapture
             FrameCount++;
 
             frame.Ticks = Stopwatch.GetElapsedTicks();
-            //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
             frame.Pixels = new byte[_byteLength];
 
             if (Gdi32.GetDIBits(_windowDeviceContext, _compatibleBitmap, 0, (uint)StartHeight, frame.Pixels, ref _bitmapHeader, DibColorModes.RgbColors) == 0)
@@ -108,7 +108,6 @@ public class GdiCapture : ScreenCapture
             FrameCount++;
 
             frame.Ticks = Stopwatch.GetElapsedTicks();
-            //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
             frame.Pixels = new byte[_byteLength];
 
             if (Gdi32.GetDIBits(_windowDeviceContext, _compatibleBitmap, 0, (uint)StartHeight, frame.Pixels, ref _bitmapHeader, DibColorModes.RgbColors) == 0)
@@ -137,17 +136,30 @@ public class GdiCapture : ScreenCapture
         if (info.WasFrameSkipped || info.Pixels == null)
         {
             info.Pixels = null;
-
-            //Pass the duration to the previous frame, if any.
-            if (Project.Frames.Count > 0)
-                Project.Frames[^1].Delay += info.Delay;
-
             return;
         }
 
-        CompressStream.WriteByte(1); //1 byte, Frame event type.
-        CompressStream.WriteInt64(info.Ticks); //8 bytes.
-        CompressStream.WriteInt64(info.Delay); //8 bytes.
+        //info.StreamPosition = (ulong)CompressStream.BaseStream.Position;
+        info.StreamPosition = (ulong)CompressStream.Position;
+
+        //Sub-sequence.
+        CompressStream.WriteByte((byte)SubSequenceTypes.Frame); //1 byte.
+        CompressStream.WriteUInt64((ulong)info.Ticks); //8 bytes.
+
+        //Rect sub-sequence.
+        CompressStream.WriteInt32(0); //4 bytes, left.
+        CompressStream.WriteInt32(0); //4 bytes, top.
+        CompressStream.WriteUInt16((ushort)Width); //2 bytes.
+        CompressStream.WriteUInt16((ushort)Height); //2 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(0)); //4 bytes.
+
+        //Raster sub-sequence. 
+        CompressStream.WriteUInt16((ushort)Width); //2 bytes.
+        CompressStream.WriteUInt16((ushort)Height); //2 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
+        CompressStream.WriteByte(Project.ChannelCount); //1 byte.
+        CompressStream.WriteByte(Project.BitsPerChannel); //1 byte.
         CompressStream.WriteInt64(info.Pixels.LongLength); //8 bytes.
         CompressStream.WriteBytes(info.Pixels);
 

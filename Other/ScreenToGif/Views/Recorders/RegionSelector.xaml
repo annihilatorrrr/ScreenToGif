@@ -5,7 +5,8 @@
         xmlns:v="clr-namespace:ScreenToGif.Util.Converters;assembly=ScreenToGif.Util"
         xmlns:e="clr-namespace:ScreenToGif.Domain.Enums;assembly=ScreenToGif.Domain"
         Title="ScreenToGif" Height="Auto" Width="Auto" WindowStyle="None" AllowsTransparency="True" Topmost="True"
-        ResizeMode="NoResize" UseLayoutRounding="True" SnapsToDevicePixels="True" Background="Transparent" ShowInTaskbar="False">
+        ResizeMode="NoResize" UseLayoutRounding="True" SnapsToDevicePixels="True" Background="Transparent" ShowInTaskbar="False"
+        Loaded="Window_Loaded">
 
     <Window.Triggers>
         <EventTrigger RoutedEvent="Loaded">
@@ -23,10 +24,10 @@
     </Window.Resources>
 
     <Grid>
-        <c:ScreenSelector x:Name="SelectElement" Opacity="0.5" Mode="{Binding SelectionMode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Focusable="False"
+        <c:ScreenSelector x:Name="SelectElement" Opacity="0.5" Mode="{Binding SelectionMode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                           SelectionChanged="SelectElement_SelectionChanged" MouseHovering="SelectElement_MouseHovering" SelectionAccepted="SelectElement_SelectionAccepted"/>
 
-        <Border x:Name="ControlsBorder" Background="{DynamicResource Brush.Dialog.Background.Alt}" Height="48" Width="179" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-40,0,0">
+        <Border x:Name="ControlsBorder" Background="{DynamicResource Brush.Window.Background.Alt}" Height="48" Width="179" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-40,0,0">
             <Grid Margin="2,3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="42"/>
@@ -36,24 +37,25 @@
                     <ColumnDefinition Width="42"/>
                 </Grid.ColumnDefinitions>
 
-                <ToggleButton Grid.Column="0" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}" ToolTip="R"
+                <RadioButton Grid.Column="0" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}" ToolTip="Rectangular selection"
                               IsChecked="{Binding SelectionMode, Converter={StaticResource Converter.EnumToBool}, ConverterParameter={x:Static e:RegionSelectionModes.Region}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding ChangeModeCommand}">
-                    <c:SymbolIcon Symbol="Hint"/>
-                </ToggleButton>
+                    <c:SymbolIcon Symbol="SquareHint"/>
+                </RadioButton>
 
-                <ToggleButton Grid.Column="1" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}"
-                              IsChecked="{Binding SelectionMode, Converter={StaticResource Converter.EnumToBool}, ConverterParameter={x:Static e:RegionSelectionModes.Window}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding ChangeModeCommand}">
+                <RadioButton Grid.Column="1" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}" ToolTip="Window selection"
+                             IsChecked="{Binding SelectionMode, Converter={StaticResource Converter.EnumToBool}, ConverterParameter={x:Static e:RegionSelectionModes.Window}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding ChangeModeCommand}">
                     <c:SymbolIcon Symbol="Window"/>
-                </ToggleButton>
+                </RadioButton>
 
-                <ToggleButton Grid.Column="2" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}"
-                              IsChecked="{Binding SelectionMode, Converter={StaticResource Converter.EnumToBool}, ConverterParameter={x:Static e:RegionSelectionModes.Fullscreen}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding ChangeModeCommand}">
-                    <c:SymbolIcon Symbol="Fit"/>
-                </ToggleButton>
+                <RadioButton Grid.Column="2" Margin="6" Width="30" Height="30" Style="{StaticResource Style.ToggleButton.Borderless}" ToolTip="Screen selection"
+                             IsChecked="{Binding SelectionMode, Converter={StaticResource Converter.EnumToBool}, ConverterParameter={x:Static e:RegionSelectionModes.Fullscreen}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding ChangeModeCommand}">
+                    <c:SymbolIcon Symbol="PageFit"/>
+                </RadioButton>
 
                 <Separator Grid.Column="3" Width="1" Margin="2,0,0,0"/>
 
-                <c:ExButton Grid.Column="4" Margin="6" Width="30" Height="30" Command="{Binding CancelCommand}" Style="{StaticResource Style.Button.Borderless}">
+                <c:ExButton Grid.Column="4" Margin="6" Width="30" Height="30" ToolTip="Cancel selection"
+                            Command="{Binding CancelCommand}" Style="{StaticResource Style.Button.Borderless}">
                     <c:SymbolIcon Symbol="Dismiss"/>
                 </c:ExButton>
             </Grid>

@@ -1,3 +1,4 @@
+using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Exceptions;
 using ScreenToGif.Domain.Models.Project.Recording;
 using SharpDX;
@@ -935,9 +936,27 @@ public class DirectCapture : ScreenCapture
 
     public override void Save(RecordingFrame info)
     {
-        CompressStream.WriteInt64(1); //1 byte, Frame event type.
-        CompressStream.WriteInt64(info.Ticks); //8 bytes.
-        CompressStream.WriteInt64(info.Delay); //8 bytes.
+        info.StreamPosition = (ulong)CompressStream.Position;
+        //info.StreamPosition = (ulong)CompressStream.BaseStream.Position;
+
+        //Sub-sequence.
+        CompressStream.WriteByte((byte)SubSequenceTypes.Frame); //1 byte.
+        CompressStream.WriteUInt64((ulong)info.Ticks); //8 bytes.
+
+        //Rect sub-sequence.
+        CompressStream.WriteInt32(0); //4 bytes, left.
+        CompressStream.WriteInt32(0); //4 bytes, top.
+        CompressStream.WriteUInt16((ushort) Width); //2 bytes.
+        CompressStream.WriteUInt16((ushort) Height); //2 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(0)); //4 bytes.
+
+        //Raster sub-sequence. 
+        CompressStream.WriteUInt16((ushort) Width); //2 bytes.
+        CompressStream.WriteUInt16((ushort) Height); //2 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
+        CompressStream.WriteByte(Project.ChannelCount); //1 byte.
+        CompressStream.WriteByte(Project.BitsPerChannel); //1 byte.
         CompressStream.WriteInt64(info.Pixels.LongLength); //8 bytes.
         CompressStream.WriteBytes(info.Pixels);
 

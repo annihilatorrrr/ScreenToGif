@@ -97,7 +97,6 @@
                         <Popup Grid.ColumnSpan="2" x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom"
                                IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
                                PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
-
                             <Border x:Name="DropDownBorder" BorderBrush="{DynamicResource Brush.ContextMenu.Border}" BorderThickness="1" Margin="6" Padding="4" CornerRadius="7" Background="{DynamicResource Brush.ContextMenu.Background}"
                                     Effect="{DynamicResource Brush.ComboBox.Shadow}" MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{TemplateBinding ActualWidth}">
                                 <ScrollViewer x:Name="DropDownScrollViewer">

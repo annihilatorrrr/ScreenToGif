@@ -1,8 +1,11 @@
+using ScreenToGif.Domain.Enums;
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Cached.Sequences;
+using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Util;
-using ScreenToGif.ViewModel.Editor;
 using ScreenToGif.ViewModel.Project.Sequences.SubSequences;
 using System.Collections.ObjectModel;
+using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
@@ -23,7 +26,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
         set => SetProperty(ref _frames, value);
     }
 
-    public static FrameSequenceViewModel FromModel(FrameSequence sequence, EditorViewModel baseViewModel)
+    public static FrameSequenceViewModel FromModel(FrameSequence sequence, IEditorViewModel baseViewModel)
     {
         return new FrameSequenceViewModel
         {
@@ -52,9 +55,34 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
         };
     }
 
-    public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, TimeSpan timestamp, double quality, string cachePath)
+    public static FrameSequenceViewModel FromModel(RecordingProject project, IEditorViewModel baseViewModel)
     {
-        var ticks = (ulong)timestamp.Ticks;
+        return new FrameSequenceViewModel
+        {
+            Id = 1,
+            StartTime = TimeSpan.Zero,
+            EndTime = TimeSpan.FromTicks(project.Frames.LastOrDefault()?.Ticks ?? 0),
+            StreamPosition = 0,
+            CachePath = project.FramesCachePath,
+            EditorViewModel = baseViewModel,
+            Left = 0,
+            Top = 0,
+            Width = (ushort)project.Width,
+            Height = (ushort)project.Height,
+            Origin = RasterSequenceSources.Screen,
+            OriginalWidth = (ushort)project.Width,
+            OriginalHeight = (ushort)project.Height,
+            ChannelCount = project.ChannelCount,
+            BitsPerChannel = project.BitsPerChannel,
+            HorizontalDpi = project.Dpi,
+            VerticalDpi = project.Dpi,
+            Frames = new(project.Frames.Select(s => FrameSubSequenceViewModel.FromModel(project, s, baseViewModel)).ToList())
+        };
+    }
+
+    public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath)
+    {
+        var ticks = (ulong)timestamp;
 
         //Get first frame after timestamp. TODO: I should probably get the frames at timestamp + 60fps(16.6ms) and merge at opacity/n
         var frame = Frames.FirstOrDefault(f => f.TimeStampInTicks >= ticks);
@@ -63,7 +91,12 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
             return;
 
         using var readStream = new FileStream(cachePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        //using var deflateStream = new DeflateStream(readStream, CompressionMode.Decompress);
+
         readStream.Position = (long) frame.DataStreamPosition;
+
+        //TODO: I need to remove the compression for the stream.
+        //Captured content needs to be flat, so that reading is fine
 
         var data = readStream.ReadBytes((uint) frame.DataLength);
 
@@ -151,7 +184,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
                 //Marshal.WriteByte(address, surfaceIndex + 3, (byte)alpha);
 
                 ////Blue = (topBlue * topA + bottomBlue * bottomA * (255 - topA) / 255) / alpha
-                //Marshal.WriteByte(address, surfaceIndex,     (byte)((buffer[bufferIndex    ] * topAlpha + Marshal.ReadByte(address, surfaceIndex    ) * bottomAlpha * (255 - topAlpha) / 255) / alpha));
+                //Marshal.WriteByte(address, surfaceIndex, (byte)((buffer[bufferIndex] * topAlpha + Marshal.ReadByte(address, surfaceIndex) * bottomAlpha * (255 - topAlpha) / 255) / alpha));
 
                 ////Green = (topGreen * topA + bottomGreen * bottomA * (255 - topA) / 255) / alpha
                 //Marshal.WriteByte(address, surfaceIndex + 1, (byte)((buffer[bufferIndex + 1] * topAlpha + Marshal.ReadByte(address, surfaceIndex + 1) * bottomAlpha * (255 - topAlpha) / 255) / alpha));

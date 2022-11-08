@@ -19,7 +19,8 @@ public static class RecordingProjectHelper
         {
             PropertiesCachePath = Path.Combine(path, "Properties.cache"),
             FramesCachePath = Path.Combine(path, "Frames.cache"),
-            EventsCachePath = Path.Combine(path, "Events.cache"),
+            MouseEventsCachePath = Path.Combine(path, "MouseEvents.cache"),
+            KeyboardEventsCachePath = Path.Combine(path, "KeyboardEvents.cache"),
             CreatedBy = source,
             CreationDate = date
         };
@@ -104,7 +105,8 @@ public static class RecordingProjectHelper
         {
             File.Delete(project.PropertiesCachePath);
             File.Delete(project.FramesCachePath);
-            File.Delete(project.EventsCachePath);
+            File.Delete(project.MouseEventsCachePath);
+            File.Delete(project.KeyboardEventsCachePath);
 
             return true;
         }

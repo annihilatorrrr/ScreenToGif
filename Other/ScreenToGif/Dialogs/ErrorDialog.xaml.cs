@@ -75,7 +75,7 @@ public partial class ErrorDialog : ExWindow
     {
         Close();
     }
-    
+
     private void FeedbackButton_Click(object sender, RoutedEventArgs e)
     {
         FeedbackDialog.Show(Exception);

@@ -1,5 +1,5 @@
+using ScreenToGif.Domain.Interfaces;
 using System.Windows;
-using Monitor = ScreenToGif.Domain.Models.Native.Monitor;
 
 namespace ScreenToGif.ViewModel;
 
@@ -9,10 +9,10 @@ public class ScreenRecorderViewModelOld : RecorderViewModel
 
     private bool _isDirectMode = false;
     private Rect _region = Rect.Empty;
-    private List<Monitor> _monitors = new();
-    private Monitor _previousMonitor = null;
-    private Monitor _currentMonitor = null;
-    private Monitor _currentControlMonitor = null;
+    private List<IMonitor> _monitors = new();
+    private IMonitor _previousMonitor = null;
+    private IMonitor _currentMonitor = null;
+    private IMonitor _currentControlMonitor = null;
     private Style _buttonStyle = null;
     
     public bool IsDirectMode
@@ -67,13 +67,13 @@ public class ScreenRecorderViewModelOld : RecorderViewModel
         }
     }
 
-    public List<Monitor> Monitors
+    public List<IMonitor> Monitors
     {
         get => _monitors;
         set => SetProperty(ref _monitors, value);
     }
 
-    public Monitor CurrentMonitor
+    public IMonitor CurrentMonitor
     {
         get => _currentMonitor;
         set
@@ -83,13 +83,13 @@ public class ScreenRecorderViewModelOld : RecorderViewModel
         }
     }
 
-    public Monitor PreviousMonitor
+    public IMonitor PreviousMonitor
     {
         get => _previousMonitor;
         set => SetProperty(ref _previousMonitor, value);
     }
 
-    public Monitor CurrentControlMonitor
+    public IMonitor CurrentControlMonitor
     {
         get => _currentControlMonitor;
         set => SetProperty(ref _currentControlMonitor, value);

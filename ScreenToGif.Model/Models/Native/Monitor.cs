@@ -5,7 +5,9 @@ namespace ScreenToGif.Domain.Models.Native;
 
 public class Monitor : IMonitor
 {
-    public IntPtr Handle { get; set; }
+    public override int GetHashCode() => Handle.GetHashCode();
+
+    public IntPtr Handle { get; }
 
     public Rect Bounds { get; set; }
 
@@ -24,4 +26,29 @@ public class Monitor : IMonitor
     public double Scale => Dpi / 96d;
 
     public bool IsPrimary { get; set; }
+
+    public Monitor(IntPtr handle)
+    {
+        Handle = handle;
+    }
+
+    public static bool operator !=(Monitor a, Monitor b) => a?.Handle != b?.Handle;
+
+    public static bool operator ==(Monitor a, Monitor b) => a?.Handle == b?.Handle;
+
+    protected bool Equals(Monitor other) => other != null && Handle.Equals(other.Handle);
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj))
+            return false;
+
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj.GetType() != GetType())
+            return false;
+
+        return Equals((Monitor)obj);
+    }
 }

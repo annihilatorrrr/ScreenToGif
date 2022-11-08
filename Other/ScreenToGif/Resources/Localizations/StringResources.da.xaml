@@ -165,7 +165,7 @@
     <s:String x:Key="S.Updater.Header">Ny udgave tilgængelig</s:String>
     <s:String x:Key="S.Updater.NewRelease">Ny udgave!</s:String>
     <s:String x:Key="S.Updater.NewRelease.Info">Version {0} er udkommet! Klik her for detaljer.</s:String>
-    <s:String x:Key="S.Updater.NoNewRelease.Info">Dit system er tilsyneladende ikke længere understøttet.&#x0d;Prøv at programmet fra hjemmesiden.</s:String>
+    <s:String x:Key="S.Updater.Unsupported.Info">Dit system er tilsyneladende ikke længere understøttet.&#x0d;Prøv at programmet fra hjemmesiden.</s:String>
     <s:String x:Key="S.Updater.Version">Version</s:String>
     <s:String x:Key="S.Updater.Portable">Portable</s:String>
     <s:String x:Key="S.Updater.Installer">Installering</s:String>

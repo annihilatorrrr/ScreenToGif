@@ -40,7 +40,7 @@
             </Grid.ColumnDefinitions>
 
             <c:ExButton Grid.Column="0" x:Name="DismissButton" Content="{DynamicResource S.Dialog.Error.Dismiss}" Margin="24,24,4,24" IsAccented="True" IsDefault="True" Click="DismissButton_Click"/>
-            <c:ExButton Grid.Column="1" x:Name="FeedbackButton" Content="{DynamicResource S.Dialog.Error.SendFeedback}" Margin="4,24,24,24" Click="FeedbackButton_Click"/>
+            <c:ExButton Grid.Column="2" x:Name="FeedbackButton" Content="{DynamicResource S.Dialog.Error.SendFeedback}" Margin="4,24,24,24" Click="FeedbackButton_Click"/>
         </Grid>
     </Grid>
 </c:ExWindow>

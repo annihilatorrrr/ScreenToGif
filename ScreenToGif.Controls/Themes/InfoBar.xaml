@@ -49,7 +49,12 @@
                             </Storyboard>
                         </Border.Resources>
 
-                        <Grid Margin="6">
+                        <Grid Margin="6" VerticalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="26"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -58,26 +63,26 @@
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
 
-                            <Border Grid.Column="0" Background="{DynamicResource Brush.InfoBar.Glyph.Foreground}" BorderThickness="0" Margin="5,9,5,9"
+                            <Border Grid.Row="0" Grid.Column="0" x:Name="IconBorder" Background="{DynamicResource Brush.InfoBar.Glyph.Foreground}" BorderThickness="0" Margin="5,0"
                                     CornerRadius="9999" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <n:SymbolIcon x:Name="SymbolIcon" Symbol="InfoFilled" Foreground="{DynamicResource Brush.InfoBar.Glyph}"
                                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </Border>
                             
-                            <TextBlock Grid.Column="1" Text="{TemplateBinding Title}" FontSize="14" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,9,5,9"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{TemplateBinding Title}" FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,0"/>
 
-                            <TextBlock Grid.Column="2" Text="{TemplateBinding Description}" FontSize="14" 
-                                       Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,9,5,9"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" x:Name="DescriptionTextBlock" Text="{TemplateBinding Description}" FontSize="14" 
+                                       Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,0"/>
 
-                            <ContentPresenter Grid.Column="3" x:Name="ContentPresenter" Margin="0,0,5,0" Focusable="False" RecognizesAccessKey="True"
+                            <ContentPresenter Grid.Row="0" Grid.Column="3" x:Name="ContentPresenter" Margin="0,0,5,0" Focusable="False" RecognizesAccessKey="True"
                                           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
 
-                            <n:HyperlinkButton Grid.Column="4" x:Name="SuppressButton" MinWidth="30" ToolTip="{DynamicResource S.Suppress}"
-                                               ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                            <n:ExButton Grid.Row="0" Grid.Column="4" x:Name="SuppressButton" MinWidth="30" Style="{DynamicResource Style.Button.Borderless}"
+                                        ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
                                 <n:SymbolIcon Symbol="Dismiss"/>
-                            </n:HyperlinkButton>
+                            </n:ExButton>
                         </Grid>
                     </Border>
 
@@ -87,6 +92,7 @@
                             <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border.Warning}"/>
                             <Setter TargetName="SymbolIcon" Property="Foreground" Value="{DynamicResource Brush.InfoBar.Glyph.Warning}"/>
                             <Setter TargetName="SymbolIcon" Property="Symbol" Value="WarningFilled"/>
+                            <Setter TargetName="IconBorder" Property="Width" Value="6"/>
                         </Trigger>
 
                         <Trigger Property="Type" Value="Error">
@@ -104,7 +110,22 @@
                         </Trigger>
 
                         <Trigger Property="Type" Value="Update">
-                            <Setter TargetName="SymbolIcon" Property="Symbol" Value="SyncFilled"/>
+                            <Setter TargetName="SymbolIcon" Property="Symbol" Value="ArrowSyncCircleFilled"/>
+                        </Trigger>
+
+                        <Trigger Property="IsIconVisible" Value="False">
+                            <Setter TargetName="IconBorder" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <Trigger Property="IsClosable" Value="False">
+                            <Setter TargetName="SuppressButton" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <Trigger Property="IsLong" Value="True">
+                            <Setter TargetName="DescriptionTextBlock" Property="Grid.Row" Value="1"/>
+                            <Setter TargetName="DescriptionTextBlock" Property="Grid.Column" Value="1"/>
+                            <Setter TargetName="ContentPresenter" Property="Grid.Row" Value="2"/>
+                            <Setter TargetName="ContentPresenter" Property="Grid.Column" Value="1"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

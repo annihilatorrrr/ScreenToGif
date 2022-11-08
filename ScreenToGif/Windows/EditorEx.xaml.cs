@@ -44,7 +44,7 @@ public partial class EditorEx : Window
     }
     
     //Editor:
-    //  Ribbon:
+    //  Small Ribbon:
     //      File:
     //          New (screen recording, webcam recording, board recording, empty project [no tracks])
     //          Insert (screen recording, webcam recording, board recording, media)

@@ -548,5 +548,8 @@ namespace ScreenToGif.Native.External
 
         [DllImport(Constants.User32)]
         public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+
+        [DllImport(Constants.User32)]
+        internal static extern bool SetWindowDisplayAffinity(IntPtr hwnd, DisplayAffinities affinity);
     }
 }

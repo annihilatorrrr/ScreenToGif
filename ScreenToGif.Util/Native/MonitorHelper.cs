@@ -1,4 +1,5 @@
 using ScreenToGif.Domain.Enums.Native;
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Native;
 using ScreenToGif.Native.External;
 using ScreenToGif.Native.Structs;
@@ -14,13 +15,12 @@ public static class MonitorHelper
     private static Monitor ParseMonitor(IntPtr monitorHandle, IntPtr hdc)
     {
         var info = new MonitorInfoEx(); //TODO: MonitorInfo not getting filled with data.
-        var a = User32.GetMonitorInfo(new HandleRef(null, monitorHandle), info);
+        User32.GetMonitorInfo(new HandleRef(null, monitorHandle), info);
 
         var name = new string(info.Device).TrimEnd((char)0);
 
-        var monitor = new Monitor
+        var monitor = new Monitor(monitorHandle)
         {
-            Handle = monitorHandle,
             Name = name,
             FriendlyName = name,
             NativeBounds = new Rect(info.Monitor.Left, info.Monitor.Top,
@@ -92,7 +92,7 @@ public static class MonitorHelper
         return monitor;
     }
 
-    public static List<Monitor> AllMonitors
+    public static List<IMonitor> AllMonitors
     {
         get
         {
@@ -101,11 +101,11 @@ public static class MonitorHelper
 
             User32.EnumDisplayMonitors(ScreenToGif.Native.Constants.NullHandleRef, IntPtr.Zero, proc, IntPtr.Zero);
 
-            return closure.Monitors.Cast<Monitor>().ToList();
+            return closure.Monitors.Cast<IMonitor>().ToList();
         }
     }
 
-    public static List<Monitor> AllMonitorsScaled(double scale, bool offset = false)
+    public static List<IMonitor> AllMonitorsScaled(double scale, bool offset = false)
     {
         //TODO: I should probably take each monitor scale.
         var monitors = AllMonitors;
@@ -130,7 +130,7 @@ public static class MonitorHelper
         return monitors;
     }
 
-    public static List<Monitor> AllMonitorsGranular(bool offset = false)
+    public static List<IMonitor> AllMonitorsGranular(bool offset = false)
     {
         var monitors = AllMonitors;
 

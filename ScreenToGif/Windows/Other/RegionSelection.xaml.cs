@@ -6,7 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using ScreenToGif.Domain.Enums;
-using ScreenToGif.Domain.Models.Native;
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Native;
 using ScreenToGif.Util.Settings;
@@ -23,7 +23,7 @@ public partial class RegionSelection : Window
 
     public bool IsStatic { get; set; }
         
-    public Monitor Monitor { get; set; }
+    public IMonitor Monitor { get; set; }
 
     public double Dpi { get; set; }
 
@@ -162,7 +162,7 @@ public partial class RegionSelection : Window
     }
 
 
-    public void Select(RegionSelectionModes? mode, Rect region, Monitor monitor = null)
+    public void Select(RegionSelectionModes? mode, Rect region, IMonitor monitor = null)
     {
         //TODO: Configurable border color.
 

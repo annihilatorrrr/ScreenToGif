@@ -68,10 +68,15 @@ public class RecordingProject
     public string StrokesCachePath { get; set; }
 
     /// <summary>
-    /// A binary cache containing a simple structure with all events (cursor, cursor data or key).
+    /// A binary cache containing a simple structure with all events (cursor position, clicks or cursor data).
     /// </summary>
-    public string EventsCachePath { get; set; }
-    
+    public string MouseEventsCachePath { get; set; }
+
+    /// <summary>
+    /// A binary cache containing a simple structure with all keyboard events.
+    /// </summary>
+    public string KeyboardEventsCachePath { get; set; }
+
     #endregion
 
     #region Events
@@ -82,9 +87,14 @@ public class RecordingProject
     public List<RecordingFrame> Frames { get; set; } = new();
 
     /// <summary>
-    /// List of captured events (cursor, keys, etc).
+    /// List of captured mouse events.
     /// </summary>
-    public List<RecordingEvent> Events { get; set; } = new();
+    public List<MouseEvent> MouseEvents { get; set; } = new();
+
+    /// <summary>
+    /// List of captured mouse events.
+    /// </summary>
+    public List<KeyEvent> KeyboardEvents { get; set; } = new();
 
     #endregion
 

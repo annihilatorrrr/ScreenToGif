@@ -25,14 +25,11 @@ public sealed class SketchBoardCapture : BaseCapture
         _bufferedStream = new BufferedStream(_fileStream, UserSettings.All.MemoryCacheSize * 1_048_576); //Each 1 MB has 1_048_576 bytes.
         _compressStream = new DeflateStream(_bufferedStream, UserSettings.All.CaptureCompression, true);
     }
-
-
     
     public override void Save(RecordingFrame frame) => throw new NotImplementedException();
 
     public override int Capture(RecordingFrame frame) => throw new NotImplementedException();
-
-
+    
     public void RegisterStroke(StrokeCollection collection)
     {
         //Since the only data being captured are drawings, the BaseCapture may not be used.
@@ -40,8 +37,7 @@ public sealed class SketchBoardCapture : BaseCapture
 
         var col = collection.Clone();
     }
-
-
+    
     public override async Task Stop()
     {
         await base.Stop();

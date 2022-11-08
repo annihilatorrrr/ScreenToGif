@@ -29,15 +29,12 @@ namespace ScreenToGif;
 
 public partial class App : IDisposable
 {
-    private static AppViewModel _viewModel;
     private Mutex _mutex;
     private bool _accepted;
     private readonly List<Exception> _exceptionList = new();
     private readonly object _lock = new();
 
     #region Properties
-
-    internal static AppViewModel ViewModel => _viewModel ??= new AppViewModel();
 
     internal static NotifyIcon NotifyIcon { get; private set; }
 
@@ -124,7 +121,7 @@ public partial class App : IDisposable
                         {
                             if (process != null)
                             {
-                                var handles = Util.Native.Windows.GetWindowHandlesFromProcess(process);
+                                var handles = Util.Native.WindowHelper.GetWindowHandlesFromProcess(process);
 
                                 //Show the window before setting focus.
                                 Native.External.User32.ShowWindow(handles.Count > 0 ? handles[0] : process.Handle, Domain.Enums.Native.ShowWindowCommands.Show);

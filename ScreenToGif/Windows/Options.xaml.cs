@@ -18,7 +18,6 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using ScreenToGif.Controls;
 using ScreenToGif.Domain.Enums;
-using ScreenToGif.Native.Helpers;
 using ScreenToGif.Util;
 using ScreenToGif.Util.InterProcessChannel;
 using ScreenToGif.Util.Native;

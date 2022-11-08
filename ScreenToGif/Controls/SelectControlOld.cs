@@ -904,7 +904,7 @@ public class SelectControlOld : Control
     public void AdjustMode()
     {
         if (Mode == RegionSelectionModes.Window)
-            Windows = Util.Native.Windows.EnumerateWindows(Scale).AdjustPosition(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop);
+            Windows = Util.Native.WindowHelper.EnumerateWindows(Scale).AdjustPosition(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop);
         else if (Mode == RegionSelectionModes.Fullscreen)
             Windows = MonitorHelper.AllMonitorsScaled(Scale, true).Select(x => new DetectedRegion(x.Handle, x.Bounds.Offset(-1), x.Name)).ToList();
         else

@@ -1,8 +1,9 @@
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Cached;
+using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Domain.ViewModels;
 using ScreenToGif.Util.Extensions;
-using ScreenToGif.ViewModel.Editor;
+using ScreenToGif.ViewModel.Project.Sequences;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 
@@ -16,7 +17,7 @@ public class TrackViewModel : BaseViewModel, ITrack
     private string _name = "";
     private Brush _accent = Brushes.Transparent;
     private string _cachePath = "";
-    private readonly EditorViewModel _editorViewModel = null;
+    private readonly IEditorViewModel _editorViewModel = null;
     private ObservableCollection<ISequence> _sequences = new();
 
     public int Id
@@ -60,7 +61,7 @@ public class TrackViewModel : BaseViewModel, ITrack
         set => SetProperty(ref _cachePath, value);
     }
 
-    internal EditorViewModel EditorViewModel
+    internal IEditorViewModel EditorViewModel
     {
         get => _editorViewModel;
         private init => SetProperty(ref _editorViewModel, value);
@@ -75,7 +76,7 @@ public class TrackViewModel : BaseViewModel, ITrack
         set => SetProperty(ref _sequences, value);
     }
 
-    public static TrackViewModel FromModel(Track track, EditorViewModel editorViewModel)
+    public static TrackViewModel FromModel(Track track, IEditorViewModel editorViewModel)
     {
         return new TrackViewModel
         {
@@ -90,7 +91,46 @@ public class TrackViewModel : BaseViewModel, ITrack
         };
     }
 
-    public void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, TimeSpan timestamp, double quality)
+    public static ObservableCollection<TrackViewModel> FromModel(RecordingProject project, IEditorViewModel editorViewModel)
+    {
+        //I'll need some work to handle cursors, because of the images.
+        //Cursor and key tracks are optional.
+
+        var tracks = new ObservableCollection<TrackViewModel>
+        {
+            new()
+            {
+                Id = 0,
+                Name = "Frames", //TODO: Localizable.
+                CachePath = project.FramesCachePath,
+                EditorViewModel = editorViewModel,
+                Sequences = new ObservableCollection<ISequence>
+                {
+                    FrameSequenceViewModel.FromModel(project, editorViewModel)
+                }
+            }
+        };
+
+        //new()
+        //{
+        //    Id = 1,
+        //    Name = "Cursor", //TODO: Localizable.
+        //    CachePath = project.MouseEventsCachePath,
+        //    EditorViewModel = editorViewModel,
+        //},
+
+        //new()
+        //{
+        //    Id = 1,
+        //    Name = "Key Presses", //TODO: Localizable.
+        //    CachePath = project.KeyboardEventsCachePath,
+        //    EditorViewModel = editorViewModel,
+        //}
+
+        return tracks;
+    }
+
+    public void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality)
     {
         if (!IsVisible)
             return;

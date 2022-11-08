@@ -10,20 +10,21 @@ namespace ScreenToGif.Views.Recorders;
 
 public partial class ScreenRecorder
 {
-    private static TaskCompletionSource<(IMonitor, Rect)> _taskCompletionSource;
+    private static TaskCompletionSource<(RegionSelectionModes, IMonitor, Rect)> _taskCompletionSource;
 
     private static readonly List<RegionSelector> Selectors = new();
 
     internal static bool IsSelecting => Selectors.Any(a => a.IsVisible && a.IsActive);
 
-    private void RegionSelected(IMonitor monitor, Rect region)
+    private void SelectionAccepted(RegionSelectionModes mode, IMonitor monitor, Rect region)
     {
         foreach (var selector in Selectors)
             selector.Close();
 
         WindowState = WindowState.Normal;
+        Activate();
 
-        _taskCompletionSource.SetResult((monitor, region));
+        _taskCompletionSource.SetResult((mode, monitor, region));
     }
 
     private void RegionGotHover(IMonitor monitor)
@@ -40,34 +41,36 @@ public partial class ScreenRecorder
             selector.SelectElement.Mode = mode;
     }
 
-    private void RegionAborted()
+    private void SelectionAborted()
     {
         foreach (var selector in Selectors)
             selector.Close();
 
         WindowState = WindowState.Normal;
+        Activate();
 
-        _taskCompletionSource.SetResult((null, Rect.Empty));
+        _taskCompletionSource.SetResult((RegionSelectionModes.Region, null, Rect.Empty));
     }
 
-    private Task<(IMonitor, Rect)> SelectRegion()
+    private Task<(RegionSelectionModes, IMonitor, Rect)> SelectRegionInternal()
     {
         Selectors.Clear();
 
+        _captureRegion.Hide();
         WindowState = WindowState.Minimized;
-
+        
         var monitors = MonitorHelper.AllMonitorsGranular();
 
         foreach (var monitor in monitors)
         {
             var selector = new RegionSelector();
-            selector.Select(monitor, RegionSelected, RegionGotHover, ModeChanged, RegionAborted);
+            selector.Select(monitor, ViewModel.SelectionMode, SelectionAccepted, RegionGotHover, ModeChanged, SelectionAborted);
 
             Selectors.Add(selector);
         }
 
         //Return only when the region gets selected.
-        _taskCompletionSource = new TaskCompletionSource<(IMonitor, Rect)>();
+        _taskCompletionSource = new TaskCompletionSource<(RegionSelectionModes, IMonitor, Rect)>();
 
         return _taskCompletionSource.Task;
     }

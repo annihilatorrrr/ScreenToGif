@@ -14,7 +14,7 @@ using Size = System.Windows.Size;
 
 namespace ScreenToGif.Util.Native
 {
-    public static class Windows
+    public static class WindowHelper
     {
         public static void MoveToScreen(this Window window, IMonitor next, bool fullScreen = false)
         {

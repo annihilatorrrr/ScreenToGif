@@ -1,10 +1,13 @@
 using ScreenToGif.Domain.ViewModels;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace ScreenToGif.ViewModel;
 
 public class StartupViewModel : BaseViewModel
 {
+    public ObservableCollection<object> RecentProjects { get; set; }
+
     public RoutedUICommand ScreenRecorderCommand { get; set; } = new()
     {
         Text = "S.Command.NewRecording",

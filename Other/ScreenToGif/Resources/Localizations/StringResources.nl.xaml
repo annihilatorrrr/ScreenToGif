@@ -165,7 +165,7 @@
     <s:String x:Key="S.Updater.Header">Er is een nieuwe update beschikbaar</s:String>
     <s:String x:Key="S.Updater.NewRelease">Nieuwe uitgave!</s:String>
     <s:String x:Key="S.Updater.NewRelease.Info">Nieuwe uitgave beschikbaar, Versie {0}!&#10;Klik hier voor meer details.</s:String>
-    <s:String x:Key="S.Updater.NoNewRelease.Info">Het lijkt erop dat jouw systeem niet langer wordt ondersteund of dat er iets is veranderd in het updatesysteem. Probeer het handmatig te downloaden van de website.</s:String>
+    <s:String x:Key="S.Updater.Unsupported.Info">Het lijkt erop dat jouw systeem niet langer wordt ondersteund of dat er iets is veranderd in het updatesysteem. Probeer het handmatig te downloaden van de website.</s:String>
     <s:String x:Key="S.Updater.Version">Versie</s:String>
     <s:String x:Key="S.Updater.Portable">Portable</s:String>
     <s:String x:Key="S.Updater.Installer">Installatieprogramma</s:String>

@@ -84,6 +84,16 @@ public static class WindowHelper
         return User32.MonitorFromWindow(window, Constants.MonitorDefaultToNearest);
     }
 
+    public static void HideFromCapture(this Window window)
+    {
+        if (Environment.OSVersion.Version.Build < 18994)
+            return;
+
+        var handle = GetWindowPtr(window);
+
+        User32.SetWindowDisplayAffinity(handle, DisplayAffinities.ExcludeFromCapture);
+    }
+
     private static bool UpdateStyle(IntPtr handle, WindowStyles removeStyle, WindowStyles addStyle)
     {
         var style = User32.GetWindowLong(handle, GetWindowsLongStyle);
@@ -138,5 +148,4 @@ public static class WindowHelper
                 break;
         }
     }
-
 }

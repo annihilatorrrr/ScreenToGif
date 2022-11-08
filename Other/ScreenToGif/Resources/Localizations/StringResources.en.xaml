@@ -15,6 +15,7 @@
     <s:String x:Key="S.Dialog.Error.Info">The app crashed due to an unforseen reason.&#10;Please send details via the feedback tool in order to help to get it fixed.</s:String>
     <s:String x:Key="S.Dialog.Error.SeeMore">Click here to see more details.</s:String>
     <s:String x:Key="S.Dialog.Error.SeeMore.Tooltip">Opens up another window to show more details about the error.</s:String>
+    <s:String x:Key="S.Dialog.Error.Details">Details</s:String>
     <s:String x:Key="S.Dialog.Error.Dismiss">Dismiss</s:String>
     <s:String x:Key="S.Dialog.Error.SendFeedback">Send Feedback</s:String>
 
@@ -30,7 +31,8 @@
     <s:String x:Key="S.Dialog.FirstTime.AskLater">Ask Later</s:String>
 
 
-
+    <!--Windows • Exporter-->
+    <s:String x:Key="S.Exporter.Export">Export</s:String>
 
 
     <!--General-->
@@ -191,7 +193,10 @@
     <s:String x:Key="S.Updater.Header">A new update is available</s:String>
     <s:String x:Key="S.Updater.NewRelease">New release!</s:String>
     <s:String x:Key="S.Updater.NewRelease.Info">New release available, Version {0}!&#x0d;Click here for more details.</s:String>
-    <s:String x:Key="S.Updater.NoNewRelease.Info">It appears that your system is no longer supported or something changed in the update system. Try downloading it manually from the website.</s:String>
+    <s:String x:Key="S.Updater.Unsupported">Unsupported</s:String>
+    <s:String x:Key="S.Updater.Unsupported.Info">It appears that your system is no longer supported or something changed in the update system. Try downloading it manually from the website.</s:String>
+    <s:String x:Key="S.Updater.NoUpdate">No update was found</s:String>
+    <s:String x:Key="S.Updater.NoUpdate.Info">Visit screentogif.com to check the latest update.</s:String>
     <s:String x:Key="S.Updater.Version">Version</s:String>
     <s:String x:Key="S.Updater.Portable">Portable</s:String>
     <s:String x:Key="S.Updater.Installer">Installer</s:String>
@@ -690,15 +695,12 @@
     <s:String x:Key="S.Recorder.SwitchFrequency">Click to switch among capture frequency modes.</s:String>
     <s:String x:Key="S.Recorder.Manual.Short">manual</s:String>
     <s:String x:Key="S.Recorder.Interaction.Short">interactions</s:String>
-    <s:String x:Key="S.Recorder.Fps">Maximum frames per second</s:String>
+    <s:String x:Key="S.Recorder.Fps">Maximum frames per second.&#10;Ranges from 1 to 60 fps, with higher values meaning more frames will be captured.&#10;Each increment represents 16 milliseconds of difference.</s:String>
     <s:String x:Key="S.Recorder.Fps.Short">fps</s:String>
-    <s:String x:Key="S.Recorder.Fps.Range">Ranges from 1 to 60 fps, with higher values meaning more frames will be captured.&#10;Each increment represents 16 milliseconds of difference.</s:String>
-    <s:String x:Key="S.Recorder.Fpm">Maximum frames per minute</s:String>
+    <s:String x:Key="S.Recorder.Fpm">Maximum frames per minute.&#10;Ranges from 1 to 60 fpm, with higher values meaning more frames will be captured.&#10;Each increment represents 1 second of difference.</s:String>
     <s:String x:Key="S.Recorder.Fpm.Short">fpm</s:String>
-    <s:String x:Key="S.Recorder.Fpm.Range">Ranges from 1 to 60 fpm, with higher values meaning more frames will be captured.&#10;Each increment represents 1 second of difference.</s:String>
-    <s:String x:Key="S.Recorder.Fph">Maximum frames per hour</s:String>
+    <s:String x:Key="S.Recorder.Fph">Maximum frames per hour&#10;Ranges from 1 to 60 fph, with higher values meaning more frames will be captured.&#10;Each increment represents 1 minute of difference.</s:String>
     <s:String x:Key="S.Recorder.Fph.Short">fph</s:String>
-    <s:String x:Key="S.Recorder.Fph.Range">Ranges from 1 to 60 fph, with higher values meaning more frames will be captured.&#10;Each increment represents 1 minute of difference.</s:String>
     
     <s:String x:Key="S.Recorder.ClickOrPress">Click or press keys to capture</s:String>
     <s:String x:Key="S.Recorder.SnapToWindow">Snap to Window (Drag and release to snap)</s:String>
@@ -727,6 +729,7 @@
     <s:String x:Key="S.Recorder.Screen.Select">Select a screen</s:String>
     <s:String x:Key="S.Recorder.Screen.Name.Internal">Internal screen</s:String>
     <s:String x:Key="S.Recorder.Screen.Name.Generic">Generic screen</s:String>
+    <s:String x:Key="S.Recorder.Screen.Name.Info">Display: {0}</s:String>
     <s:String x:Key="S.Recorder.Screen.Name.Info1">Graphics adapter: {0}</s:String>
     <s:String x:Key="S.Recorder.Screen.Name.Info2">Resolution: {0} x {1}</s:String>
     <s:String x:Key="S.Recorder.Screen.Name.Info3">Native resolution: {0} x {1}</s:String>

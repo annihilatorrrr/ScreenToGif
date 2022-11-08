@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Microsoft.Win32;
-using ScreenToGif.Domain.Models.Native;
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Native;
 
@@ -24,7 +24,7 @@ public partial class GraphicsConfigurationDialog : Window
 
     public Exception Exception { get; set; }
 
-    public Monitor Monitor { get; set; }
+    public IMonitor Monitor { get; set; }
 
     #endregion
 
@@ -107,7 +107,7 @@ public partial class GraphicsConfigurationDialog : Window
         OkButton.Focus();
     }
 
-    public static bool Ok(Exception exception, Monitor monitor)
+    public static bool Ok(Exception exception, IMonitor monitor)
     {
         var dialog = new GraphicsConfigurationDialog
         {

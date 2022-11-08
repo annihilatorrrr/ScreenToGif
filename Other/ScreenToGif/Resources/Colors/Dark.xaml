@@ -5,10 +5,12 @@
     <SolidColorBrush x:Key="Brush.Foreground" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="Brush.Foreground.Medium" Color="#70ffffff"/>
     <SolidColorBrush x:Key="Brush.Foreground.Disabled" Color="#5Dffffff"/>
+    <SolidColorBrush x:Key="Brush.Foreground.Weak" Color="#08ffffff"/>
     <SolidColorBrush x:Key="Brush.FocusVisual" Color="#FFFFFF"/>
 
     <SolidColorBrush x:Key="Brush.Window.Background" Color="#202020"/>
-    <SolidColorBrush x:Key="Brush.Dialog.Background.Alt" Color="#0effffff"/>
+    <SolidColorBrush x:Key="Brush.Window.Background.Alt" Color="#2C2C2C"/>
+    <SolidColorBrush x:Key="Brush.Dialog.Background.Alt" Color="#0Effffff"/>
 
     <!--TitleBar-->
     <SolidColorBrush x:Key="Brush.TitleBar.Button.Foreground" Color="#ffffff"/>
@@ -70,6 +72,28 @@
     <SolidColorBrush x:Key="Brush.HyperlinkButton.Background.Disabled" Color="Transparent"/>
     <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Disabled" Color="#5DFFFFFF"/>
     <SolidColorBrush x:Key="Brush.HyperlinkButton.Foreground.Icon.Disabled" Color="#5DFFFFFF"/>
+
+    <!--TextBox-->
+    <SolidColorBrush x:Key="Brush.TextBox.Foreground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.TextBox.Foreground.Medium" Color="#C8FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.TextBox.Foreground.Disabled" Color="#5DFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.TextBox.Background" Color="#0FFFFFFF"/>
+    <LinearGradientBrush x:Key="Brush.TextBox.Border" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#14FFFFFF" Offset="0.96"/>
+        <GradientStop Color="#8BFFFFFF" Offset="0.98"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Brush.TextBox.Background.Hover" Color="#15FFFFFF"/>
+    <LinearGradientBrush x:Key="Brush.TextBox.Border.Hover" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#14FFFFFF" Offset="0.96"/>
+        <GradientStop Color="#8BFFFFFF" Offset="0.98"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Brush.TextBox.Background.Focused" Color="#B21E1E1E"/>
+    <LinearGradientBrush x:Key="Brush.TextBox.Border.Focused" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#12FFFFFF" Offset="0.9"/>
+        <GradientStop Color="#60CDFF" Offset="0.95"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Brush.TextBox.Background.Disabled" Color="#0BFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.TextBox.Border.Disabled" Color="#12FFFFFF"/>
 
     <!--CheckBox-->
     <SolidColorBrush x:Key="Brush.CheckBox.Background" Color="#1a000000"/>
@@ -148,4 +172,18 @@
     <SolidColorBrush x:Key="Brush.InfoBar.Background.Success" Color="#393D1B"/>
     <SolidColorBrush x:Key="Brush.InfoBar.Border.Success" Color="#1A000000"/>
     <SolidColorBrush x:Key="Brush.InfoBar.Glyph.Success" Color="#6CCB5F"/>
+
+    <!--Slider-->
+    <SolidColorBrush x:Key="Brush.Fill.Accent.Default" Color="#60CDFF"/>
+    <SolidColorBrush x:Key="Brush.Fill.Accent.Secondary" Color="#E560CDFF"/>
+    <SolidColorBrush x:Key="Brush.Fill.Accent.Tertiary" Color="#CC60CDFF"/>
+    <SolidColorBrush x:Key="Brush.Fill.Accent.Disabled" Color="#28FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Fill.Control.Strong.Default" Color="#8BFFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Fill.Control.Solid.Default" Color="#454545"/>
+    <LinearGradientBrush x:Key="Brush.Elevation.Circle.Border" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#18FFFFFF" Offset="0.0"/>
+        <GradientStop Color="#12FFFFFF" Offset="0.5"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Brush.Stroke.Control.Default" Color="#12FFFFFF"/>
+
 </ResourceDictionary>

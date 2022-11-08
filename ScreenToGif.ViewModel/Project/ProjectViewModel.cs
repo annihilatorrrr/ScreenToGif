@@ -1,4 +1,6 @@
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Cached;
+using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Domain.ViewModels;
 using ScreenToGif.ViewModel.Editor;
 using System.Collections.ObjectModel;
@@ -15,7 +17,7 @@ public class ProjectViewModel : BaseViewModel
     private double _verticalDpi = 96d;
     private Brush _background = Brushes.White;
     private ObservableCollection<TrackViewModel> _tracks;
-    private readonly EditorViewModel _editorViewModel;
+    private readonly IEditorViewModel _editorViewModel;
 
     public CachedProject Project { get; set; }
 
@@ -60,7 +62,7 @@ public class ProjectViewModel : BaseViewModel
         }
     }
 
-    internal EditorViewModel EditorViewModel
+    internal IEditorViewModel EditorViewModel
     {
         get => _editorViewModel;
         private init => SetProperty(ref _editorViewModel, value);
@@ -72,7 +74,7 @@ public class ProjectViewModel : BaseViewModel
         set => SetProperty(ref _tracks, value);
     }
 
-    public static ProjectViewModel FromModel(CachedProject project, EditorViewModel editorViewModel)
+    public static ProjectViewModel FromModel(CachedProject project, IEditorViewModel editorViewModel)
     {
         return new ProjectViewModel
         {
@@ -85,6 +87,20 @@ public class ProjectViewModel : BaseViewModel
             Background = project.Background,
             EditorViewModel = editorViewModel,
             Tracks = new ObservableCollection<TrackViewModel>(project.Tracks.Select(s => TrackViewModel.FromModel(s, editorViewModel)).ToList())
+        };
+    }
+
+    public static ProjectViewModel FromModel(RecordingProject project, IEditorViewModel exporterViewModel)
+    {
+        return new ProjectViewModel
+        {
+            //Project = project,
+            Width = project.Width,
+            Height = project.Height,
+            HorizontalDpi = project.Dpi,
+            VerticalDpi = project.Dpi,
+            EditorViewModel = exporterViewModel,
+            Tracks = TrackViewModel.FromModel(project, exporterViewModel)
         };
     }
 

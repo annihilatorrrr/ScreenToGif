@@ -3,6 +3,7 @@
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
             xmlns:u="clr-namespace:ScreenToGif.Util.Settings;assembly=ScreenToGif.Util"
+            xmlns:v="clr-namespace:ScreenToGif.ViewModel;assembly=ScreenToGif.ViewModel"
             Title="{DynamicResource S.StartUp.Title}" Height="380" Width="700"
             MinHeight="380" MinWidth="700" MaxHeight="600" MaxWidth="900" UseLayoutRounding="True"
             ShowCustomCaptionButtons="True" WindowStyle="None" ShowMaximizeButton="False" ShowMinimizeButton="False"
@@ -13,8 +14,26 @@
             <ColumnDefinition Width="Auto" MinWidth="100"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
+        
+        <Border Grid.Column="0">
+            <Border.Background>
+                <DrawingBrush Viewport="0,0,40,40" Viewbox="0,0,40,40" ViewboxUnits="Absolute" ViewportUnits="Absolute" TileMode="Tile" Opacity="1">
+                    <DrawingBrush.Drawing>
+                        <DrawingGroup>
+                            <GeometryDrawing Brush="{DynamicResource Brush.Dialog.Background.Alt}">
+                                <GeometryDrawing.Geometry>
+                                    <RectangleGeometry Rect="0,0,40,40"/>
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
 
-        <Border Grid.Column="0" Background="{DynamicResource Brush.Dialog.Background.Alt}">
+                            <!--TODO: Tilt the drawing-->
+                            <GeometryDrawing Brush="{DynamicResource Brush.Foreground.Weak}"
+                                             Geometry="F1 M 4 3.799999 C 3.44 3.799999 2.966666 3.993334 2.58 4.379999 C 2.193333 4.766666 2 5.24 2 5.799999 L 2 14.799999 C 2 15.36 2.193333 15.833333 2.58 16.219999 C 2.966666 16.606667 3.44 16.799999 4 16.799999 L 7 16.799999 L 7 18.799999 L 5.52 18.799999 C 5.36 18.799999 5.233333 18.846666 5.14 18.939999 C 5.046666 19.033333 5 19.153332 5 19.299999 C 5 19.446667 5.046666 19.566666 5.14 19.66 C 5.233333 19.753332 5.36 19.799999 5.52 19.799999 L 14.52 19.799999 C 14.653333 19.799999 14.766666 19.753332 14.86 19.66 C 14.953333 19.566666 14.999999 19.446667 15 19.299999 C 14.999999 19.153332 14.953333 19.033333 14.86 18.939999 C 14.766666 18.846666 14.653333 18.799999 14.52 18.799999 L 13 18.799999 L 13 16.799999 L 16 16.799999 C 16.559999 16.799999 17.033333 16.606667 17.42 16.219999 C 17.806665 15.833333 18 15.36 18 14.799999 L 18 5.799999 C 18 5.24 17.806665 4.766666 17.42 4.379999 C 17.033333 3.993334 16.559999 3.799999 16 3.799999 Z M 12 16.799999 L 12 18.799999 L 8 18.799999 L 8 16.799999 Z M 3 5.799999 C 3 5.533333 3.1 5.299999 3.3 5.1 C 3.5 4.9 3.733333 4.799999 4 4.799999 L 16 4.799999 C 16.266666 4.799999 16.5 4.9 16.699999 5.1 C 16.9 5.299999 17 5.533333 17 5.799999 L 17 14.799999 C 17 15.066666 16.9 15.299999 16.699999 15.5 C 16.5 15.7 16.266666 15.799999 16 15.799999 L 4 15.799999 C 3.733333 15.799999 3.5 15.7 3.3 15.5 C 3.1 15.299999 3 15.066666 3 14.799999 Z"/>
+                        </DrawingGroup>
+                    </DrawingBrush.Drawing>
+                </DrawingBrush>
+            </Border.Background>
+
             <Grid Margin="10,5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -34,35 +53,35 @@
 
                 <c:ExButton Grid.Row="2" Command="{Binding ScreenRecorderCommand}" Margin="6,3" Padding="6,4" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
                     <StackPanel Orientation="Horizontal">
-                        <c:SymbolIcon Symbol="Desktop" FontSize="18"/>
+                        <c:SymbolIcon Symbol="Desktop" FontSize="18" Foreground="{DynamicResource Brush.Accent}"/>
                         <TextBlock Text="Screen Recorder" VerticalAlignment="Center" Margin="8,0,0,0"/>
                     </StackPanel>
                 </c:ExButton>
 
                 <c:ExButton Grid.Row="3" Command="{Binding WebcamRecorderCommand}" Margin="6,3" Padding="6,4" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
                     <StackPanel Orientation="Horizontal">
-                        <c:SymbolIcon Symbol="Camera" FontSize="18"/>
+                        <c:SymbolIcon Symbol="Camera" FontSize="18" Foreground="{DynamicResource Brush.Accent}"/>
                         <TextBlock Text="Webcam Recorder" VerticalAlignment="Center" Margin="8,0,0,0"/>
                     </StackPanel>
                 </c:ExButton>
 
                 <c:ExButton Grid.Row="4" Command="{Binding BoardRecorderCommand}" Margin="6,3" Padding="6,4" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
                     <StackPanel Orientation="Horizontal">
-                        <c:SymbolIcon Symbol="InkStroke" FontSize="18"/>
+                        <c:SymbolIcon Symbol="InkStroke" FontSize="18" Foreground="{DynamicResource Brush.Accent}"/>
                         <TextBlock Text="Sketchboard Recorder" VerticalAlignment="Center" Margin="8,0,0,0"/>
                     </StackPanel>
                 </c:ExButton>
 
                 <c:ExButton Grid.Row="5" Command="{Binding EditorCommand}" Margin="6,3" Padding="6,4" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
                     <StackPanel Orientation="Horizontal">
-                        <c:SymbolIcon Symbol="WindowEdit" FontSize="18"/>
+                        <c:SymbolIcon Symbol="WindowEdit" FontSize="18" Foreground="{DynamicResource Brush.Accent}"/>
                         <TextBlock Text="Editor" VerticalAlignment="Center" Margin="8,0,0,0"/>
                     </StackPanel>
                 </c:ExButton>
 
                 <c:ExButton Grid.Row="6" Command="{Binding OptionsCommand}" Margin="6,3" Padding="6,4" ToolTip="Options" FontSize="14" Style="{StaticResource Style.Button.Borderless}">
                     <StackPanel Orientation="Horizontal">
-                        <c:SymbolIcon Symbol="Setting" FontSize="18"/>
+                        <c:SymbolIcon Symbol="Setting" FontSize="18" Foreground="{DynamicResource Brush.Accent}"/>
                         <TextBlock Text="Options" VerticalAlignment="Center" Margin="8,0,0,0"/>
                     </StackPanel>
                 </c:ExButton>
@@ -75,17 +94,24 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <c:InfoBar Grid.Row="0" x:Name="InfoBar" Title="Update Available" Description="Version 3.1" Margin="6" Visibility="Visible">
+            <c:InfoBar Grid.Row="0" x:Name="InfoBar" Margin="6" Title="Update Available"
+                       Description="{Binding Source={StaticResource AppViewModel}, Path=UpdaterViewModel.Version, UpdateSourceTrigger=PropertyChanged}"
+                       Visibility="{Binding Source={StaticResource AppViewModel}, Path=UpdateVisibility, UpdateSourceTrigger=PropertyChanged}">
                 <c:ExButton Content="Update Now" Command="{Binding UpdateCommand}" TextWrapping="NoWrap"/>
             </c:InfoBar>
+            
+            <ListBox Grid.Row="1" BorderThickness="0" Background="Transparent" Margin="5" ItemsSource="{Binding RecentProjects, UpdateSourceTrigger=PropertyChanged}">
+                <ListBox.Resources>
+                    <DataTemplate DataType="{x:Type v:AppViewModel}">
+                        <Grid>
+                            <TextBlock Text="Text"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.Resources>
+            </ListBox>
 
-            <!--Maybe display the "No projects opened" centered, outside of the scrollviewer.-->
-
-            <ScrollViewer Grid.Row="1">
-                <StackPanel>
-                    <TextBlock Text="No recent projects or other files opened" Foreground="{DynamicResource Brush.Foreground.Medium}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,10" FontSize="13"/>
-                </StackPanel>
-            </ScrollViewer>
+            <TextBlock Grid.Row="1" Text="No recent projects or other files opened" Foreground="{DynamicResource Brush.Foreground.Medium}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,10" FontSize="13"/>
         </Grid>
     </Grid>
 </c:ExWindow>

@@ -94,9 +94,9 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <Image Grid.Column="0" x:Name="IconImage" Width="22" Height="22" Source="{TemplateBinding Icon}" Margin="4"/>
+                            <Image Grid.Column="0" x:Name="IconImage" Width="18" Height="18" Source="{TemplateBinding Icon}" Margin="15,4,10,4"/>
 
-                            <TextBlock Grid.Column="1" x:Name="TitleTextBlock" Margin="4,0,0,0" FontSize="14" Foreground="{DynamicResource Brush.Window.Foreground}"
+                            <TextBlock Grid.Column="1" x:Name="TitleTextBlock" Margin="5,0,0,0" FontSize="12" Foreground="{DynamicResource Brush.Window.Foreground}"
                                        VerticalAlignment="Center" Text="{TemplateBinding Title}"/>
 
                             <Grid Grid.Column="2" x:Name="CaptionButtonsGrid" Visibility="Collapsed">

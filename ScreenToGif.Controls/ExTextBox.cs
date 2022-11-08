@@ -19,6 +19,8 @@ public class ExTextBox : TextBox
 
     public static readonly DependencyProperty AllowedCharactersProperty = DependencyProperty.Register(nameof(AllowedCharacters), typeof(string), typeof(ExTextBox));
 
+    public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register(nameof(Watermark), typeof(string), typeof(ExTextBox));
+
     #endregion
 
     #region Properties
@@ -52,6 +54,13 @@ public class ExTextBox : TextBox
     {
         get => (string)GetValue(AllowedCharactersProperty);
         set => SetValue(AllowedCharactersProperty, value);
+    }
+
+    [Bindable(true), Category("Common")]
+    public string Watermark
+    {
+        get => (string)GetValue(WatermarkProperty);
+        set => SetValue(WatermarkProperty, value);
     }
 
     #endregion

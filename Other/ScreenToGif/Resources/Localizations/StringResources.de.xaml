@@ -165,7 +165,7 @@
     <s:String x:Key="S.Updater.Header">Ein neue Version ist verfügbar!</s:String>
     <s:String x:Key="S.Updater.NewRelease">Neue Version!</s:String>
     <s:String x:Key="S.Updater.NewRelease.Info">Neue Version {0} kann heruntergeladen werden! Für weitere Details bitte hier klicken.</s:String>
-    <s:String x:Key="S.Updater.NoNewRelease.Info">Es scheint, dass Ihr System nicht mehr unterstützt wird oder dass sich etwas am Aktualisierungssystem geändert hat. Versuchen Sie, die Aktualisierung manuell von der Website herunterzuladen.</s:String>
+    <s:String x:Key="S.Updater.Unsupported.Info">Es scheint, dass Ihr System nicht mehr unterstützt wird oder dass sich etwas am Aktualisierungssystem geändert hat. Versuchen Sie, die Aktualisierung manuell von der Website herunterzuladen.</s:String>
     <s:String x:Key="S.Updater.Version">Version</s:String>
     <s:String x:Key="S.Updater.Portable">Portabel</s:String>
     <s:String x:Key="S.Updater.Installer">Installation</s:String>

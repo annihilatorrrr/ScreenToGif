@@ -1,25 +1,84 @@
+using ScreenToGif.Controls;
 using ScreenToGif.Controls.Recorder;
 using ScreenToGif.Dialogs;
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Settings;
+using ScreenToGif.ViewModel;
 using ScreenToGif.Views;
 using ScreenToGif.Views.Recorders;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace ScreenToGif;
 
 public partial class App
 {
+    internal static void Launch(object paramater)
+    {
+        switch (paramater)
+        {
+            case StartupWindows.None:
+                return;
+
+            case StartupWindows.ScreenRecorder:
+            {
+                TryOpeningScreenRecorder();
+                return;
+            }
+
+            case StartupWindows.WebcamRecorder:
+            {
+                TryOpeningWebcamRecorder();
+                return;
+            }
+
+            case StartupWindows.SketchboardRecorder:
+            {
+                TryOpeningBoardRecorder();
+                return;
+            }
+
+            case StartupWindows.Editor:
+            {
+                OpenEditor(null);
+                return;
+            }
+
+            default:
+            {
+                if (UserSettings.All.IsFirstTime)
+                {
+                    if (SetupDialog.Ask())
+                    {
+                        UserSettings.All.IsFirstTime = false;
+
+                        Launch(UserSettings.All.StartupWindow);
+                        return;
+                    }
+                }
+
+                OpenStartup(null);
+                return;
+            }
+        }
+    }
+
     internal static bool CanOpenRecorder(object sender)
     {
-        return Current?.Windows.OfType<Window>().All(a => a is not BaseRecorderOld) ?? true;
+        return Current?.Windows.OfType<Window>().All(a => a is not BaseRecorder) ?? true;
     }
 
     internal static void TryOpeningScreenRecorder(bool forGlobal = false)
@@ -100,56 +159,6 @@ public partial class App
         }
     }
 
-    internal static void Launch(object paramater)
-    {
-        switch (paramater)
-        {
-            case StartupWindows.None:
-                return;
-
-            case StartupWindows.ScreenRecorder:
-            {
-                TryOpeningScreenRecorder();
-                return;
-            }
-
-            case StartupWindows.WebcamRecorder:
-            {
-                TryOpeningWebcamRecorder();
-                return;
-            }
-
-            case StartupWindows.SketchboardRecorder:
-            {
-                TryOpeningBoardRecorder();
-                return;
-            }
-
-            case StartupWindows.Editor:
-            {
-                OpenEditor(null);
-                return;
-            }
-            
-            default:
-            {
-                if (UserSettings.All.IsFirstTime)
-                {
-                    if (SetupDialog.Ask())
-                    {
-                        UserSettings.All.IsFirstTime = false;
-
-                        Launch(UserSettings.All.StartupWindow);
-                        return;
-                    }
-                }
-
-                OpenStartup(null);
-                return;
-            }
-        }
-    }
-
     internal static void OpenStartup(object parameter)
     {
         var startup = Current.Windows.OfType<Startup>().FirstOrDefault();
@@ -170,7 +179,7 @@ public partial class App
         }
     }
 
-    internal void TryOpeningEditor(bool forGlobal = false)
+    internal static void TryOpeningEditor(bool forGlobal = false)
     {
         if ((forGlobal && ViewModel.IgnoreHotKeys))
             return;
@@ -180,7 +189,22 @@ public partial class App
 
     internal static void OpenEditor(object parameter)
     {
+        var startup = Current.Windows.OfType<Editor>().FirstOrDefault(f => !f.HasProjectLoaded);
 
+        if (startup == null)
+        {
+            startup = new Editor();
+            startup.Closed += (_, _) => CloseOrNot();
+
+            startup.Show();
+        }
+        else
+        {
+            if (startup.WindowState == WindowState.Minimized)
+                startup.WindowState = WindowState.Normal;
+
+            startup.Activate();
+        }
     }
 
     internal static bool CanOpenUpdater(object parameter)
@@ -192,10 +216,12 @@ public partial class App
 
     internal static void OpenUpdater(object parameter)
     {
-
+        //Try to install the update, closing the app if successful.
+        if (InstallUpdate(true))
+            Current.Shutdown(69);
     }
 
-    internal void TryOpeningOptions(bool forGlobal = false)
+    internal static void TryOpeningOptions(bool forGlobal = false)
     {
         if ((forGlobal && ViewModel.IgnoreHotKeys))
             return;
@@ -224,7 +250,7 @@ public partial class App
         }
     }
 
-    internal void TryOpeningFeedback(bool forGlobal = false)
+    internal static void TryOpeningFeedback(bool forGlobal = false)
     {
         if ((forGlobal && ViewModel.IgnoreHotKeys))
             return;
@@ -252,7 +278,7 @@ public partial class App
         //}
     }
 
-    internal void TryOpeningTroubleshooter(bool forGlobal = false)
+    internal static void TryOpeningTroubleshooter(bool forGlobal = false)
     {
         if ((forGlobal && ViewModel.IgnoreHotKeys))
             return;
@@ -280,6 +306,21 @@ public partial class App
         //}
     }
 
+    internal static void TrayLeftClick(object parameter)
+    {
+        Interact(UserSettings.All.LeftClickAction, UserSettings.All.LeftOpenWindow);
+    }
+
+    internal static void TrayLeftDoubleClick(object parameter)
+    {
+        Interact(UserSettings.All.DoubleLeftClickAction, UserSettings.All.DoubleLeftOpenWindow);
+    }
+
+    internal static void TrayMiddleClick(object parameter)
+    {
+        Interact(UserSettings.All.MiddleClickAction, UserSettings.All.MiddleOpenWindow);
+    }
+    
     internal void TryExiting(bool forGlobal = false)
     {
         if ((forGlobal && ViewModel.IgnoreHotKeys) || !CanExitApplication(null))
@@ -290,7 +331,7 @@ public partial class App
 
     internal static bool CanExitApplication(object parameter)
     {
-        return Current?.Windows.OfType<BaseRecorderOld>().All(a => a.Stage != RecorderStages.Recording) ?? false;
+        return Current?.Windows.OfType<BaseRecorder>().All(a => a.ViewModel.Stage != RecorderStages.Recording) ?? false;
     }
 
     internal static void ExitApplication(object parameter)
@@ -359,86 +400,376 @@ public partial class App
         }, TaskCreationOptions.LongRunning);
     }
 
+    internal static async void CheckForUpdates(object parameter)
+    {
+        //When checking automatically (paramater = null).
+        if (!UserSettings.All.CheckForUpdates && parameter == null)
+            return;
+
+#if FULL_MULTI_MSIX_STORE
+            return;
+#endif
+
+        //If the app was installed by Chocolatey, avoid updating via normal means.
+        if (await IsChocolateyPackage())
+            return;
+
+        //Try checking for the update on Github first then fallbacks to Fosshub.
+        if (!await CheckOnGithub())
+            await CheckOnFosshub();
+    }
+
     //TODO: Move to other file.
-    private static async Task RecorderCallback(Window caller, Editor editor, object sender, EventArgs args)
-    {
-        var window = sender as BaseRecorderOld;
 
-        if (window?.Project != null && window.Project.Any)
+    private static async Task<bool> IsChocolateyPackage()
+    {
+        try
         {
-            if (editor == null)
+            //Binaries distributed via Chocolatey are of Installer or Portable types.
+            if (IdentityHelper.ApplicationType != ApplicationTypes.FullSingle && IdentityHelper.ApplicationType != ApplicationTypes.DependantSingle)
+                return false;
+
+            //If Chocolatey is installed and ScreenToGif was installed via its service, it will be listed.
+            var choco = await ProcessHelper.Start("choco list -l screentogif");
+
+            if (!choco.Contains("screentogif"))
+                return false;
+
+            //The Portable package gets shimmed when installing via choco.
+            //As for the Installer package, I'm letting it to be updated via normal means too (for now).
+            var shim = await ProcessHelper.Start("$a='path to executable: '; (ScreenToGif.exe --shimgen-noop | Select-String $a) -split $a | ForEach-Object Trim");
+            var path = ProcessHelper.GetEntryAssemblyPath();
+
+            return shim.Contains(path);
+        }
+        catch (Exception e)
+        {
+            LogWriter.Log(e, "Not possible to detect Chocolatey package.");
+            return false;
+        }
+    }
+
+    private static async Task<bool> CheckOnGithub()
+    {
+        try
+        {
+            #region GraphQL equivalent
+
+            //query {
+            //    repository(owner: "NickeManarin", name: "ScreenToGif") {
+            //        releases(first: 1, orderBy: { field: CREATED_AT, direction: DESC}) {
+            //            nodes {
+            //                name
+            //                tagName
+            //                createdAt
+            //                url
+            //                isPrerelease
+            //                description
+            //                releaseAssets(last: 2) {
+            //                    nodes {
+            //                        name
+            //                        downloadCount
+            //                        downloadUrl
+            //                        size
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
+            #endregion
+
+            var proxy = WebHelper.GetProxy();
+            var handler = new HttpClientHandler
             {
-                await ShowEditor(window.Project);
-                caller?.Close();
+                Proxy = proxy,
+                UseProxy = proxy != null
+            };
+
+            using var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
+            using var response = await client.GetAsync("https://api.github.com/repos/NickeManarin/ScreenToGif/releases/latest");
+            var result = await response.Content.ReadAsStringAsync();
+
+            var jsonReader = JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(result), new System.Xml.XmlDictionaryReaderQuotas());
+            var release = XElement.Load(jsonReader);
+
+            var version = Version.Parse(release.XPathSelectElement("tag_name")?.Value ?? "0.1");
+
+            //if (version.Major == 0 || version <= Assembly.GetExecutingAssembly().GetName().Version)
+            //    return true;
+
+            ParseDownloadUrls(release, version);
+
+            //Download update to be installed when the app closes.
+            if (UserSettings.All.InstallUpdates && ViewModel.UpdaterViewModel.HasDownloadLink)
+                await DownloadUpdate();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Log(ex, "Impossible to check for updates on Github");
+            return false;
+        }
+        finally
+        {
+            GC.Collect();
+        }
+    }
+
+    private static bool ParseDownloadUrls(XElement release, Version version, bool fromGithub = true)
+    {
+        var moniker = RuntimeInformation.OSArchitecture switch
+        {
+            Architecture.X64 => "x64",
+            Architecture.X86 => "x86",
+            _ => "arm64"
+        };
+
+        switch (IdentityHelper.ApplicationType)
+        {
+            case ApplicationTypes.FullMultiMsix:
+            {
+                //Only get Msix files.
+                //ScreenToGif.2.36.Package.x64.msix
+                //ScreenToGif.2.36.Package.msix
+
+                var package = (release.Element("assets") ?? release.Element("items"))?.Elements().FirstOrDefault(f =>
+                {
+                    var name = (f.Element("name")?.Value ?? f.Element("title")?.Value ?? "").ToLower();
+
+                    return name.EndsWith(".package." + moniker + ".msix") || name.EndsWith("package.msix");
+                });
+
+                return SetDownloadDetails(fromGithub, version, release, package);
+            }
+            case ApplicationTypes.DependantSingle:
+            {
+                //Get portable or installer packages, light or not.
+                //ScreenToGif.2.36.Light.Portable.x64.zip
+                //ScreenToGif.2.36.Light.Portable.zip
+                //Or
+                //ScreenToGif.2.36.Light.Setup.x64.msi
+                //ScreenToGif.2.36.Light.Setup.msi
+
+                var portable = (release.Element("assets") ?? release.Element("items"))?.Elements().FirstOrDefault(f =>
+                {
+                    var name = (f.Element("name")?.Value ?? f.Element("title")?.Value ?? "").ToLower();
+
+                    return name.EndsWith(".light.portable." + moniker + ".zip") || name.EndsWith(".light.portable.zip");
+                });
+                var installer = (release.Element("assets") ?? release.Element("items"))?.Elements().FirstOrDefault(f =>
+                {
+                    var name = (f.Element("name")?.Value ?? f.Element("title")?.Value ?? "").ToLower();
+
+                    return name.EndsWith(".light.setup." + moniker + ".msi") || name.EndsWith(".light.setup.msi");
+                });
+
+                //If missing light (framework dependent) variant, download full package.
+                if (installer == null)
+                {
+                    portable = (release.Element("assets") ?? release.Element("items"))?.Elements().FirstOrDefault(f =>
+                    {
+                        var name = (f.Element("name")?.Value ?? f.Element("title")?.Value ?? "").ToLower();
+
+                        return name.EndsWith(".portable." + moniker + ".zip") || name.EndsWith(".portable.zip");
+                    });
+                    installer = (release.Element("assets") ?? release.Element("items"))?.Elements().FirstOrDefault(f =>
+                    {
+                        var name = (f.Element("name")?.Value ?? f.Element("title")?.Value ?? "").ToLower();
+
+                        return name.EndsWith(".setup." + moniker + ".msi") || name.EndsWith(".setup.msi");
+                    });
+                }
+
+                return SetDownloadDetails(fromGithub, version, release, installer, portable);
+            }
+            default:
+            {
+                //Get portable or installer packages, light or not.
+                //ScreenToGif.2.36.Portable.x64.zip
+                //ScreenToGif.2.36.Portable.zip
+                //Or
+                //ScreenToGif.2.36.Setup.x64.msi
+                //ScreenToGif.2.36.Setup.msi
+
+                var portable = (release.Element("assets") ?? release.Element("items"))?.Elements().FirstOrDefault(f =>
+                {
+                    var name = (f.Element("name")?.Value ?? f.Element("title")?.Value ?? "").ToLower();
+
+                    return (name.EndsWith(".portable." + moniker + ".zip") || name.EndsWith("portable.zip")) && !name.Contains(".light.");
+                });
+                var installer = (release.Element("assets") ?? release.Element("items"))?.Elements().FirstOrDefault(f =>
+                {
+                    var name = (f.Element("name")?.Value ?? f.Element("title")?.Value ?? "").ToLower();
+
+                    return (name.EndsWith(".setup." + moniker + ".msi") || name.EndsWith("setup.msi")) && !name.Contains(".light.");
+                });
+
+                return SetDownloadDetails(fromGithub, version, release, installer, portable);
+            }
+        }
+    }
+
+    private static bool SetDownloadDetails(bool fromGithub, Version version, XElement release, XElement installer, XElement portable = null)
+    {
+        if (installer == null)
+        {
+            ViewModel.UpdaterViewModel = new UpdaterViewModel
+            {
+                IsFromGithub = fromGithub,
+                Version = version,
+                Description = release.XPathSelectElement("body")?.Value ?? "",
+                MustDownloadManually = true
+            };
+
+            return false;
+        }
+
+        if (fromGithub)
+        {
+            ViewModel.UpdaterViewModel = new UpdaterViewModel
+            {
+                Version = version,
+                Description = release.XPathSelectElement("body")?.Value ?? "",
+
+                PortableDownloadUrl = portable?.Element("browser_download_url")?.Value ?? "",
+                PortableSize = Convert.ToInt64(portable?.Element("size")?.Value ?? "0"),
+                PortableName = portable?.Element("name")?.Value ?? "ScreenToGif.zip",
+
+                InstallerDownloadUrl = installer.Element("browser_download_url")?.Value ?? "",
+                InstallerSize = Convert.ToInt64(installer.Element("size")?.Value ?? "0"),
+                InstallerName = installer.Element("name")?.Value ?? "ScreenToGif.Setup.msi"
+            };
+
+            return true;
+        }
+
+        ViewModel.UpdaterViewModel = new UpdaterViewModel
+        {
+            IsFromGithub = false,
+            Version = version,
+            PortableDownloadUrl = portable?.Element("link")?.Value ?? "",
+            InstallerDownloadUrl = installer.Element("link")?.Value ?? "",
+        };
+
+        return true;
+    }
+
+    private static async Task CheckOnFosshub()
+    {
+        try
+        {
+            var proxy = WebHelper.GetProxy();
+            var handler = new HttpClientHandler
+            {
+                Proxy = proxy,
+                UseProxy = proxy != null,
+            };
+
+            using var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
+            using var response = await client.GetAsync("https://www.fosshub.com/feed/5bfc6fce8c9fe8186f809d24.json");
+            var result = await response.Content.ReadAsStringAsync();
+
+            var jsonReader = JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(result), new System.Xml.XmlDictionaryReaderQuotas());
+            var release = XElement.Load(jsonReader);
+
+            var version = Version.Parse(release.XPathSelectElement("release/items")?.FirstNode?.XPathSelectElement("version")?.Value ?? "0.1");
+
+            if (version.Major == 0 || version <= Assembly.GetExecutingAssembly().GetName().Version)
                 return;
-            }
 
-            await editor.LoadProject(window.Project);
-            return;
+            ParseDownloadUrls(release, version);
         }
-
-        if (editor == null)
+        catch (Exception ex)
         {
-            caller?.Show();
-            CloseOrNot();
-            return;
+            LogWriter.Log(ex, "Impossible to check for updates on Fosshub");
         }
-
-        await editor.LoadProject(null);
+        finally
+        {
+            GC.Collect();
+        }
     }
 
-    private static async Task ShowEditor(RecordingProject project = null, bool openMedia = false)
+    internal static async Task<bool> DownloadUpdate()
     {
-        var editor = Current.Windows.OfType<Editor>().FirstOrDefault(f => f.HasProjectLoaded);
-
-        if (editor == null)
+        try
         {
-            editor = new Editor();
-            editor.Closed += (_, _) => CloseOrNot();
-            editor.Show();
-        }
-        else
-        {
-            //TODO: Detect if the last state was normal/maximized.
-            if (editor.WindowState == WindowState.Minimized)
-                editor.WindowState = WindowState.Normal;
-        }
-
-        if (project != null)
-            await editor.LoadProject(project);
-        else if (openMedia)
-            editor.LoadFromArguments();
-
-        Current.MainWindow = editor;
-        editor.Activate();
-    }
-
-    private static void CloseOrNot()
-    {
-        //When closed, check if it's the last window, then close if it's the configured behavior.
-        if (UserSettings.All.ShowNotificationIcon && UserSettings.All.KeepOpen)
-            return;
-
-        //We only need to check loaded windows that have content, since any special window could be open.
-        if (Current.Windows.Cast<Window>().Count(window => window.HasContent) == 0)
-        {
-            //Install the available update on closing.
-            if (UserSettings.All.InstallUpdates)
-                InstallUpdate();
-
-            if (UserSettings.All.DeleteCacheWhenClosing)
+            lock (UserSettings.Lock)
             {
-                //TODO: Create cache dialog.
-                //if (UserSettings.All.AskDeleteCacheWhenClosing && !CacheDialog.Ask(false, out _))
-                //    return;
+                if (string.IsNullOrWhiteSpace(UserSettings.All.TemporaryFolderResolved) || ViewModel.UpdaterViewModel.IsDownloading)
+                    return false;
 
-                StorageHelper.PurgeCache();
+                var folder = Path.Combine(UserSettings.All.TemporaryFolderResolved, "ScreenToGif", "Updates");
+
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                ViewModel.UpdaterViewModel.ActivePath = Path.Combine(folder, ViewModel.UpdaterViewModel.ActiveName);
+
+                //Check if installer was already downloaded.
+                if (File.Exists(ViewModel.UpdaterViewModel.ActivePath))
+                {
+                    //Minor issue, if for some reason, the update has the exact same size, this won't work properly. I would need to check a hash.
+                    if (GetSize(ViewModel.UpdaterViewModel.ActivePath) == ViewModel.UpdaterViewModel.ActiveSize)
+                        return false;
+
+                    File.Delete(ViewModel.UpdaterViewModel.ActivePath);
+                }
+
+                ViewModel.UpdaterViewModel.IsDownloading = true;
             }
 
-            Current.Shutdown(2);
+            var proxy = WebHelper.GetProxy();
+            var handler = new HttpClientHandler
+            {
+                Proxy = proxy,
+                UseProxy = proxy != null,
+            };
+
+            //TODO: Use HttpClientFactory
+            //https://www.aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
+            //https://marcominerva.wordpress.com/2019/03/13/using-httpclientfactory-with-wpf-on-net-core-3-0/
+
+            using (var client = new HttpClient(handler))
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
+
+                var response = await client.GetAsync(ViewModel.UpdaterViewModel.ActiveDownloadUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var stream = await response.Content.ReadAsStreamAsync();
+                    var fileInfo = new FileInfo(ViewModel.UpdaterViewModel.ActivePath);
+                    await using var fileStream = fileInfo.OpenWrite();
+                    await stream.CopyToAsync(fileStream);
+                }
+                else
+                {
+                    throw new FileNotFoundException("Impossible to download update.");
+                }
+            }
+
+            ViewModel.UpdaterViewModel.MustDownloadManually = false;
+            ViewModel.UpdaterViewModel.TaskCompletionSource?.TrySetResult(true);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Log(ex, "Impossible to automatically download update");
+            ViewModel.UpdaterViewModel.MustDownloadManually = true;
+            ViewModel.UpdaterViewModel.TaskCompletionSource?.TrySetResult(false);
+            return false;
+        }
+        finally
+        {
+            ViewModel.UpdaterViewModel.IsDownloading = false;
         }
     }
-
+    
     internal static bool InstallUpdate(bool wasPromptedManually = false)
     {
         try
@@ -458,7 +789,6 @@ public partial class App
             //Download not completed (perharps because the notification was triggered by a query on Fosshub).
             if (UserSettings.All.PromptToInstall || !UserSettings.All.InstallUpdates || string.IsNullOrWhiteSpace(ViewModel.UpdaterViewModel.ActivePath) || ViewModel.UpdaterViewModel.MustDownloadManually)
             {
-                //TODO: Download dialog.
                 var download = new DownloadDialog { WasPromptedManually = wasPromptedManually };
                 var result = download.ShowDialog();
 
@@ -518,6 +848,214 @@ public partial class App
             //TODO: Localize
             ErrorDialog.ShowStatic("Update", "It was not possible to install the update.", ex);
             return false;
+        }
+    }
+
+    //Maybe turn into a helper
+    private static long GetSize(string path)
+    {
+        var info = new FileInfo(path);
+        info.Refresh();
+
+        return info.Length;
+    }
+
+    private static async Task RecorderCallback(Window caller, Editor editor, object sender, EventArgs args)
+    {
+        var window = sender as BaseRecorder;
+
+        if (window?.Project != null && window.Project.Any)
+        {
+            if (editor == null)
+            {
+                if (UserSettings.All.WindowAfterRecording == AfterRecordingWindows.SaveDialog)
+                    ShowExporter(window.Project);
+                else
+                    await ShowEditor(window.Project);
+
+                caller?.Close();
+                return;
+            }
+
+            await editor.LoadProject(window.Project);
+            return;
+        }
+
+        if (editor == null)
+        {
+            caller?.Show();
+            CloseOrNot();
+            return;
+        }
+
+        await editor.LoadProject(null);
+    }
+
+    private static async Task ShowEditor(RecordingProject project = null, bool openMedia = false)
+    {
+        var editor = Current.Windows.OfType<Editor>().FirstOrDefault(f => !f.HasProjectLoaded);
+
+        if (editor == null)
+        {
+            editor = new Editor();
+            editor.Closed += (_, _) => CloseOrNot();
+            editor.Show();
+        }
+        else
+        {
+            //TODO: Detect if the last state was normal/maximized.
+            if (editor.WindowState == WindowState.Minimized)
+                editor.WindowState = WindowState.Normal;
+        }
+
+        if (project != null)
+            await editor.LoadProject(project);
+        else if (openMedia)
+            editor.LoadFromArguments();
+
+        Current.MainWindow = editor;
+        editor.Activate();
+    }
+
+    private static void ShowExporter(RecordingProject project = null)
+    {
+        var exporter = new Exporter();
+        exporter.Closed += (_, _) => CloseOrNot();
+        exporter.Show();
+
+        exporter.LoadProject(project);
+
+        Current.MainWindow = exporter;
+        exporter.Activate();
+    }
+
+    private static void Interact(NotificationIconActions action, StartupWindows open)
+    {
+        switch (action)
+        {
+            case NotificationIconActions.OpenWindow:
+            {
+                switch (open)
+                {
+                    case StartupWindows.Welcome:
+                    {
+                        OpenStartup(null);
+                        break;
+                    }
+                    case StartupWindows.ScreenRecorder:
+                    {
+                        TryOpeningScreenRecorder();
+                        return;
+                    }
+                    case StartupWindows.WebcamRecorder:
+                    {
+                        TryOpeningWebcamRecorder();
+                        break;
+                    }
+                    case StartupWindows.SketchboardRecorder:
+                    {
+                        TryOpeningBoardRecorder();
+                        break;
+                    }
+                    case StartupWindows.Editor:
+                    {
+                        TryOpeningEditor();
+                        break;
+                    }
+                }
+
+                break;
+            }
+
+            case NotificationIconActions.ToggleWindows:
+            {
+                var all = Current.Windows.OfType<Window>().Where(w => w.Content != null).ToList();
+
+                if (all.Count == 0)
+                {
+                    Interact(NotificationIconActions.OpenWindow, open);
+                    return;
+                }
+
+                if (all.Any(n => n.WindowState != WindowState.Minimized))
+                {
+                    //Minimize all windows, disabling before to prevent some behaviors.
+                    foreach (var f in all)
+                        f.IsEnabled = false;
+
+                    foreach (var f in all)
+                        f.WindowState = WindowState.Minimized;
+
+                    foreach (var f in all)
+                        f.IsEnabled = true;
+                }
+                else
+                {
+                    //Restore all windows.
+                    foreach (var window in all)
+                        window.WindowState = WindowState.Normal;
+                }
+
+                break;
+            }
+
+            case NotificationIconActions.MinimizeWindows:
+            {
+                var all = Current.Windows.OfType<Window>().Where(w => w.Content != null).ToList();
+
+                if (all.Count == 0)
+                {
+                    Interact(NotificationIconActions.OpenWindow, open);
+                    return;
+                }
+
+                foreach (var window in all)
+                    window.WindowState = WindowState.Minimized;
+
+                break;
+            }
+
+            case NotificationIconActions.MaximizeWindows:
+            {
+                var all = Current.Windows.OfType<Window>().Where(w => w.Content != null).ToList();
+
+                if (all.Count == 0)
+                {
+                    Interact(NotificationIconActions.OpenWindow, open);
+                    return;
+                }
+
+                foreach (var window in all)
+                    window.WindowState = WindowState.Normal;
+
+                break;
+            }
+        }
+    }
+
+    private static void CloseOrNot()
+    {
+        //When closed, check if it's the last window, then close if it's the configured behavior.
+        if (UserSettings.All.ShowNotificationIcon && UserSettings.All.KeepOpen)
+            return;
+
+        //We only need to check loaded windows that have content, since any special window could be open.
+        if (Current.Windows.Cast<Window>().Count(window => window.HasContent) == 0)
+        {
+            //Install the available update on closing.
+            if (UserSettings.All.InstallUpdates)
+                InstallUpdate();
+
+            if (UserSettings.All.DeleteCacheWhenClosing)
+            {
+                //TODO: Create cache dialog.
+                //if (UserSettings.All.AskDeleteCacheWhenClosing && !CacheDialog.Ask(false, out _))
+                //    return;
+
+                StorageHelper.PurgeCache();
+            }
+
+            Current.Shutdown(2);
         }
     }
 }

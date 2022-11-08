@@ -19,11 +19,14 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
     private Task _eventConsumerTask;
 
     private FileStream _fileStream;
-    private BufferedStream _bufferedStream;
-    protected DeflateStream CompressStream;
+    protected BufferedStream CompressStream;
+    //private BufferedStream _bufferedStream;
+    //protected DeflateStream CompressStream;
 
-    private FileStream _eventsFileStream;
-    private BufferedStream _eventsBufferedStream;
+    private FileStream _mouseEventsFileStream;
+    private BufferedStream _mouseEventsBufferedStream;
+    private FileStream _keyboardEventsFileStream;
+    private BufferedStream _keyboardEventsBufferedStream;
 
     #endregion
 
@@ -56,14 +59,20 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
 
         //Frame cache on memory/disk.
         _fileStream = new FileStream(project.FramesCachePath, FileMode.Create, FileAccess.Write, FileShare.None);
-        _bufferedStream = new BufferedStream(_fileStream, UserSettings.All.MemoryCacheSize * 1_048_576); //Each 1 MB has 1_048_576 bytes.
-        CompressStream = new DeflateStream(_bufferedStream, UserSettings.All.CaptureCompression, false);
+        CompressStream = new BufferedStream(_fileStream, UserSettings.All.MemoryCacheSize * 1_048_576); //Each 1 MB has 1_048_576 bytes.
+        //_bufferedStream = new BufferedStream(_fileStream, UserSettings.All.MemoryCacheSize * 1_048_576); //Each 1 MB has 1_048_576 bytes.
+        //CompressStream = new DeflateStream(_bufferedStream, UserSettings.All.CaptureCompression, false);
         
-        //Events (cursor, key presses) cache on memory/disk.
-        _eventsFileStream = new FileStream(project.EventsCachePath, FileMode.Create, FileAccess.Write, FileShare.None);
-        _eventsBufferedStream = new BufferedStream(_eventsFileStream, 10 * 1_048_576); //Each 1 MB has 1_048_576 bytes.
+        //Mouse events cache on memory/disk.
+        _mouseEventsFileStream = new FileStream(project.MouseEventsCachePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        _mouseEventsBufferedStream = new BufferedStream(_mouseEventsFileStream, 5 * 1_048_576); //Each 1 MB has 1_048_576 bytes.
+
+        //Keyboard events cache on memory/disk.
+        _keyboardEventsFileStream = new FileStream(project.KeyboardEventsCachePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        _keyboardEventsBufferedStream = new BufferedStream(_keyboardEventsFileStream, 1 * 1_048_576); //Each 1 MB has 1_048_576 bytes.
 
         ConfigureEventConsumer();
+        WriteFrameSequenceHeader();
 
         WasEventCaptureStarted = true;
         IsAcceptingEvents = IsAutomatic;
@@ -107,6 +116,39 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
         });
     }
 
+    private void WriteFrameSequenceHeader()
+    {
+        //Sequence details.
+        CompressStream.WriteUInt16(1); //2 bytes, ID.
+        CompressStream.WriteByte((byte)SequenceTypes.Frame); //1 bytes.
+        CompressStream.WriteUInt64(0); //8 bytes, start time in ticks.
+        CompressStream.WriteUInt64(0); //8 bytes, end time in ticks (unknown for now).
+        CompressStream.WriteBytes(BitConverter.GetBytes(1)); //4 bytes, opacity.
+        CompressStream.WritePascalStringUInt32(null); //4 bytes, background as string.
+
+        //Sequence effects.
+        CompressStream.WriteByte(0); //Effect count, 1 bytes.
+
+        //Rect sequence.
+        CompressStream.WriteInt32(0); //4 bytes, left/X.
+        CompressStream.WriteInt32(0); //4 bytes, top/Y.
+        CompressStream.WriteUInt16((ushort) Width); //2 bytes.
+        CompressStream.WriteUInt16((ushort) Height); //2 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(0))); //4 bytes, angle.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
+
+        //Raster sequence. Should it be type of raster?
+        CompressStream.WriteByte((byte)RasterSequenceSources.Screen); //1 byte.
+        CompressStream.WriteUInt16((ushort)Width); //2 bytes.
+        CompressStream.WriteUInt16((ushort)Height); //2 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
+        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
+        CompressStream.WriteByte(Project.ChannelCount); //1 byte.
+        CompressStream.WriteByte(Project.BitsPerChannel); //1 byte.
+        CompressStream.WriteUInt32((uint)0); //1 byte, frame count (unknown for now).
+    }
+
     #region Capture
 
     public abstract int CaptureWithCursor(RecordingFrame frame);
@@ -148,7 +190,7 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
             MouseDelta = mouseDelta
         };
 
-        Project.Events.Add(recordingEvent);
+        Project.MouseEvents.Add(recordingEvent);
         _eventConsumer.Add(recordingEvent);
     }
 
@@ -170,7 +212,7 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
             Data = pixels
         };
 
-        Project.Events.Add(recordingEvent);
+        Project.MouseEvents.Add(recordingEvent);
         _eventConsumer.Add(recordingEvent);
     }
     
@@ -188,45 +230,45 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
             WasInjected = wasInjected
         };
 
-        Project.Events.Add(recordingEvent);
+        Project.KeyboardEvents.Add(recordingEvent);
         _eventConsumer.Add(recordingEvent);
     }
 
     public virtual void SaveEvent(CursorEvent cursorEvent)
     {
-        cursorEvent.StreamPosition = _eventsBufferedStream.Position;
+        cursorEvent.StreamPosition = _mouseEventsBufferedStream.Position;
 
-        _eventsBufferedStream.WriteByte((byte)RecordingEvents.Cursor); //1 byte.
-        _eventsBufferedStream.WriteUInt64((ulong)cursorEvent.TimeStampInTicks); //8 bytes.
-        _eventsBufferedStream.WriteInt32(cursorEvent.Left); //4 bytes.
-        _eventsBufferedStream.WriteInt32(cursorEvent.Top); //4 bytes.
-        _eventsBufferedStream.WriteBoolean(cursorEvent.LeftButton == MouseButtonState.Pressed); //1 byte.
-        _eventsBufferedStream.WriteBoolean(cursorEvent.RightButton == MouseButtonState.Pressed); //1 byte.
-        _eventsBufferedStream.WriteBoolean(cursorEvent.MiddleButton == MouseButtonState.Pressed); //1 byte.
-        _eventsBufferedStream.WriteBoolean(cursorEvent.FirstExtraButton == MouseButtonState.Pressed); //1 byte.
-        _eventsBufferedStream.WriteBoolean(cursorEvent.SecondExtraButton == MouseButtonState.Pressed); //1 byte.
-        _eventsBufferedStream.WriteInt16(cursorEvent.MouseDelta); //2 bytes.
+        _mouseEventsBufferedStream.WriteByte((byte)RecordingEvents.Cursor); //1 byte.
+        _mouseEventsBufferedStream.WriteUInt64((ulong)cursorEvent.TimeStampInTicks); //8 bytes.
+        _mouseEventsBufferedStream.WriteInt32(cursorEvent.Left); //4 bytes.
+        _mouseEventsBufferedStream.WriteInt32(cursorEvent.Top); //4 bytes.
+        _mouseEventsBufferedStream.WriteBoolean(cursorEvent.LeftButton == MouseButtonState.Pressed); //1 byte.
+        _mouseEventsBufferedStream.WriteBoolean(cursorEvent.RightButton == MouseButtonState.Pressed); //1 byte.
+        _mouseEventsBufferedStream.WriteBoolean(cursorEvent.MiddleButton == MouseButtonState.Pressed); //1 byte.
+        _mouseEventsBufferedStream.WriteBoolean(cursorEvent.FirstExtraButton == MouseButtonState.Pressed); //1 byte.
+        _mouseEventsBufferedStream.WriteBoolean(cursorEvent.SecondExtraButton == MouseButtonState.Pressed); //1 byte.
+        _mouseEventsBufferedStream.WriteInt16(cursorEvent.MouseDelta); //2 bytes.
     }
 
     public virtual void SaveEvent(CursorDataEvent cursorEvent)
     {
-        cursorEvent.StreamPosition = _eventsBufferedStream.Position;
+        cursorEvent.StreamPosition = _mouseEventsBufferedStream.Position;
 
-        _eventsBufferedStream.WriteByte((byte)RecordingEvents.CursorData); //1 byte.
-        _eventsBufferedStream.WriteUInt64((ulong)cursorEvent.TimeStampInTicks); //8 bytes.
-        _eventsBufferedStream.WriteByte((byte)cursorEvent.CursorType); //1 byte.
+        _mouseEventsBufferedStream.WriteByte((byte)RecordingEvents.CursorData); //1 byte.
+        _mouseEventsBufferedStream.WriteUInt64((ulong)cursorEvent.TimeStampInTicks); //8 bytes.
+        _mouseEventsBufferedStream.WriteByte((byte)cursorEvent.CursorType); //1 byte.
 
-        _eventsBufferedStream.WriteInt32(cursorEvent.Left); //4 bytes.
-        _eventsBufferedStream.WriteInt32(cursorEvent.Top); //4 bytes.
-        _eventsBufferedStream.WriteUInt32((uint)cursorEvent.Width); //4 bytes.
-        _eventsBufferedStream.WriteUInt32((uint)cursorEvent.Height); //4 bytes.
-        _eventsBufferedStream.WriteUInt32((uint)cursorEvent.XHotspot); //4 bytes.
-        _eventsBufferedStream.WriteUInt32((uint)cursorEvent.YHotspot); //4 bytes.
-        _eventsBufferedStream.WriteUInt64((ulong)cursorEvent.Data.Length); //8 bytes.
+        _mouseEventsBufferedStream.WriteInt32(cursorEvent.Left); //4 bytes.
+        _mouseEventsBufferedStream.WriteInt32(cursorEvent.Top); //4 bytes.
+        _mouseEventsBufferedStream.WriteUInt32((uint)cursorEvent.Width); //4 bytes.
+        _mouseEventsBufferedStream.WriteUInt32((uint)cursorEvent.Height); //4 bytes.
+        _mouseEventsBufferedStream.WriteUInt32((uint)cursorEvent.XHotspot); //4 bytes.
+        _mouseEventsBufferedStream.WriteUInt32((uint)cursorEvent.YHotspot); //4 bytes.
+        _mouseEventsBufferedStream.WriteUInt64((ulong)cursorEvent.Data.Length); //8 bytes.
 
         if (cursorEvent.Data?.Length > 0)
         {
-            _eventsBufferedStream.WriteBytes(cursorEvent.Data);
+            _mouseEventsBufferedStream.WriteBytes(cursorEvent.Data);
 
             cursorEvent.PixelsLength = cursorEvent.Data.Length;
             cursorEvent.Data = null;
@@ -235,14 +277,14 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
 
     public virtual void SaveEvent(KeyEvent keyEvent)
     {
-        keyEvent.StreamPosition = _eventsBufferedStream.Position;
+        keyEvent.StreamPosition = _keyboardEventsBufferedStream.Position;
 
-        _eventsBufferedStream.WriteByte((byte)RecordingEvents.Key); //Key event type.
-        _eventsBufferedStream.WriteUInt64((ulong)keyEvent.TimeStampInTicks); //TimeStamp since capture start.
-        _eventsBufferedStream.WriteUInt32((uint)keyEvent.Key);
-        _eventsBufferedStream.WriteByte((byte)keyEvent.Modifiers);
-        _eventsBufferedStream.WriteByte(keyEvent.IsUppercase ? (byte) 1 : (byte) 0);
-        _eventsBufferedStream.WriteByte(keyEvent.WasInjected ? (byte) 1 : (byte) 0);
+        _keyboardEventsBufferedStream.WriteByte((byte)RecordingEvents.Key); //Key event type.
+        _keyboardEventsBufferedStream.WriteUInt64((ulong)keyEvent.TimeStampInTicks); //TimeStamp since capture start.
+        _keyboardEventsBufferedStream.WriteUInt32((uint)keyEvent.Key);
+        _keyboardEventsBufferedStream.WriteByte((byte)keyEvent.Modifiers);
+        _keyboardEventsBufferedStream.WriteByte(keyEvent.IsUppercase ? (byte) 1 : (byte) 0);
+        _keyboardEventsBufferedStream.WriteByte(keyEvent.WasInjected ? (byte) 1 : (byte) 0);
     }
 
     #endregion
@@ -265,11 +307,13 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
         await CompressStream.FlushAsync();
         await CompressStream.DisposeAsync();
         //await _bufferedStream.FlushAsync();
-        await _bufferedStream.DisposeAsync();
+        //await _bufferedStream.DisposeAsync();
         await _fileStream.DisposeAsync();
         
-        await _eventsBufferedStream.DisposeAsync();
-        await _eventsFileStream.DisposeAsync();
+        await _mouseEventsBufferedStream.DisposeAsync();
+        await _mouseEventsFileStream.DisposeAsync();
+        await _keyboardEventsBufferedStream.DisposeAsync();
+        await _keyboardEventsFileStream.DisposeAsync();
 
         WasEventCaptureStarted = false;
     }

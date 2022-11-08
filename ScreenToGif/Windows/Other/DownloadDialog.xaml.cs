@@ -7,7 +7,6 @@ using System.Windows.Documents;
 using System.Xml.Linq;
 using ScreenToGif.Controls;
 using ScreenToGif.Domain.Enums;
-using ScreenToGif.Native.Helpers;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Native;
 using ScreenToGif.Util.Settings;

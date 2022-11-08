@@ -165,7 +165,7 @@
     <s:String x:Key="S.Updater.Header">Доступно обновление</s:String>
     <s:String x:Key="S.Updater.NewRelease">Новая версия!</s:String>
     <s:String x:Key="S.Updater.NewRelease.Info">Доступна новая версия {0}! Показать детали.</s:String>
-    <s:String x:Key="S.Updater.NoNewRelease.Info">Возможно ваша система больше не поддерживается или что-то мешает обновлению. Попробуйте загрузить его вручную с сайта.</s:String>
+    <s:String x:Key="S.Updater.Unsupported.Info">Возможно ваша система больше не поддерживается или что-то мешает обновлению. Попробуйте загрузить его вручную с сайта.</s:String>
     <s:String x:Key="S.Updater.Version">Версия</s:String>
     <s:String x:Key="S.Updater.Portable">Портативная</s:String>
     <s:String x:Key="S.Updater.Installer">Установщик</s:String>

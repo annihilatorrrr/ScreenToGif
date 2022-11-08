@@ -8,7 +8,7 @@
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-        <Setter Property="Background" Value="{DynamicResource Brush.ScrollBar.Border}"/>
+        <Setter Property="Background" Value="{DynamicResource Brush.Stroke.Control.Default}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
@@ -61,7 +61,7 @@
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Background" Value="#33FFFFFF"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource Brush.ScrollBar.Border}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.Control.Default}"/>
         <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
@@ -97,7 +97,7 @@
     <Style TargetType="{x:Type n:HorizontalTimelineScrollBar}">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="Background" Value="{DynamicResource Element.Background}"/>
+        <Setter Property="Background" Value="{DynamicResource Brush.Window.Background}"/>
 
         <Setter Property="Template">
             <Setter.Value>
@@ -132,7 +132,7 @@
 
     <Style TargetType="{x:Type n:TimeBar}">
         <Setter Property="Padding" Value="10,5"/>
-        <Setter Property="Background" Value="{DynamicResource Element.Background}"/>
+        <Setter Property="Background" Value="{DynamicResource Brush.Window.Background}"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
 
@@ -210,7 +210,7 @@
     <Style TargetType="{x:Type n:Timeline}">
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
-        <Setter Property="Background" Value="{DynamicResource Element.Background}"/>
+        <Setter Property="Background" Value="{DynamicResource Brush.Window.Background}"/>
 
         <Setter Property="Template">
             <Setter.Value>
@@ -234,7 +234,7 @@
 
                         <ItemsControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{TemplateBinding Tracks}" ItemTemplate="{StaticResource TrackTemplate}"/>
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" TextAlignment="Center">
+                        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" TextAlignment="Center" Foreground="{DynamicResource Brush.Foreground}">
                             <Run Text="Start: "/>
                             <Run Text="{Binding ViewportStart, RelativeSource={RelativeSource TemplatedParent}, StringFormat=g}"/>
                             <Run Text="• End: "/>

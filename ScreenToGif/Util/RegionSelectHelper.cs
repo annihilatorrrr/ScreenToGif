@@ -1,4 +1,5 @@
 using ScreenToGif.Domain.Enums;
+using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Native;
 using ScreenToGif.Util.Native;
 using ScreenToGif.Windows.Other;
@@ -13,11 +14,11 @@ internal static class RegionSelectHelper
 {
     internal class Selection
     {
-        public Monitor Monitor { get; set; }
+        public IMonitor Monitor { get; set; }
             
         public Rect Region { get; set; }
 
-        public Selection(Monitor monitor, Rect region)
+        public Selection(IMonitor monitor, Rect region)
         {
             Monitor = monitor;
             Region = region;
@@ -34,7 +35,7 @@ internal static class RegionSelectHelper
 
     #endregion
 
-    internal static Task<Selection> Select(RegionSelectionModes mode, Rect previousRegion, Monitor currentMonitor, bool quickSelection = false)
+    internal static Task<Selection> Select(RegionSelectionModes mode, Rect previousRegion, IMonitor currentMonitor, bool quickSelection = false)
     {
         _taskCompletionSource = new TaskCompletionSource<Selection>();
 

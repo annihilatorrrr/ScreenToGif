@@ -1,11 +1,13 @@
 using ScreenToGif.Domain.ViewModels;
+using ScreenToGif.Util;
 using ScreenToGif.Util.Settings;
 
 namespace ScreenToGif.ViewModel;
 
 public class UpdaterViewModel : BaseViewModel
 {
-    private bool _isFromGithub;
+    private bool _isFromGithub = true;
+    private bool _isInstaller;
     private bool _mustDownloadManually;
     private Version _version;
     private string _description;
@@ -26,6 +28,19 @@ public class UpdaterViewModel : BaseViewModel
         set => SetProperty(ref _isFromGithub, value);
     }
 
+    public bool IsInstaller
+    {
+        get => _isInstaller;
+        set
+        {
+            SetProperty(ref _isInstaller, value);
+
+            OnPropertyChanged(nameof(TypeDescription));
+        }
+    }
+
+    public string TypeDescription => IsInstaller ? LocalizationHelper.Get("S.Updater.Installer") : LocalizationHelper.Get("S.Updater.Portable");
+
     public bool MustDownloadManually
     {
         get => _mustDownloadManually;
@@ -35,12 +50,19 @@ public class UpdaterViewModel : BaseViewModel
     public Version Version
     {
         get => _version;
-        set => SetProperty(ref _version, value);
+        set
+        {
+            SetProperty(ref _version, value);
+
+            OnPropertyChanged(nameof(VersionDescription));
+        }
     }
+
+    public string VersionDescription => $"{LocalizationHelper.Get("S.Updater.Version")} {Version}";
 
     public string Description
     {
-        get => _description;
+        get => _description ?? "";
         set => SetProperty(ref _description, value);
     }
 
@@ -92,6 +114,7 @@ public class UpdaterViewModel : BaseViewModel
             SetProperty(ref _installerSize, value);
 
             OnPropertyChanged(nameof(ActiveSize));
+            OnPropertyChanged(nameof(SizeHumanized));
         }
     }
 
@@ -137,6 +160,7 @@ public class UpdaterViewModel : BaseViewModel
             SetProperty(ref _portableSize, value);
 
             OnPropertyChanged(nameof(ActiveSize));
+            OnPropertyChanged(nameof(SizeHumanized));
         }
     }
 
@@ -173,4 +197,8 @@ public class UpdaterViewModel : BaseViewModel
 #endif
 
     public bool HasDownloadLink => !string.IsNullOrWhiteSpace(ActiveDownloadUrl);
+
+    public string SizeHumanized => Humanizer.BytesToString(ActiveSize);
+
+    public TaskCompletionSource<bool> TaskCompletionSource { get; set; }
 }

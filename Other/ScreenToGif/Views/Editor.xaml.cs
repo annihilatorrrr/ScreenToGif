@@ -1,3 +1,4 @@
+using ScreenToGif.Controls;
 using ScreenToGif.Controls.Recorder;
 using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Util;
@@ -13,7 +14,7 @@ using System.Windows.Input;
 
 namespace ScreenToGif.Views;
 
-public partial class Editor : Window
+public partial class Editor : ExWindow
 {
     #region Variables
 
@@ -257,6 +258,6 @@ public partial class Editor : Window
 
     private void Previewer_OnMouseDown(object sender, MouseButtonEventArgs e)
     {
-        _viewModel.Seek(TimeSpan.FromMilliseconds(0));
+        _viewModel.Seek(0);
     }
 }

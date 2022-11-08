@@ -165,7 +165,7 @@
     <s:String x:Key="S.Updater.Header">Uusi päivitys on saatavilla</s:String>
     <s:String x:Key="S.Updater.NewRelease">Uusi julkaisu!</s:String>
     <s:String x:Key="S.Updater.NewRelease.Info">Uusi versio saatavilla, versio {0}!&#x0d;Klikkaa tästä saadaksesi lisätietoja.</s:String>
-    <s:String x:Key="S.Updater.NoNewRelease.Info">Näyttää siltä, että järjestelmääsi ei enää tueta tai että päivitysjärjestelmässä on tapahtunut muutoksia. Yritä ladata se manuaalisesti verkkosivustolta.</s:String>
+    <s:String x:Key="S.Updater.Unsupported.Info">Näyttää siltä, että järjestelmääsi ei enää tueta tai että päivitysjärjestelmässä on tapahtunut muutoksia. Yritä ladata se manuaalisesti verkkosivustolta.</s:String>
     <s:String x:Key="S.Updater.Version">Versio</s:String>
     <s:String x:Key="S.Updater.Portable">Siirrettävä</s:String>
     <s:String x:Key="S.Updater.Installer">Asentaja</s:String>

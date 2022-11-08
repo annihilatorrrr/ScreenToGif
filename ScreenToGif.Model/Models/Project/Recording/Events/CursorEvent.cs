@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace ScreenToGif.Domain.Models.Project.Recording.Events;
 
-public class CursorEvent : RecordingEvent
+public class CursorEvent : MouseEvent
 {
     public CursorEvent()
     {
@@ -22,16 +22,6 @@ public class CursorEvent : RecordingEvent
         SecondExtraButton = secondExtra;
         MouseDelta = mouseDelta;
     }
-
-    /// <summary>
-    /// Horizontal axis position.
-    /// </summary>
-    public int Left { get; set; }
-
-    /// <summary>
-    /// Vertical axis position.
-    /// </summary>
-    public int Top { get; set; }
 
     /// <summary>
     /// State of the left mouse button.

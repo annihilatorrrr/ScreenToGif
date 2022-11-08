@@ -8,5 +8,5 @@ public interface ISequence
 
     public string CachePath { get; set; }
 
-    public void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, TimeSpan timestamp, double quality, string cachePath);
+    public void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath);
 }

@@ -25,7 +25,7 @@
                     <DataTemplate DataType="{x:Type m:ExtendedItem}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="1"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
@@ -34,7 +34,7 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
 
-                            <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Width="36" Height="34" Margin="3,3,6,3" Background="{Binding Drawing}"/>
+                            <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
 
                             <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
                             <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Title}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
@@ -51,17 +51,17 @@
 
                     <TextBlock Grid.Row="0" Text="On start, open..." Margin="5,3" FontSize="15"/>
 
-                    <c:ExComboBox Grid.Row="1" Margin="5,3" MinWidth="200" SelectedIndex="{Binding FirstWindow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}" Height="50">
-                        <m:ExtendedItem Title="Screen Recorder" Description="Capture your screen" Drawing="{StaticResource Drawings.Recorder.Screen}"/>
-                        <m:ExtendedItem Title="Webcam Recorder" Description="Capture from webcam" Drawing="{StaticResource Drawings.Recorder.Webcam}"/>
-                        <m:ExtendedItem Title="Sketchboard Recorder" Description="Capture your drawings" Drawing="{StaticResource Drawings.Recorder.Sketchboard}"/>
-                        <m:ExtendedItem Title="Editor" Description="Create, edit and export animations" Drawing="{StaticResource Drawings.Editor}"/>
-                        <m:ExtendedItem Title="Startup" Description="Simple welcome screen with shortcuts" Drawing="{StaticResource Drawings.Welcome}"/>
-                        <m:ExtendedItem Title="Nothing" Description="Leave the app in the system tray" Drawing="{StaticResource Drawings.SystemTray}"/>
+                    <c:ExComboBox Grid.Row="1" Margin="5,3" MinWidth="250" SelectedIndex="{Binding StartupWindow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}" Height="50">
+                        <m:ExtendedItem Title="Screen Recorder" Description="Capture your screen" Symbol="SquareHint"/>
+                        <m:ExtendedItem Title="Webcam Recorder" Description="Capture from webcam" Symbol="Camera"/>
+                        <m:ExtendedItem Title="Sketchboard Recorder" Description="Capture your drawings" Symbol="InkStroke"/>
+                        <m:ExtendedItem Title="Editor" Description="Create, edit and export animations" Symbol="WindowEdit"/>
+                        <m:ExtendedItem Title="Startup" Description="Simple welcome screen with shortcuts" Symbol="Home"/>
+                        <m:ExtendedItem Title="Nothing" Description="Leave the app in the system tray" Symbol="TrayItemAdd"/>
                     </c:ExComboBox>
                 </Grid>
 
-                <Grid x:Name="ThenGrid" Visibility="{Binding SecondStepVisibility, FallbackValue={x:Static Visibility.Collapsed}}">
+                <Grid x:Name="ThenGrid" Visibility="{Binding SecondStepVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue={x:Static Visibility.Collapsed}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -70,7 +70,7 @@
                     <TextBlock Grid.Row="0" Text="Then..." Margin="5,3" FontSize="15"/>
 
                     <c:ExComboBox Grid.Row="1" Margin="5,3" MinWidth="200" SelectedIndex="0" IsEnabled="False" Height="50">
-                        <m:ExtendedItem Title="Open Anything" Description="Open any recorder or the editor" Drawing="{StaticResource Drawings.Recorder.Screen}"/>
+                        <m:ExtendedItem Title="Open Anything" Description="Open any recorder or the editor" Symbol="Window"/>
                     </c:ExComboBox>
                 </Grid>
 
@@ -82,9 +82,9 @@
 
                     <TextBlock Grid.Row="0" Text="After recording, show..." Margin="5,3" FontSize="15"/>
 
-                    <c:ExComboBox Grid.Row="1" Margin="5,3" MinWidth="200" SelectedIndex="{Binding AfterRecording, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}" Height="50">
-                        <m:ExtendedItem Title="Save Dialog" Description="With a simple editor" Drawing="{StaticResource Drawings.SaveDialog}"/>
-                        <m:ExtendedItem Title="Advanced Editor" Description="Capable of editing your recording" Drawing="{StaticResource Drawings.Editor}"/>
+                    <c:ExComboBox Grid.Row="1" Margin="5,3" MinWidth="250" SelectedIndex="{Binding AfterRecording, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}" Height="50">
+                        <m:ExtendedItem Title="Exporter" Description="With a simple editor" Symbol="Save"/>
+                        <m:ExtendedItem Title="Advanced Editor" Description="Capable of editing your recording" Symbol="WindowEdit"/>
                     </c:ExComboBox>
                 </Grid>
             </WrapPanel>

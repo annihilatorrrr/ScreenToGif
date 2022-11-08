@@ -13,7 +13,7 @@ public class RecorderViewModel : BindableBase
     #region Properties
 
     private RecorderStages _stage = RecorderStages.Stopped;
-    private int _frameCount = 1;
+    private int _frameCount = 0;
     private bool _hasImpreciseCapture;
     private RecordingProject _project;
 
@@ -29,12 +29,20 @@ public class RecorderViewModel : BindableBase
 
             OnPropertyChanged(nameof(CanOpenOptions));
             OnPropertyChanged(nameof(CanSwitchFrequency));
+            OnPropertyChanged(nameof(CanSelectRegion));
             OnPropertyChanged(nameof(CanRecord));
             OnPropertyChanged(nameof(CanPause));
             OnPropertyChanged(nameof(CanSnap));
             OnPropertyChanged(nameof(CanStop));
             OnPropertyChanged(nameof(CanStopLarge));
             OnPropertyChanged(nameof(CanDiscard));
+
+            OnPropertyChanged(nameof(SnapVisibility));
+            OnPropertyChanged(nameof(RecordVisibility));
+            OnPropertyChanged(nameof(PauseVisibility));
+            OnPropertyChanged(nameof(StopVisibility));
+            OnPropertyChanged(nameof(StopLargeVisibility));
+            OnPropertyChanged(nameof(DiscardVisibility));
         }
     }
 
@@ -56,9 +64,28 @@ public class RecorderViewModel : BindableBase
             OnPropertyChanged(nameof(CanStop));
             OnPropertyChanged(nameof(CanStopLarge));
             OnPropertyChanged(nameof(CanDiscard));
+            OnPropertyChanged(nameof(CanSelectRegion));
 
-            OnPropertyChanged(nameof(UserInteractionWarningVisibility));
+            OnPropertyChanged(nameof(CaptureFrequencyAsInteger));
+
+            OnPropertyChanged(nameof(SnapVisibility));
+            OnPropertyChanged(nameof(RecordVisibility));
+            OnPropertyChanged(nameof(PauseVisibility));
+            OnPropertyChanged(nameof(StopVisibility));
+            OnPropertyChanged(nameof(StopLargeVisibility));
+            OnPropertyChanged(nameof(DiscardVisibility));
+
+            OnPropertyChanged(nameof(FramerateVisibility));
+            OnPropertyChanged(nameof(ManualInfoVisibility));
+            OnPropertyChanged(nameof(InteractionInfoVisibility));
+            OnPropertyChanged(nameof(InteractionInfoTextVisibility));
         }
+    }
+
+    public int CaptureFrequencyAsInteger
+    {
+        get => (int)CaptureFrequency;
+        set => CaptureFrequency = (CaptureFrequencies)value;
     }
 
     /// <summary>
@@ -71,11 +98,16 @@ public class RecorderViewModel : BindableBase
         {
             SetProperty(ref _frameCount, value);
 
+            OnPropertyChanged(nameof(CanSelectRegion));
             OnPropertyChanged(nameof(CanStop));
             OnPropertyChanged(nameof(CanStopLarge));
             OnPropertyChanged(nameof(CanDiscard));
 
-            OnPropertyChanged(nameof(UserInteractionWarningVisibility));
+            OnPropertyChanged(nameof(StopVisibility));
+            OnPropertyChanged(nameof(StopLargeVisibility));
+            OnPropertyChanged(nameof(DiscardVisibility));
+
+            OnPropertyChanged(nameof(InteractionInfoTextVisibility));
         }
     }
 
@@ -102,18 +134,42 @@ public class RecorderViewModel : BindableBase
         }
     }
 
-    public bool CanOpenOptions => (Stage != RecorderStages.Recording || CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction) && Stage != RecorderStages.PreStarting;
+    public bool ShowDiscardDuringCapturing
+    {
+        get => _showDiscardDuringCapturing;
+        set
+        {
+            SetProperty(ref _showDiscardDuringCapturing, value);
+
+            OnPropertyChanged(nameof(CanStop));
+            OnPropertyChanged(nameof(CanStopLarge));
+            OnPropertyChanged(nameof(CanDiscard));
+        }
+    }
+
+    public bool CanOpenOptions => (Stage != RecorderStages.Recording || CaptureFrequency is CaptureFrequencies.Manual) && Stage != RecorderStages.PreStarting;
     public bool CanSwitchFrequency => ((Stage != RecorderStages.Recording || Project == null) || CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction) && Stage != RecorderStages.PreStarting;
+    public bool CanSelectRegion => (Stage is RecorderStages.Stopped && FrameCount == 0) || (CaptureFrequency is CaptureFrequencies.Manual && FrameCount == 0);
+
     public bool CanRecord => Stage is RecorderStages.Stopped or RecorderStages.Paused && CaptureFrequency != CaptureFrequencies.Manual;
     public bool CanPause => Stage == RecorderStages.Recording && CaptureFrequency != CaptureFrequencies.Manual;
-    public bool CanSnap => Stage == RecorderStages.Recording && CaptureFrequency == CaptureFrequencies.Manual;
+    public bool CanSnap => Stage == RecorderStages.Recording && CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction;
 
-    public bool CanStop => (Stage == RecorderStages.Recording && (CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction || UserSettings.All.RecorderDisplayDiscard) && FrameCount > 0) || (Stage == RecorderStages.Paused && FrameCount > 0);
-    public bool CanStopLarge => (Stage == RecorderStages.Recording && CaptureFrequency != CaptureFrequencies.Manual && CaptureFrequency != CaptureFrequencies.Interaction && !UserSettings.All.RecorderDisplayDiscard) || Stage == RecorderStages.PreStarting;
+    public bool CanStop => (Stage == RecorderStages.Recording && (CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction || ShowDiscardDuringCapturing) && FrameCount > 0) || (Stage == RecorderStages.Paused && FrameCount > 0);
+    public bool CanStopLarge => (Stage == RecorderStages.Recording && CaptureFrequency != CaptureFrequencies.Manual && CaptureFrequency != CaptureFrequencies.Interaction && !ShowDiscardDuringCapturing) || Stage == RecorderStages.PreStarting;
+    public bool CanDiscard => (Stage == RecorderStages.Paused && FrameCount > 0) || (Stage == RecorderStages.Recording && (CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction || ShowDiscardDuringCapturing) && FrameCount > 0);
 
-    public bool CanDiscard => (Stage == RecorderStages.Paused && FrameCount > 0) || (Stage == RecorderStages.Recording && (CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction || UserSettings.All.RecorderDisplayDiscard) && FrameCount > 0);
+    public Visibility SnapVisibility => CaptureFrequency == CaptureFrequencies.Manual ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility RecordVisibility => CaptureFrequency != CaptureFrequencies.Manual && Stage is RecorderStages.Stopped or RecorderStages.Paused ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility PauseVisibility => CaptureFrequency != CaptureFrequencies.Manual && Stage == RecorderStages.Recording ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility StopVisibility => (Stage == RecorderStages.Recording && (CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction || ShowDiscardDuringCapturing) && FrameCount > 0) || (Stage == RecorderStages.Paused && FrameCount > 0) ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility StopLargeVisibility => (Stage == RecorderStages.Recording && CaptureFrequency != CaptureFrequencies.Manual && CaptureFrequency != CaptureFrequencies.Interaction && !ShowDiscardDuringCapturing) || Stage == RecorderStages.PreStarting ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility DiscardVisibility => (Stage == RecorderStages.Paused && FrameCount > 0) || (Stage == RecorderStages.Recording && (CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction || ShowDiscardDuringCapturing) && FrameCount > 0) ? Visibility.Visible : Visibility.Collapsed;
 
-    public Visibility UserInteractionWarningVisibility => CaptureFrequency == CaptureFrequencies.Interaction && FrameCount == 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility FramerateVisibility => CaptureFrequency is not CaptureFrequencies.Manual and not CaptureFrequencies.Interaction ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility ManualInfoVisibility => CaptureFrequency == CaptureFrequencies.Manual ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility InteractionInfoVisibility => CaptureFrequency == CaptureFrequencies.Interaction ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility InteractionInfoTextVisibility => CaptureFrequency == CaptureFrequencies.Interaction && FrameCount == 0 ? Visibility.Visible : Visibility.Collapsed;
 
     #endregion
 
@@ -123,6 +179,7 @@ public class RecorderViewModel : BindableBase
     private KeyGesture _stopKeyGesture = null;
     private KeyGesture _discardKeyGesture = null;
     private CaptureFrequencies _captureFrequency;
+    private bool _showDiscardDuringCapturing;
 
     public KeyGesture RecordKeyGesture
     {
@@ -182,6 +239,11 @@ public class RecorderViewModel : BindableBase
     public RoutedUICommand SwitchFrequencyCommand { get; set; } = new()
     {
         Text = "S.Command.SwitchCaptureFrequency",
+    };
+
+    public RoutedUICommand SelectRegionCommand { get; set; } = new()
+    {
+        Text = "S.Command.SelectRegion",
     };
 
     #endregion

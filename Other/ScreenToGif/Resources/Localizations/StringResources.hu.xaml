@@ -165,7 +165,7 @@
     <s:String x:Key="S.Updater.Header">Egy új frissítés érhető el</s:String>
     <s:String x:Key="S.Updater.NewRelease">Új kiadás!</s:String>
     <s:String x:Key="S.Updater.NewRelease.Info">Új kiadás áll rendelkezésre, Verzió {0}!&#x0d;Kattints ide további részletekért.</s:String>
-    <s:String x:Key="S.Updater.NoNewRelease.Info">Úgy tűnik, hogy a rendszered már nem támogatott, vagy valami megváltozott a frissítési rendszerben. Próbáld meg manuálisan letölteni a weboldalról.</s:String>
+    <s:String x:Key="S.Updater.Unsupported.Info">Úgy tűnik, hogy a rendszered már nem támogatott, vagy valami megváltozott a frissítési rendszerben. Próbáld meg manuálisan letölteni a weboldalról.</s:String>
     <s:String x:Key="S.Updater.Version">Verzió</s:String>
     <s:String x:Key="S.Updater.Portable">Hordozható</s:String>
     <s:String x:Key="S.Updater.Installer">Telepítő</s:String>

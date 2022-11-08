@@ -24,13 +24,34 @@ internal class Migration2_37_0To3_0_0
         /// 2 - Webcam window.
         /// 3 - Board window.
         /// 4 - Editor window.
-        //Startup -> FirstWindow
+        //Startup -> FirstWindow, int to StartupWindows
         /// 0: Screen recorder
         /// 1: Webcam recorder
         /// 2: Sketchboard recorder
         /// 3: Editor
         /// 4: Welcome
         /// 5: Nothing
+
+        //LeftClickAction int to NotificationIconActions, same indexes
+        //DoubleLeftClickAction int to NotificationIconActions, same indexes
+        //MiddleClickAction int to NotificationIconActions, same indexes
+
+        /// 0: None.
+        /// 1: Startup
+        /// 2: Screen recorder
+        /// 3: Webcam recorder
+        /// 4: Board recorder
+        /// 5: Editor
+        //LeftOpenWindowOriginal, int to StartupWindows
+        //DoubleLeftOpenWindow, int to StartupWindows
+        //MiddleOpenWindow, int to StartupWindows
+        // 0: ScreenRecorder,
+        // 1: WebcamRecorder,
+        // 2: SketchboardRecorder,
+        // 3: Editor,
+        // 4: Welcome,
+        // 5: None,
+
 
 
         //Update namespaces.

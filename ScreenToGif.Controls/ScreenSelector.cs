@@ -209,6 +209,8 @@ public class ScreenSelector : Control
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
+        Focus();
+
         _startPoint = e.GetPosition(this);
 
         if (Mode == RegionSelectionModes.Region)
@@ -238,7 +240,12 @@ public class ScreenSelector : Control
     protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
     {
         if (Mode == RegionSelectionModes.Region)
+        {
+            //When canceling the selection while the left button is still down, the starting point needs to be reset.
+            _startPoint = e.GetPosition(this);
+
             Retry();
+        }
 
         e.Handled = true;
         base.OnMouseLeftButtonDown(e);
@@ -341,7 +348,7 @@ public class ScreenSelector : Control
     #endregion
 
     #region Methods
-    
+
     private void AdjustZoomView(Point point)
     {
         if (BackgroundImage == null || Mode != RegionSelectionModes.Region || !UserSettings.All.Magnifier || (Selected.Width > 10 && Selected.Height > 10 && Selected.Offset(5).Contains(point)))

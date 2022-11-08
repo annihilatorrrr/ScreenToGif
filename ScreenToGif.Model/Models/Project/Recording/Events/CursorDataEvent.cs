@@ -2,7 +2,7 @@ using ScreenToGif.Domain.Enums;
 
 namespace ScreenToGif.Domain.Models.Project.Recording.Events;
 
-public class CursorDataEvent : RecordingEvent
+public class CursorDataEvent : MouseEvent
 {
     public CursorDataEvent()
     {
@@ -21,10 +21,6 @@ public class CursorDataEvent : RecordingEvent
     ///     When the mask value is 0xFF, an XOR operation is performed on the RGB value and the screen pixel; the result replaces the screen pixel.
     /// </summary>
     public int CursorType { get; set; }
-
-    public int Left { get; set; }
-
-    public int Top { get; set; }
 
     public int Width { get; set; }
 

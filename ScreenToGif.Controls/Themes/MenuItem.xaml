@@ -54,7 +54,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="CheckedBorder" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="ContentPresenter" Property="Margin" Value="9,6"/>
+                            <Setter TargetName="ContentPresenter" Property="Margin" Value="5,6"/>
                         </Trigger>
 
                         <Trigger Property="Icon" Value="None">
@@ -89,7 +89,7 @@
                 <Setter Property="Padding" Value="6,2"/>
                 <Setter Property="MinHeight" Value="26"/>
                 <Setter Property="MinWidth" Value="50"/>
-
+                
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type c:ExMenuItem}">
@@ -132,7 +132,7 @@
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter TargetName="CheckedBorder" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="ContentPresenter" Property="Margin" Value="9,6"/>
+                                    <Setter TargetName="ContentPresenter" Property="Margin" Value="5,6"/>
                                 </Trigger>
 
                                 <Trigger Property="Icon" Value="None">
@@ -199,7 +199,7 @@
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter TargetName="CheckedBorder" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="ContentPresenter" Property="Margin" Value="9,6"/>
+                                    <Setter TargetName="ContentPresenter" Property="Margin" Value="5,6"/>
                                 </Trigger>
 
                                 <Trigger Property="Icon" Value="None">
@@ -276,7 +276,7 @@
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter TargetName="CheckedBorder" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="ContentPresenter" Property="Margin" Value="9,6"/>
+                                    <Setter TargetName="ContentPresenter" Property="Margin" Value="5,6"/>
                                 </Trigger>
 
                                 <Trigger Property="Icon" Value="None">
