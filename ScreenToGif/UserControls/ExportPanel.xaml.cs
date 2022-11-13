@@ -9,18 +9,19 @@ using ScreenToGif.Util.Extensions;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel;
 using ScreenToGif.ViewModel.ExportPresets;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Apng;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Gif;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Webp;
-using ScreenToGif.ViewModel.ExportPresets.Image;
-using ScreenToGif.ViewModel.ExportPresets.Other;
-using ScreenToGif.ViewModel.ExportPresets.Video;
-using ScreenToGif.ViewModel.ExportPresets.Video.Avi;
 using ScreenToGif.ViewModel.ExportPresets.Video.Codecs;
-using ScreenToGif.ViewModel.ExportPresets.Video.Mkv;
-using ScreenToGif.ViewModel.ExportPresets.Video.Mov;
-using ScreenToGif.ViewModel.ExportPresets.Video.Mp4;
-using ScreenToGif.ViewModel.ExportPresets.Video.Webm;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Apng;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Webp;
+using ScreenToGif.ViewModel.Presets.Export.Image;
+using ScreenToGif.ViewModel.Presets.Export.Other;
+using ScreenToGif.ViewModel.Presets.Export.Video;
+using ScreenToGif.ViewModel.Presets.Export.Video.Avi;
+using ScreenToGif.ViewModel.Presets.Export.Video.Codecs;
+using ScreenToGif.ViewModel.Presets.Export.Video.Mkv;
+using ScreenToGif.ViewModel.Presets.Export.Video.Mov;
+using ScreenToGif.ViewModel.Presets.Export.Video.Mp4;
+using ScreenToGif.ViewModel.Presets.Export.Video.Webm;
 using ScreenToGif.ViewModel.UploadPresets;
 using ScreenToGif.Windows;
 using ScreenToGif.Windows.Other;
@@ -44,7 +45,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     #region Dependency Properties
 
-    public static readonly DependencyProperty CurrentPresetProperty = DependencyProperty.Register(nameof(CurrentPreset), typeof(ExportPreset), typeof(ExportPanel), new PropertyMetadata(default(ExportPreset)));
+    public static readonly DependencyProperty CurrentPresetProperty = DependencyProperty.Register(nameof(CurrentPreset), typeof(ExportPresetOld), typeof(ExportPanel), new PropertyMetadata(default(ExportPresetOld)));
 
     public static readonly DependencyProperty FrameCountProperty = DependencyProperty.Register(nameof(FrameCount), typeof(int), typeof(ExportPanel), new PropertyMetadata(default(int)));
 
@@ -54,9 +55,9 @@ public partial class ExportPanel : UserControl, IPanel
 
     public static readonly DependencyProperty CurrentFrameProperty = DependencyProperty.Register(nameof(CurrentFrame), typeof(FrameViewModel), typeof(ExportPanel), new PropertyMetadata(default(FrameViewModel)));
 
-    public ExportPreset CurrentPreset
+    public ExportPresetOld CurrentPreset
     {
-        get => (ExportPreset)GetValue(CurrentPresetProperty);
+        get => (ExportPresetOld)GetValue(CurrentPresetProperty);
         set => SetValue(CurrentPresetProperty, value);
     }
 
@@ -317,14 +318,14 @@ public partial class ExportPanel : UserControl, IPanel
         SaveFileCheckBox.IsEnabled = UploadFileCheckBox.Visibility == Visibility.Visible || CopyFileCheckBox.Visibility == Visibility.Visible;
     }
 
-    private void LoadPresets(ExportFormats type, ExportPreset toLoad = null, bool firstLoad = false)
+    private void LoadPresets(ExportFormats type, ExportPresetOld toLoad = null, bool firstLoad = false)
     {
         //Get all presets of given type. It's possible that there's none available.
-        var search = UserSettings.All.ExportPresets?.OfType<ExportPreset>().Where(w => w.Type == type) ?? new List<ExportPreset>();
+        var search = UserSettings.All.ExportPresets?.OfType<ExportPresetOld>().Where(w => w.Type == type) ?? new List<ExportPresetOld>();
 
         //Ignore unsupported profiles.
         if (!Environment.Is64BitProcess)
-            search = search.Where(tp => tp is not GifskiGifPreset);
+            search = search.Where(tp => tp is not GifskiGifPresetViewModel);
 
         var list = search.ToList();
 
@@ -355,7 +356,7 @@ public partial class ExportPanel : UserControl, IPanel
             PresetComboBox.SelectedItem = toLoad ?? list.FirstOrDefault(f => f.IsSelected) ?? list.FirstOrDefault();
     }
 
-    private void LoadUploadPresets(ExportPreset preset, UploadPreset uploadPreset = null)
+    private void LoadUploadPresets(ExportPresetOld preset, UploadPreset uploadPreset = null)
     {
         var type = (preset.Extension ?? preset.DefaultExtension) == ".zip" ? ExportFormats.Zip : preset.Type;
         var list = UserSettings.All.UploadPresets?.OfType<UploadPreset>().Where(w => w.AllowedTypes.Count == 0 || w.AllowedTypes.Contains(type)).ToList() ?? new List<UploadPreset>();
@@ -383,89 +384,89 @@ public partial class ExportPanel : UserControl, IPanel
             preset.UploadService = previous;
     }
 
-    private IEnumerable<ExportPreset> GeneratePresets(ExportFormats type, ICollection<ExportPreset> presets)
+    private IEnumerable<ExportPresetOld> GeneratePresets(ExportFormats type, ICollection<ExportPresetOld> presets)
     {
         switch (type)
         {
             //Animated images.
             case ExportFormats.Gif:
             {
-                AddDistinct(presets, EmbeddedGifPreset.Defaults);
-                AddDistinct(presets, KGySoftGifPreset.Defaults);
-                AddDistinct(presets, FfmpegGifPreset.Defaults);
+                AddDistinct(presets, EmbeddedGifPresetViewModel.Defaults);
+                AddDistinct(presets, KGySoftGifPresetViewModel.Defaults);
+                AddDistinct(presets, FfmpegGifPresetViewModel.Defaults);
 
                 //Gifski only runs on x64.
                 if (Environment.Is64BitProcess)
-                    AddDistinct(presets, GifskiGifPreset.Defaults);
+                    AddDistinct(presets, GifskiGifPresetViewModel.Defaults);
 
-                AddDistinct(presets, SystemGifPreset.Default);
+                AddDistinct(presets, SystemGifPresetViewModel.Default);
                 break;
             }
             case ExportFormats.Apng:
             {
-                AddDistinct(presets, EmbeddedApngPreset.Default);
-                AddDistinct(presets, FfmpegApngPreset.Defaults);
+                AddDistinct(presets, EmbeddedApngPresetViewModel.Default);
+                AddDistinct(presets, FfmpegApngPresetViewModel.Defaults);
                 break;
             }
             case ExportFormats.Webp:
             {
-                AddDistinct(presets, FfmpegWebpPreset.Defaults);
+                AddDistinct(presets, FfmpegWebpPresetViewModel.Defaults);
                 break;
             }
 
             //Videos.
             case ExportFormats.Avi:
             {
-                AddDistinct(presets, FfmpegAviPreset.Default);
+                AddDistinct(presets, FfmpegAviPresetViewModel.Default);
                 break;
             }
             case ExportFormats.Mkv:
             {
-                AddDistinct(presets, FfmpegMkvPreset.Defaults);
+                AddDistinct(presets, FfmpegMkvPresetViewModel.Defaults);
                 break;
             }
             case ExportFormats.Mov:
             {
-                AddDistinct(presets, FfmpegMovPreset.Defaults);
+                AddDistinct(presets, FfmpegMovPresetViewModel.Defaults);
                 break;
             }
             case ExportFormats.Mp4:
             {
-                AddDistinct(presets, FfmpegMp4Preset.Defaults);
+                AddDistinct(presets, FfmpegMp4PresetViewModel.Defaults);
                 break;
             }
             case ExportFormats.Webm:
             {
-                AddDistinct(presets, FfmpegWebmPreset.Defaults);
+                AddDistinct(presets, FfmpegWebmPresetViewModel.Defaults);
                 break;
             }
 
             //Images.
             case ExportFormats.Jpeg:
             {
-                AddDistinct(presets, JpegPreset.Default);
+                AddDistinct(presets, JpegPresetViewModel.Default);
                 break;
             }
             case ExportFormats.Png:
             {
-                AddDistinct(presets, PngPreset.Default);
+                AddDistinct(presets, PngPresetViewModel.Default);
                 break;
             }
             case ExportFormats.Bmp:
             {
-                AddDistinct(presets, BmpPreset.Default);
+                AddDistinct(presets, BmpPresetViewModel.Default);
                 break;
             }
 
             //Other.
             case ExportFormats.Stg:
             {
-                AddDistinct(presets, StgPreset.Default);
+                AddDistinct(presets, StgPresetViewModel.Default);
                 break;
             }
             case ExportFormats.Psd:
             {
-                AddDistinct(presets, PsdPreset.Default);
+                AddDistinct(presets, PsdPresetViewModel.Default);
                 break;
             }
         }
@@ -473,25 +474,25 @@ public partial class ExportPanel : UserControl, IPanel
         return presets;
     }
 
-    private void AddDistinct(ICollection<ExportPreset> current, IEnumerable<IExportPreset> newList)
+    private void AddDistinct(ICollection<ExportPresetOld> current, IEnumerable<IExportPreset> newList)
     {
         foreach (var preset in newList.Where(preset => current.Where(w => w.Type == preset.Type).All(a => a.TitleKey != preset.TitleKey)))
-            current.Add((ExportPreset)preset);
+            current.Add((ExportPresetOld)preset);
     }
 
-    private void AddDistinct(ICollection<ExportPreset> current, IExportPreset newPreset)
+    private void AddDistinct(ICollection<ExportPresetOld> current, IExportPreset newPreset)
     {
         if (current.Where(w => w.Type == newPreset.Type).All(a => a.TitleKey != newPreset.TitleKey))
-            current.Add((ExportPreset)newPreset);
+            current.Add((ExportPresetOld)newPreset);
     }
 
-    private void SetPresetAsLastSelected(ExportPreset preset)
+    private void SetPresetAsLastSelected(ExportPresetOld preset)
     {
         if (preset == null)
             return;
 
         //Get all presets of given type. It's possible that there's none available.
-        var list = UserSettings.All.ExportPresets?.OfType<ExportPreset>().Where(w => w.Type == preset.Type).ToList() ?? new List<ExportPreset>();
+        var list = UserSettings.All.ExportPresets?.OfType<ExportPresetOld>().Where(w => w.Type == preset.Type).ToList() ?? new List<ExportPresetOld>();
 
         //Set the selected preset as the last selected one.
         foreach (var pre in list)
@@ -502,7 +503,7 @@ public partial class ExportPanel : UserControl, IPanel
                 pre.IsSelectedForEncoder = pre.IsSelected;
         }
 
-        foreach (var pre in PresetComboBox.ItemsSource.OfType<ExportPreset>())
+        foreach (var pre in PresetComboBox.ItemsSource.OfType<ExportPresetOld>())
         {
             pre.IsSelected = (pre.Title ?? "").Equals(preset.Title ?? "");
 
@@ -513,18 +514,18 @@ public partial class ExportPanel : UserControl, IPanel
         PersistPresets(list, preset.Type);
     }
 
-    private static void PersistPresets(IEnumerable<ExportPreset> typeList, ExportFormats type)
+    private static void PersistPresets(IEnumerable<ExportPresetOld> typeList, ExportFormats type)
     {
-        var list = UserSettings.All.ExportPresets?.OfType<ExportPreset>().Where(w => w.Type != type).ToList() ?? new List<ExportPreset>();
+        var list = UserSettings.All.ExportPresets?.OfType<ExportPresetOld>().Where(w => w.Type != type).ToList() ?? new List<ExportPresetOld>();
 
         list.AddRange(typeList);
 
         UserSettings.All.ExportPresets = new ArrayList(list.ToArray());
     }
 
-    private void AdjustCodecs(ExportPreset preset)
+    private void AdjustCodecs(ExportPresetOld preset)
     {
-        if (preset is not VideoPreset videoPreset)
+        if (preset is not VideoPresetViewModel videoPreset)
             return;
 
         FfmpegCodecComboBox.SelectionChanged -= FfmpegCodecComboBox_SelectionChanged;
@@ -534,7 +535,7 @@ public partial class ExportPanel : UserControl, IPanel
         {
             case ExportFormats.Avi:
             {
-                FfmpegCodecComboBox.ItemsSource = new List<VideoCodec>
+                FfmpegCodecComboBox.ItemsSource = new List<VideoCodecViewModel>
                 {
                     new Mpeg2(),
                     new Mpeg4()
@@ -546,7 +547,7 @@ public partial class ExportPanel : UserControl, IPanel
             {
                 if (videoPreset.HardwareAcceleration == HardwareAccelerationModes.On)
                 {
-                    FfmpegCodecComboBox.ItemsSource = new List<VideoCodec>
+                    FfmpegCodecComboBox.ItemsSource = new List<VideoCodecViewModel>
                     {
                         new X264(),
                         new H264Amf(),
@@ -565,7 +566,7 @@ public partial class ExportPanel : UserControl, IPanel
                 }
                 else
                 {
-                    FfmpegCodecComboBox.ItemsSource = new List<VideoCodec>
+                    FfmpegCodecComboBox.ItemsSource = new List<VideoCodecViewModel>
                     {
                         new X264(),
                         new X265(),
@@ -584,7 +585,7 @@ public partial class ExportPanel : UserControl, IPanel
             {
                 if (videoPreset.HardwareAcceleration == HardwareAccelerationModes.On)
                 {
-                    FfmpegCodecComboBox.ItemsSource = new List<VideoCodec>
+                    FfmpegCodecComboBox.ItemsSource = new List<VideoCodecViewModel>
                     {
                         new X264(),
                         new H264Amf(),
@@ -598,7 +599,7 @@ public partial class ExportPanel : UserControl, IPanel
                 }
                 else
                 {
-                    FfmpegCodecComboBox.ItemsSource = new List<VideoCodec>
+                    FfmpegCodecComboBox.ItemsSource = new List<VideoCodecViewModel>
                     {
                         new X264(),
                         new X265()
@@ -609,7 +610,7 @@ public partial class ExportPanel : UserControl, IPanel
             }
             case ExportFormats.Webm:
             {
-                FfmpegCodecComboBox.ItemsSource = new List<VideoCodec>
+                FfmpegCodecComboBox.ItemsSource = new List<VideoCodecViewModel>
                 {
                     new Vp8(),
                     new Vp9(),
@@ -710,7 +711,7 @@ public partial class ExportPanel : UserControl, IPanel
         if (CurrentPreset == null || !UserSettings.All.SyncPathFolder)
             return;
 
-        foreach (var preset in UserSettings.All.ExportPresets?.OfType<ExportPreset>() ?? new List<ExportPreset>())
+        foreach (var preset in UserSettings.All.ExportPresets?.OfType<ExportPresetOld>() ?? new List<ExportPresetOld>())
         {
             if (UserSettings.All.SyncPathForSameType && preset.Type != CurrentPreset.Type)
                 continue;
@@ -766,7 +767,7 @@ public partial class ExportPanel : UserControl, IPanel
                 if (CurrentPreset.OverwriteMode != OverwriteModes.Allow)
                 {
                     //Get the project extension in use.
-                    var extension = UserSettings.All.ExportPresets.OfType<StgPreset>().OrderBy(o => o.IsSelectedForEncoder).Select(s => s.Extension ?? s.DefaultExtension).FirstOrDefault() ?? ".stg";
+                    var extension = UserSettings.All.ExportPresets.OfType<StgPresetViewModel>().OrderBy(o => o.IsSelectedForEncoder).Select(s => s.Extension ?? s.DefaultExtension).FirstOrDefault() ?? ".stg";
 
                     if (File.Exists(Path.Combine(CurrentPreset.OutputFolder, CurrentPreset.OutputFilename + extension)))
                     {
@@ -867,9 +868,9 @@ public partial class ExportPanel : UserControl, IPanel
         return true;
     }
 
-    public ExportPreset GetPreset()
+    public ExportPresetOld GetPreset()
     {
-        return (CurrentPreset ?? PresetComboBox.SelectedItem as ExportPreset)?.ShallowCopy();
+        return (CurrentPreset ?? PresetComboBox.SelectedItem as ExportPresetOld)?.ShallowCopy();
     }
 
     #endregion
@@ -906,7 +907,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void PresetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (PresetComboBox.SelectedItem is not ExportPreset selected)
+        if (PresetComboBox.SelectedItem is not ExportPresetOld selected)
             return;
 
         var firstLoad = CurrentPreset == null;
@@ -951,7 +952,7 @@ public partial class ExportPanel : UserControl, IPanel
             //Animated images.
             case ExportFormats.Apng:
             {
-                if (selected is not ApngPreset apngPreset)
+                if (selected is not ApngPresetViewModel apngPreset)
                     break;
 
                 switch (apngPreset.Encoder)
@@ -968,7 +969,7 @@ public partial class ExportPanel : UserControl, IPanel
             }
             case ExportFormats.Gif:
             {
-                if (selected is not GifPreset gifPreset)
+                if (selected is not GifPresetViewModel gifPreset)
                     break;
 
                 switch (gifPreset.Encoder)
@@ -1038,7 +1039,7 @@ public partial class ExportPanel : UserControl, IPanel
     {
         var add = new Preset
         {
-            Current = PresetComboBox.SelectedItem as ExportPreset,
+            Current = PresetComboBox.SelectedItem as ExportPresetOld,
             IsNew = true
         };
 
@@ -1056,7 +1057,7 @@ public partial class ExportPanel : UserControl, IPanel
         if (CurrentPreset == null)
             return;
 
-        var list = UserSettings.All.ExportPresets.OfType<ExportPreset>().ToList();
+        var list = UserSettings.All.ExportPresets.OfType<ExportPresetOld>().ToList();
         var oldPreset = list.FirstOrDefault(f => f.Type == CurrentPreset.Type && f.Title == CurrentPreset.Title);
 
         if (oldPreset != null)
@@ -1071,7 +1072,7 @@ public partial class ExportPanel : UserControl, IPanel
     {
         var edit = new Preset
         {
-            Current = PresetComboBox.SelectedItem as ExportPreset
+            Current = PresetComboBox.SelectedItem as ExportPresetOld
         };
 
         var result = edit.ShowDialog();
@@ -1088,7 +1089,7 @@ public partial class ExportPanel : UserControl, IPanel
         //TODO: Let the user remove default presets (just not the main default for the type). Add a way to restore removed presets.
 
         //Ask if the user really wants to remove the preset.
-        if (PresetComboBox.SelectedItem is not ExportPreset preset || !Dialog.Ask(LocalizationHelper.Get("S.SaveAs.Presets.Ask.Delete.Title"), LocalizationHelper.Get("S.SaveAs.Presets.Ask.Delete.Instruction"),
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset || !Dialog.Ask(LocalizationHelper.Get("S.SaveAs.Presets.Ask.Delete.Title"), LocalizationHelper.Get("S.SaveAs.Presets.Ask.Delete.Instruction"),
                 LocalizationHelper.Get("S.SaveAs.Presets.Ask.Delete.Message")))
             return;
 
@@ -1100,11 +1101,11 @@ public partial class ExportPanel : UserControl, IPanel
     private void ResetPreset_Click(object sender, RoutedEventArgs e)
     {
         //Ask if the user really wants to reset the preset to its default settings.
-        if (PresetComboBox.SelectedItem is not ExportPreset preset || !Dialog.Ask(LocalizationHelper.Get("S.SaveAs.Presets.Ask.Reset.Title"), LocalizationHelper.Get("S.SaveAs.Presets.Ask.Reset.Instruction"),
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset || !Dialog.Ask(LocalizationHelper.Get("S.SaveAs.Presets.Ask.Reset.Title"), LocalizationHelper.Get("S.SaveAs.Presets.Ask.Reset.Instruction"),
                 LocalizationHelper.Get("S.SaveAs.Presets.Ask.Reset.Message")))
             return;
 
-        var hasReset = GeneratePresets(preset.Type, new List<ExportPreset>()).FirstOrDefault(f => f.TitleKey == preset.TitleKey);
+        var hasReset = GeneratePresets(preset.Type, new List<ExportPresetOld>()).FirstOrDefault(f => f.TitleKey == preset.TitleKey);
 
         if (hasReset == null)
             return; //TODO: What to do? Tell the user that this is an old preset, which is not being used anymore.
@@ -1123,8 +1124,8 @@ public partial class ExportPanel : UserControl, IPanel
         if (EncoderComboBox.SelectedValue is not EncoderTypes encoder || encoder == CurrentPreset?.Encoder)
             return;
 
-        PresetComboBox.SelectedItem = PresetComboBox.ItemsSource.OfType<ExportPreset>().FirstOrDefault(f => f.Type == UserSettings.All.SaveType && f.Encoder == encoder && f.IsSelectedForEncoder) ??
-                                      PresetComboBox.ItemsSource.OfType<ExportPreset>().FirstOrDefault(f => f.Type == UserSettings.All.SaveType && f.Encoder == encoder);
+        PresetComboBox.SelectedItem = PresetComboBox.ItemsSource.OfType<ExportPresetOld>().FirstOrDefault(f => f.Type == UserSettings.All.SaveType && f.Encoder == encoder && f.IsSelectedForEncoder) ??
+                                      PresetComboBox.ItemsSource.OfType<ExportPresetOld>().FirstOrDefault(f => f.Type == UserSettings.All.SaveType && f.Encoder == encoder);
         QuantizerComboBox.Visibility = UserSettings.All.SaveType == ExportFormats.Gif && encoder == EncoderTypes.ScreenToGif ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -1170,7 +1171,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void EnableTransparencyCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
     {
-        if (!IsLoaded || CurrentPreset is not EmbeddedGifPreset preset)
+        if (!IsLoaded || CurrentPreset is not EmbeddedGifPresetViewModel preset)
             return;
 
         if (!DetectCheckBox.IsEnabled)
@@ -1207,7 +1208,7 @@ public partial class ExportPanel : UserControl, IPanel
         if (!IsLoaded)
             return;
 
-        if (FfmpegCodecComboBox.SelectedItem is not VideoCodec selected || CurrentPreset is not VideoPreset videoPreset)
+        if (FfmpegCodecComboBox.SelectedItem is not VideoCodecViewModel selected || CurrentPreset is not VideoPresetViewModel videoPreset)
             return;
 
         //That's a lot of work just to maintain the binding. Sure there must be an easy way, right?
@@ -1301,7 +1302,7 @@ public partial class ExportPanel : UserControl, IPanel
         if (!IsLoaded)
             return;
 
-        if (PresetComboBox.SelectedItem is not ExportPreset preset)
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset)
             return;
 
         LoadUploadPresets(preset);
@@ -1309,7 +1310,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void ChooseLocation_Click(object sender, RoutedEventArgs e)
     {
-        if (PresetComboBox.SelectedItem is not ExportPreset preset)
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset)
             return;
 
         try
@@ -1467,7 +1468,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void FilenameTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (!IsLoaded || !(PresetComboBox.SelectedItem is ExportPreset preset))
+        if (!IsLoaded || !(PresetComboBox.SelectedItem is ExportPresetOld preset))
             return;
 
         _searchTimer?.Stop();
@@ -1522,10 +1523,10 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void Extension_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (PresetComboBox.SelectedItem is not ExportPreset preset)
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset)
             return;
 
-        if (preset is ImagePreset imagePreset)
+        if (preset is ImagePresetViewModel imagePreset)
             imagePreset.ZipFilesInternal = (string)ExtensionComboBox.SelectedValue == ".zip";
 
         FilenameTextBox_TextChanged(null, null);
@@ -1543,7 +1544,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void FileHyperlink_RequestNavigate(object sender, RoutedEventArgs e)
     {
-        if (PresetComboBox.SelectedItem is not ExportPreset preset)
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset)
             return;
 
         try
@@ -1577,7 +1578,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void AddUploadPreset_Click(object sender, RoutedEventArgs e)
     {
-        if (PresetComboBox.SelectedItem is not ExportPreset preset)
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset)
             return;
 
         var upload = new Upload { Type = preset.Extension == ".zip" ? ExportFormats.Zip : preset.Type };
@@ -1594,7 +1595,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void EditUploadPreset_Click(object sender, RoutedEventArgs e)
     {
-        if (PresetComboBox.SelectedItem is not ExportPreset preset)
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset)
             return;
 
         if (UploadPresetComboBox.SelectedItem is not UploadPreset selected)
@@ -1613,7 +1614,7 @@ public partial class ExportPanel : UserControl, IPanel
         //Update the upload preset in all export presets.
         if (selected.Title != upload.CurrentPreset.Title)
         {
-            foreach (var exportPreset in UserSettings.All.ExportPresets.OfType<ExportPreset>().Where(w => w.UploadService == selected.Title))
+            foreach (var exportPreset in UserSettings.All.ExportPresets.OfType<ExportPresetOld>().Where(w => w.UploadService == selected.Title))
                 exportPreset.UploadService = upload.CurrentPreset.Title;
         }
 
@@ -1634,7 +1635,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void RemoveUploadPreset_Click(object sender, RoutedEventArgs e)
     {
-        if (PresetComboBox.SelectedItem is not ExportPreset preset)
+        if (PresetComboBox.SelectedItem is not ExportPresetOld preset)
             return;
 
         //Ask if the user really wants to remove the preset.
@@ -1646,7 +1647,7 @@ public partial class ExportPanel : UserControl, IPanel
         UserSettings.Save();
 
         //Remove the upload preset from all export presets.
-        foreach (var exportPreset in UserSettings.All.ExportPresets.OfType<ExportPreset>().Where(w => w.UploadService == selected.Title))
+        foreach (var exportPreset in UserSettings.All.ExportPresets.OfType<ExportPresetOld>().Where(w => w.UploadService == selected.Title))
             exportPreset.UploadService = null;
 
         LoadUploadPresets(preset);

@@ -1,0 +1,65 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:n="clr-namespace:ScreenToGif.Controls">
+
+    <Style TargetType="{x:Type n:CommandBar}">
+        <Setter Property="MinHeight" Value="48"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="IsTabStop" Value="False"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type n:CommandBar}">
+                    <Border x:Name="MainBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="7" Padding="4">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                            <ItemsControl ItemsSource="{TemplateBinding ItemsSource}" VerticalAlignment="Center">
+                                <StackPanel IsItemsHost="True" Orientation="Horizontal"/>
+                            </ItemsControl>
+
+                            <ToggleButton x:Name="MoreToggleButton" Style="{DynamicResource Style.ToggleButton.Borderless}" Padding="5,0"
+                                          IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ToolTip="{DynamicResource S.Imperative.SeeMore}" ToolTipService.Placement="Top">
+                                <n:SymbolIcon Symbol="MoreHorizontal"/>
+
+                                <!--For some reason, the ContextMenu Placement Bottom or Top doesn't work-->
+                                <ToggleButton.ContextMenu>
+                                    <ContextMenu ItemsSource="{TemplateBinding SecondaryCommands}" Placement="MousePoint"
+                                                 IsOpen="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </ToggleButton.ContextMenu>
+                            </ToggleButton>
+
+                            <!--Using a popup, clicking on any menu item doesn't close it, so I'm sticking with the context menu for now-->
+
+                            <!--<Popup Name="Popup" Placement="Bottom" PlacementTarget="{Binding ElementName=MoreToggleButton}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide" VerticalOffset="-2"
+                                   IsOpen="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" StaysOpen="False">
+                                <Border Name="SubmenuBorder" SnapsToDevicePixels="True" Background="{DynamicResource Brush.ContextMenu.Background}" BorderBrush="{DynamicResource Brush.ContextMenu.Border}"
+                                    BorderThickness="1" Effect="{DynamicResource Brush.ContextMenu.Shadow}" CornerRadius="7" Margin="2" Padding="4">
+                                    <ItemsControl ItemsSource="{TemplateBinding SecondaryCommands}" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                                </Border>
+                            </Popup>-->
+                        </StackPanel>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="SecondaryCommands" Value="{x:Null}">
+                            <Setter TargetName="MoreToggleButton" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <Trigger Property="IsOpen" Value="True">
+                            <Setter TargetName="MoreToggleButton" Property="IsHitTestVisible" Value="False"/>
+                            <Setter TargetName="MoreToggleButton" Property="Background" Value="Transparent"/>
+                            <Setter TargetName="MoreToggleButton" Property="Foreground" Value="{DynamicResource Brush.Button.Foreground}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

@@ -101,8 +101,6 @@
                 </Setter>
             </Style>
 
-            <!--Style for MenuItem-->
-
             <!--ComboBoxItem-->
             <Style TargetType="{x:Type ComboBoxItem}">
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Item.Foreground}"/>
@@ -115,6 +113,8 @@
                 <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
                 <Setter Property="Margin" Value="0"/>
                 <Setter Property="Padding" Value="9,6"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
 
                 <Setter Property="Template">
                     <Setter.Value>
@@ -473,6 +473,7 @@
             <!--Slider-->
             <Style TargetType="{x:Type Slider}">
                 <Setter Property="Background" Value="{DynamicResource Brush.Fill.Control.Strong.Default}"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource Style.FocusVisual}"/>
 
                 <Setter Property="Template">
                     <Setter.Value>

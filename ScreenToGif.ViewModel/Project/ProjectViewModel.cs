@@ -2,7 +2,6 @@ using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Cached;
 using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Domain.ViewModels;
-using ScreenToGif.ViewModel.Editor;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 
@@ -17,7 +16,7 @@ public class ProjectViewModel : BaseViewModel
     private double _verticalDpi = 96d;
     private Brush _background = Brushes.White;
     private ObservableCollection<TrackViewModel> _tracks;
-    private readonly IEditorViewModel _editorViewModel;
+    private readonly IPreviewerViewModel _previewerViewModel;
 
     public CachedProject Project { get; set; }
 
@@ -58,14 +57,14 @@ public class ProjectViewModel : BaseViewModel
         {
             SetProperty(ref _background, value);
 
-            EditorViewModel?.Render();
+            PreviewerViewModel?.Render();
         }
     }
 
-    internal IEditorViewModel EditorViewModel
+    internal IPreviewerViewModel PreviewerViewModel
     {
-        get => _editorViewModel;
-        private init => SetProperty(ref _editorViewModel, value);
+        get => _previewerViewModel;
+        private init => SetProperty(ref _previewerViewModel, value);
     }
 
     public ObservableCollection<TrackViewModel> Tracks
@@ -74,7 +73,7 @@ public class ProjectViewModel : BaseViewModel
         set => SetProperty(ref _tracks, value);
     }
 
-    public static ProjectViewModel FromModel(CachedProject project, IEditorViewModel editorViewModel)
+    public static ProjectViewModel FromModel(CachedProject project, IPreviewerViewModel previewerViewModel)
     {
         return new ProjectViewModel
         {
@@ -85,12 +84,12 @@ public class ProjectViewModel : BaseViewModel
             HorizontalDpi = project.HorizontalDpi,
             VerticalDpi = project.VerticalDpi,
             Background = project.Background,
-            EditorViewModel = editorViewModel,
-            Tracks = new ObservableCollection<TrackViewModel>(project.Tracks.Select(s => TrackViewModel.FromModel(s, editorViewModel)).ToList())
+            PreviewerViewModel = previewerViewModel,
+            Tracks = new ObservableCollection<TrackViewModel>(project.Tracks.Select(s => TrackViewModel.FromModel(s, previewerViewModel)).ToList())
         };
     }
 
-    public static ProjectViewModel FromModel(RecordingProject project, IEditorViewModel exporterViewModel)
+    public static ProjectViewModel FromModel(RecordingProject project, IPreviewerViewModel exporterViewModel)
     {
         return new ProjectViewModel
         {
@@ -99,7 +98,7 @@ public class ProjectViewModel : BaseViewModel
             Height = project.Height,
             HorizontalDpi = project.Dpi,
             VerticalDpi = project.Dpi,
-            EditorViewModel = exporterViewModel,
+            PreviewerViewModel = exporterViewModel,
             Tracks = TrackViewModel.FromModel(project, exporterViewModel)
         };
     }

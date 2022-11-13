@@ -227,16 +227,14 @@ public static class CachedProjectHelper
         writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(sequence.Angle))); //4 bytes.
 
         //Cursor sequence.
-        var cursorEvents = recording.MouseEvents.Where(w => w.EventType is RecordingEvents.Cursor or RecordingEvents.CursorData).ToList();
-        
-        writeStream.WriteUInt32((uint) cursorEvents.Count); //4 bytes.
+        writeStream.WriteUInt32((uint)recording.MouseEvents.Count); //4 bytes.
 
         await using var readStream = new FileStream(recording.MouseEventsCachePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-        var cursorData = cursorEvents.OfType<CursorDataEvent>().FirstOrDefault();
+        var cursorData = recording.MouseEvents.OfType<CursorDataEvent>().FirstOrDefault();
 
         //Cursor sub-sequence.
-        foreach (var entry in cursorEvents)
+        foreach (var entry in recording.MouseEvents)
         {
             var sub = new CursorSubSequence
             {
@@ -272,18 +270,18 @@ public static class CachedProjectHelper
             {
                 sub.Left = data.Left;
                 sub.Top = data.Top;
-                sub.Width = (ushort)(cursorData?.Width ?? 32);
-                sub.Height = (ushort)Math.Abs(cursorData?.Height ?? 32);
-                sub.OriginalWidth = (ushort)(cursorData?.Width ?? 32);
-                sub.OriginalHeight = (ushort)Math.Abs(cursorData?.Height ?? 32);
+                sub.Width = (ushort)data.Width;
+                sub.Height = (ushort)Math.Abs(data.Height);
+                sub.OriginalWidth = (ushort)data.Width;
+                sub.OriginalHeight = (ushort)Math.Abs(data.Height);
                 sub.HorizontalDpi = 96; //How to get this information? Does it change for high DPI screens?
                 sub.VerticalDpi = 96;
                 sub.ChannelCount = 4;
                 sub.BitsPerChannel = 8;
-                sub.DataLength = (ushort)(cursorData?.PixelsLength ?? 0);
-                sub.CursorType = (byte)(cursorData?.CursorType ?? 0);
-                sub.XHotspot = (ushort)(cursorData?.XHotspot ?? 0);
-                sub.YHotspot = (ushort)(cursorData?.YHotspot ?? 0);
+                sub.DataLength = (ushort)data.PixelsLength;
+                sub.CursorType = (byte)data.CursorType;
+                sub.XHotspot = (ushort)data.XHotspot;
+                sub.YHotspot = (ushort)data.YHotspot;
 
                 cursorData = data;
             }

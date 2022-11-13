@@ -23,7 +23,7 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
     /// </summary>
     public override ulong DataStreamPosition => StreamPosition + 47; //55;
 
-    public static FrameSubSequenceViewModel FromModel(FrameSubSequence sequence, IEditorViewModel baseViewModel)
+    public static FrameSubSequenceViewModel FromModel(FrameSubSequence sequence, IPreviewerViewModel baseViewModel)
     {
         return new FrameSubSequenceViewModel
         {
@@ -44,7 +44,7 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
         };
     }
 
-    public static FrameSubSequenceViewModel FromModel(RecordingProject project, RecordingFrame frame, IEditorViewModel baseViewModel)
+    public static FrameSubSequenceViewModel FromModel(RecordingProject project, RecordingFrame frame, IPreviewerViewModel baseViewModel)
     {
         return new FrameSubSequenceViewModel
         {

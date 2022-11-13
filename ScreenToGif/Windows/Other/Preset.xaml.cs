@@ -23,7 +23,7 @@ namespace ScreenToGif.Windows.Other;
 
 public partial class Preset : Window
 {
-    public ExportPreset Current { get; set; }
+    public ExportPresetOld Current { get; set; }
         
     public bool IsNew { get; set; }
         
@@ -128,7 +128,7 @@ public partial class Preset : Window
             return;
         }
             
-        var list = UserSettings.All.ExportPresets.OfType<ExportPreset>().ToList();
+        var list = UserSettings.All.ExportPresets.OfType<ExportPresetOld>().ToList();
 
         //Don't let two preset of the same type to have the same name.
         if (list.Any(a => a.Type == Current.Type && a.Title != Current.Title && a.Title == TitleTextBox.Text.Trim()))

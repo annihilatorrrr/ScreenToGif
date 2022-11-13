@@ -7,6 +7,9 @@ namespace ScreenToGif.Domain.Enums;
 /// </summary>
 public enum DitherMethods
 {
+    [Description("none")]
+    None,
+
     [Description("bayer")]
     Bayer,
 

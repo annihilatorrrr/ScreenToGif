@@ -1,9 +1,12 @@
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Cached.Sequences;
+using ScreenToGif.Domain.Models.Project.Recording;
+using ScreenToGif.Domain.Models.Project.Recording.Events;
 using ScreenToGif.Util;
 using ScreenToGif.ViewModel.Project.Sequences.SubSequences;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
+using System.Windows.Input;
 
 namespace ScreenToGif.ViewModel.Project.Sequences;
 
@@ -12,7 +15,7 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
     private ObservableCollection<CursorSubSequenceViewModel> _cursorEvents;
 
     /// <summary>
-    /// Each frame with its timings.
+    /// Each cursor event with its timings.
     /// </summary>
     public ObservableCollection<CursorSubSequenceViewModel> CursorEvents
     {
@@ -20,7 +23,7 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
         set => SetProperty(ref _cursorEvents, value);
     }
 
-    public static CursorSequenceViewModel FromModel(CursorSequence sequence, IEditorViewModel baseViewModel)
+    public static CursorSequenceViewModel FromModel(CursorSequence sequence, IPreviewerViewModel baseViewModel)
     {
         return new CursorSequenceViewModel
         {
@@ -32,7 +35,7 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
             Effects = new ObservableCollection<object>(sequence.Effects), //TODO
             StreamPosition = sequence.StreamPosition,
             CachePath = sequence.CachePath,
-            EditorViewModel = baseViewModel,
+            PreviewerViewModel = baseViewModel,
             Left = sequence.Left,
             Top = sequence.Top,
             Width = sequence.Width,
@@ -42,12 +45,88 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
         };
     }
 
+    public static CursorSequenceViewModel FromModel(RecordingProject project, IPreviewerViewModel baseViewModel)
+    {
+        var events = new ObservableCollection<CursorSubSequenceViewModel>();
+        var cursorData = project.MouseEvents.OfType<CursorDataEvent>().FirstOrDefault();
+
+        //Cursor sub-sequence.
+        foreach (var entry in project.MouseEvents)
+        {
+            var sub = new CursorSubSequenceViewModel
+            {
+                TimeStampInTicks = (ulong)(entry?.TimeStampInTicks ?? 0)
+            };
+
+            //If only data, ignore press states
+            if (entry is CursorEvent state)
+            {
+                sub.Left = state.Left;
+                sub.Top = state.Top;
+                sub.Width = (ushort)(cursorData?.Width ?? 32);
+                sub.Height = (ushort)Math.Abs(cursorData?.Height ?? 32);
+                sub.OriginalWidth = (ushort)(cursorData?.Width ?? 32);
+                sub.OriginalHeight = (ushort)Math.Abs(cursorData?.Height ?? 32);
+                sub.HorizontalDpi = 96; //How to get this information? Does it change for high DPI screens?
+                sub.VerticalDpi = 96;
+                sub.ChannelCount = 4;
+                sub.BitsPerChannel = 8;
+                sub.DataLength = (ushort)(cursorData?.PixelsLength ?? 0);
+                sub.CursorType = (byte)(cursorData?.CursorType ?? 0);
+                sub.XHotspot = (ushort)(cursorData?.XHotspot ?? 0);
+                sub.YHotspot = (ushort)(cursorData?.YHotspot ?? 0);
+                sub.IsLeftButtonDown = state.LeftButton == MouseButtonState.Pressed;
+                sub.IsRightButtonDown = state.RightButton == MouseButtonState.Pressed;
+                sub.IsMiddleButtonDown = state.MiddleButton == MouseButtonState.Pressed;
+                sub.IsFirstExtraButtonDown = state.FirstExtraButton == MouseButtonState.Pressed;
+                sub.IsSecondExtraButtonDown = state.SecondExtraButton == MouseButtonState.Pressed;
+                sub.MouseWheelDelta = state.MouseDelta;
+                sub.StreamPosition = (ulong)(cursorData?.StreamPosition ?? 0);
+            }
+            else if (entry is CursorDataEvent data)
+            {
+                sub.Left = data.Left;
+                sub.Top = data.Top;
+                sub.Width = (ushort)(data.Width);
+                sub.Height = (ushort)Math.Abs(data.Height);
+                sub.OriginalWidth = (ushort)data.Width;
+                sub.OriginalHeight = (ushort)Math.Abs(data.Height);
+                sub.HorizontalDpi = 96; //How to get this information? Does it change for high DPI screens?
+                sub.VerticalDpi = 96;
+                sub.ChannelCount = 4;
+                sub.BitsPerChannel = 8;
+                sub.DataLength = (ushort)data.PixelsLength;
+                sub.CursorType = (byte)data.CursorType;
+                sub.XHotspot = (ushort)data.XHotspot;
+                sub.YHotspot = (ushort)data.YHotspot;
+                sub.StreamPosition = (ulong)data.StreamPosition;
+
+                cursorData = data;
+            }
+
+            events.Add(sub);
+        }
+
+        return new CursorSequenceViewModel
+        {
+            Id = 0,
+            StartTime = TimeSpan.Zero,
+            EndTime = TimeSpan.FromTicks(project.MouseEvents.LastOrDefault()?.TimeStampInTicks ?? 0),
+            StreamPosition = 0,
+            CachePath = project.MouseEventsCachePath,
+            PreviewerViewModel = baseViewModel,
+            Width = (ushort)project.Width,
+            Height = (ushort)project.Height,
+            CursorEvents = events
+        };
+    }
+
     public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath)
     {
         var ticks = (ulong)timestamp;
 
-        //Get first cursor after timestamp.
-        var cursor = CursorEvents.FirstOrDefault(f => f.TimeStampInTicks >= ticks);
+        //Get last cursor that appears after current timestamp.
+        var cursor = CursorEvents.LastOrDefault(f => f.TimeStampInTicks <= ticks);
 
         if (cursor == null)
             return;
@@ -56,6 +135,8 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
         readStream.Position = (long)cursor.DataStreamPosition;
 
         var data = readStream.ReadBytes((uint)cursor.DataLength);
+
+        //TODO: Click effects, the style for it must come from somewhere.
 
         //Missing features:
         //Sequence background.
@@ -111,13 +192,14 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
         var cursorHeight = cursorHeightOffset > 0 ? cursor.Height - cursorHeightOffset : cursor.Height;
 
         var stride = Width * ((BitsPerChannel * ChannelCount + 7) / 8); //TODO: get the Project details.
-        var cursorStride = (int)(cursor.DataLength / cursor.Width);
+        var cursorStride = cursor.Width * ((cursor.BitsPerChannel * cursor.ChannelCount + 7) / 8);
         
         //Cursors can be divided into 3 types:
         switch (cursor.CursorType)
         {
             //Masked monochrome, a cursor which reacts with the background.
             case 1:
+                cursorStride = (int)(cursor.DataLength / cursor.Width);
                 DrawMonochromeCursor(current, stride, data, cursorLeft, cursorTop, offsetX, offsetY, cursorWidth, cursorHeight, cursorStride, cursor.Height);
                 break;
 
@@ -155,7 +237,7 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
             {
                 //var targetIndex = (row - offsetY + posY) * targetPitch + (col - offsetX + posX) * 4;
                 var targetIndex = (row - offsetY + Math.Max(posY, 0)) * targetPitch + (col - offsetX + Math.Max(posX, 0)) * 4;
-
+                
                 //AND mask is taken from the first half of the cursor image.
                 //XOR mask is taken from the second half of the cursor image, hence the "+ actualHeight * cursorPitch". 
                 var and = (buffer[row * cursorPitch + col / 8] & mask) == mask; 

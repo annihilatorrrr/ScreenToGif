@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace ScreenToGif.ViewModel.Editor;
 
-public partial class EditorViewModel : BaseViewModel, IEditorViewModel
+public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
 {
     #region Variables
 

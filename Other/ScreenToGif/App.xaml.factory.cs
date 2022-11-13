@@ -1,5 +1,4 @@
 using ScreenToGif.Controls;
-using ScreenToGif.Controls.Recorder;
 using ScreenToGif.Dialogs;
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Models.Project.Recording;
@@ -869,7 +868,7 @@ public partial class App
             if (editor == null)
             {
                 if (UserSettings.All.WindowAfterRecording == AfterRecordingWindows.SaveDialog)
-                    ShowExporter(window.Project);
+                    ShowExporter(window, window.Project);
                 else
                     await ShowEditor(window.Project);
 
@@ -891,7 +890,7 @@ public partial class App
         await editor.LoadProject(null);
     }
 
-    private static async Task ShowEditor(RecordingProject project = null, bool openMedia = false)
+    internal static async Task ShowEditor(RecordingProject project = null, bool openMedia = false)
     {
         var editor = Current.Windows.OfType<Editor>().FirstOrDefault(f => !f.HasProjectLoaded);
 
@@ -917,10 +916,36 @@ public partial class App
         editor.Activate();
     }
 
-    private static void ShowExporter(RecordingProject project = null)
+    private static void ShowExporter(Window caller, RecordingProject project)
     {
         var exporter = new Exporter();
-        exporter.Closed += (_, _) => CloseOrNot();
+        exporter.Closed += (_, _) =>
+        {
+            //When called by any recorder:
+            //  Open new window of the same type.
+            //  If screen recorder, maybe re-set the size/position. 
+            //When called by editor/startup (recent projects):
+            //  Display again the editor, since it should be still be opened.
+            
+            if (caller.IsLoaded)
+            {
+                caller.Show();
+                return;
+            }
+
+            switch (project.CreatedBy)
+            {
+                case ProjectSources.ScreenRecorder:
+                    Launch(StartupWindows.ScreenRecorder);
+                    break;
+                case ProjectSources.WebcamRecorder:
+                    Launch(StartupWindows.WebcamRecorder);
+                    break;
+                case ProjectSources.SketchboardRecorder:
+                    Launch(StartupWindows.SketchboardRecorder);
+                    break;
+            }
+        };
         exporter.Show();
 
         exporter.LoadProject(project);

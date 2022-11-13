@@ -180,7 +180,7 @@ public class SplitButton : ItemsControl
         else
             split.Text = list[split.SelectedIndex].Header as string;
 
-        split.Icon = list[split.SelectedIndex].Icon;
+        //split.Icon = list[split.SelectedIndex].Icon;
         split.Command = list[split.SelectedIndex].Command;
             
         _current = list[split.SelectedIndex];

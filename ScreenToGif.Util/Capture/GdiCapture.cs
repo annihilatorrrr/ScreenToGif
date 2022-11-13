@@ -283,7 +283,7 @@ public class GdiCapture : ScreenCapture
 
                 if (!needsMask)
                 {
-                    RegisterCursorDataEvent(2, colorBuffer, colorHeader.Width, colorHeader.Height * -1, cursorInfo.ScreenPosition.X - Left, cursorInfo.ScreenPosition.Y - Top, iconInfo.XHotspot, iconInfo.YHotspot);
+                    RegisterCursorDataEvent(2, colorBuffer, colorHeader.Width, colorHeader.Height * -1, cursorInfo.ScreenPosition.X - Left, cursorInfo.ScreenPosition.Y - Top, iconInfo.XHotspot, iconInfo.YHotspot, true);
                     return;
                 }
 
@@ -319,7 +319,7 @@ public class GdiCapture : ScreenCapture
                     }
                 }
 
-                RegisterCursorDataEvent(4, colorBuffer, colorWidth, colorHeight, cursorInfo.ScreenPosition.X - Left, cursorInfo.ScreenPosition.Y - Top, iconInfo.XHotspot, iconInfo.YHotspot);
+                RegisterCursorDataEvent(4, colorBuffer, colorWidth, colorHeight, cursorInfo.ScreenPosition.X - Left, cursorInfo.ScreenPosition.Y - Top, iconInfo.XHotspot, iconInfo.YHotspot, true);
                 return;
             }
 
@@ -328,7 +328,7 @@ public class GdiCapture : ScreenCapture
             maskHeader.Height *= -1;
             Gdi32.GetDIBits(_windowDeviceContext, iconInfo.Mask, 0, (uint)(maskHeader.Height * -1), maskBuffer, ref maskHeader, DibColorModes.RgbColors);
             
-            RegisterCursorDataEvent(1, maskBuffer, maskHeader.Width, maskHeader.Height / 2 * -1, cursorInfo.ScreenPosition.X - Left, cursorInfo.ScreenPosition.Y - Top, iconInfo.XHotspot, iconInfo.YHotspot);
+            RegisterCursorDataEvent(1, maskBuffer, maskHeader.Width, maskHeader.Height / 2 * -1, cursorInfo.ScreenPosition.X - Left, cursorInfo.ScreenPosition.Y - Top, iconInfo.XHotspot, iconInfo.YHotspot, true);
         }
         catch (Exception e)
         {

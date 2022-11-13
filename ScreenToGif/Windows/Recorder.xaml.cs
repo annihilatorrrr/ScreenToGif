@@ -738,14 +738,14 @@ public partial class Recorder
         CommandBindings.Clear();
         CommandBindings.AddRange(new CommandBindingCollection
         {
-            new CommandBinding(_viewModel.CloseCommand, (_, _) => Close(),
-                (_, args) => args.CanExecute = Stage == RecorderStages.Stopped || (UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && (Project == null || !Project.Any))),
+            //new CommandBinding(_viewModel.CloseCommand, (_, _) => Close(),
+            //    (_, args) => args.CanExecute = Stage == RecorderStages.Stopped || (UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && (Project == null || !Project.Any))),
 
             new CommandBinding(_viewModel.OptionsCommand, ShowOptions,
                 (_, args) => args.CanExecute = (Stage != RecorderStages.Recording || UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction) && Stage != RecorderStages.PreStarting),
 
-            new CommandBinding(_viewModel.SnapToWindowCommand, null,
-                (_, args) => args.CanExecute = Stage == RecorderStages.Stopped || (Stage == RecorderStages.Recording && UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && (Project == null || Project.Frames.Count == 0))),
+            //new CommandBinding(_viewModel.SnapToWindowCommand, null,
+            //    (_, args) => args.CanExecute = Stage == RecorderStages.Stopped || (Stage == RecorderStages.Recording && UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && (Project == null || Project.Frames.Count == 0))),
 
             new CommandBinding(_viewModel.SwitchFrequencyCommand, SwitchFrequency,
                 (_, args) =>

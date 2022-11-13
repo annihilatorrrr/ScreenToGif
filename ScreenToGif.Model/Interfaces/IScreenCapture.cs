@@ -29,6 +29,6 @@ public interface IScreenCapture : ICapture
     Task<int> ManualCaptureAsync(RecordingFrame frame, bool showCursor = false);
 
     void RegisterCursorEvent(int x, int y, MouseButtonState left, MouseButtonState right, MouseButtonState middle, MouseButtonState firstExtra, MouseButtonState secondExtra, short mouseDelta = 0);
-    void RegisterCursorDataEvent(int type, byte[] pixels, int width, int height, int left, int top, int xHotspot, int yHotspot);
+    void RegisterCursorDataEvent(int type, byte[] pixels, int width, int height, int left, int top, int xHotspot, int yHotspot, bool force = false);
     void RegisterKeyEvent(Key key, ModifierKeys modifiers, bool isUppercase, bool wasInjected);
 }

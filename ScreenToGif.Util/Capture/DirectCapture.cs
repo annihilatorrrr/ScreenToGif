@@ -748,7 +748,7 @@ public class DirectCapture : ScreenCapture
         if (screenTexture == null || CursorShapeBuffer?.Length == 0)// || !info.PointerPosition.Visible)
             return false;
 
-        RegisterCursorDataEvent(CursorShapeInfo.Type, CursorShapeBuffer, CursorShapeInfo.Width, CursorShapeInfo.Height, cursorX, cursorY, CursorShapeInfo.HotSpot.X, CursorShapeInfo.HotSpot.Y);
+        RegisterCursorDataEvent(CursorShapeInfo.Type, CursorShapeBuffer, CursorShapeInfo.Width, CursorShapeInfo.Height, cursorX, cursorY, CursorShapeInfo.HotSpot.X, CursorShapeInfo.HotSpot.Y, true);
         return true;
 
         //Don't let it bleed beyond the top-left corner, calculate the dimensions of the portion of the cursor that will appear.

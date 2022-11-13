@@ -17,7 +17,7 @@ public class TrackViewModel : BaseViewModel, ITrack
     private string _name = "";
     private Brush _accent = Brushes.Transparent;
     private string _cachePath = "";
-    private readonly IEditorViewModel _editorViewModel = null;
+    private readonly IPreviewerViewModel _previewerViewModel = null;
     private ObservableCollection<ISequence> _sequences = new();
 
     public int Id
@@ -33,7 +33,7 @@ public class TrackViewModel : BaseViewModel, ITrack
         {
             SetProperty(ref _isVisible, value);
 
-            EditorViewModel?.Render();
+            PreviewerViewModel?.Render();
         }
     }
 
@@ -61,10 +61,10 @@ public class TrackViewModel : BaseViewModel, ITrack
         set => SetProperty(ref _cachePath, value);
     }
 
-    internal IEditorViewModel EditorViewModel
+    internal IPreviewerViewModel PreviewerViewModel
     {
-        get => _editorViewModel;
-        private init => SetProperty(ref _editorViewModel, value);
+        get => _previewerViewModel;
+        private init => SetProperty(ref _previewerViewModel, value);
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public class TrackViewModel : BaseViewModel, ITrack
         set => SetProperty(ref _sequences, value);
     }
 
-    public static TrackViewModel FromModel(Track track, IEditorViewModel editorViewModel)
+    public static TrackViewModel FromModel(Track track, IPreviewerViewModel previewerViewModel)
     {
         return new TrackViewModel
         {
@@ -86,15 +86,14 @@ public class TrackViewModel : BaseViewModel, ITrack
             Name = track.Name,
             Accent = new SolidColorBrush(ColorExtensions.GenerateRandomPastel()),
             CachePath = track.CachePath,
-            EditorViewModel = editorViewModel,
-            Sequences = new ObservableCollection<ISequence>(track.Sequences.Select(s => SequenceViewModel.FromModel(s, editorViewModel)))
+            PreviewerViewModel = previewerViewModel,
+            Sequences = new ObservableCollection<ISequence>(track.Sequences.Select(s => SequenceViewModel.FromModel(s, previewerViewModel)))
         };
     }
 
-    public static ObservableCollection<TrackViewModel> FromModel(RecordingProject project, IEditorViewModel editorViewModel)
+    public static ObservableCollection<TrackViewModel> FromModel(RecordingProject project, IPreviewerViewModel previewerViewModel)
     {
-        //I'll need some work to handle cursors, because of the images.
-        //Cursor and key tracks are optional.
+        //TODO: If it's a sketchboard recording, I won't have raster images.
 
         var tracks = new ObservableCollection<TrackViewModel>
         {
@@ -103,29 +102,43 @@ public class TrackViewModel : BaseViewModel, ITrack
                 Id = 0,
                 Name = "Frames", //TODO: Localizable.
                 CachePath = project.FramesCachePath,
-                EditorViewModel = editorViewModel,
+                PreviewerViewModel = previewerViewModel,
                 Sequences = new ObservableCollection<ISequence>
                 {
-                    FrameSequenceViewModel.FromModel(project, editorViewModel)
+                    FrameSequenceViewModel.FromModel(project, previewerViewModel)
                 }
             }
         };
 
-        //new()
-        //{
-        //    Id = 1,
-        //    Name = "Cursor", //TODO: Localizable.
-        //    CachePath = project.MouseEventsCachePath,
-        //    EditorViewModel = editorViewModel,
-        //},
+        if (project.MouseEvents.Any())
+        {
+            tracks.Add(new()
+            {
+                Id = 1,
+                Name = "Cursor", //TODO: Localizable.
+                CachePath = project.MouseEventsCachePath,
+                PreviewerViewModel = previewerViewModel,
+                Sequences = new ObservableCollection<ISequence>
+                {
+                    CursorSequenceViewModel.FromModel(project, previewerViewModel)
+                }
+            });
+        }
 
-        //new()
-        //{
-        //    Id = 1,
-        //    Name = "Key Presses", //TODO: Localizable.
-        //    CachePath = project.KeyboardEventsCachePath,
-        //    EditorViewModel = editorViewModel,
-        //}
+        if (project.KeyboardEvents.Any())
+        {
+        //    tracks.Add(new()
+        //    {
+        //        Id = tracks.Count,
+        //        Name = "Key Presses", //TODO: Localizable.
+        //        CachePath = project.KeyboardEventsCachePath,
+        //        EditorViewModel = editorViewModel,
+        //        Sequences = new ObservableCollection<ISequence>
+        //        {
+        //            KeySequenceViewModel.FromModel(project, editorViewModel)
+        //        }
+        //    });
+        }
 
         return tracks;
     }

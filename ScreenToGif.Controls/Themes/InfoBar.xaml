@@ -9,6 +9,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
 
         <Setter Property="Template">
             <Setter.Value>
@@ -60,13 +61,17 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition/>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <Border Grid.Row="0" Grid.Column="0" x:Name="IconBorder" Background="{DynamicResource Brush.InfoBar.Glyph.Foreground}" BorderThickness="0" Margin="5,0"
+                            <Border Grid.Row="0" Grid.Column="0" x:Name="IconBorder" BorderThickness="0" Margin="5,0"
                                     CornerRadius="9999" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <n:SymbolIcon x:Name="SymbolIcon" Symbol="InfoFilled" Foreground="{DynamicResource Brush.InfoBar.Glyph}"
-                                              VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Grid>
+                                    <n:SymbolIcon x:Name="BackgroundSymbolIcon" Symbol="Info" Foreground="{DynamicResource Brush.InfoBar.Glyph.Foreground}"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <n:SymbolIcon x:Name="SymbolIcon" Symbol="InfoFilled" Foreground="{DynamicResource Brush.InfoBar.Glyph}"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid>
                             </Border>
                             
                             <TextBlock Grid.Row="0" Grid.Column="1" Text="{TemplateBinding Title}" FontSize="14" FontWeight="SemiBold"
@@ -91,14 +96,15 @@
                             <Setter Property="Background" Value="{DynamicResource Brush.InfoBar.Background.Warning}"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border.Warning}"/>
                             <Setter TargetName="SymbolIcon" Property="Foreground" Value="{DynamicResource Brush.InfoBar.Glyph.Warning}"/>
+                            <Setter TargetName="BackgroundSymbolIcon" Property="Symbol" Value="Warning"/>
                             <Setter TargetName="SymbolIcon" Property="Symbol" Value="WarningFilled"/>
-                            <Setter TargetName="IconBorder" Property="Width" Value="6"/>
                         </Trigger>
 
                         <Trigger Property="Type" Value="Error">
                             <Setter Property="Background" Value="{DynamicResource Brush.InfoBar.Background.Error}"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border.Error}"/>
                             <Setter TargetName="SymbolIcon" Property="Foreground" Value="{DynamicResource Brush.InfoBar.Glyph.Error}"/>
+                            <Setter TargetName="BackgroundSymbolIcon" Property="Symbol" Value="DismissCircle"/>
                             <Setter TargetName="SymbolIcon" Property="Symbol" Value="DismissCircleFilled"/>
                         </Trigger>
 
@@ -106,10 +112,12 @@
                             <Setter Property="Background" Value="{DynamicResource Brush.InfoBar.Background.Success}"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource Brush.InfoBar.Border.Success}"/>
                             <Setter TargetName="SymbolIcon" Property="Foreground" Value="{DynamicResource Brush.InfoBar.Glyph.Success}"/>
+                            <Setter TargetName="BackgroundSymbolIcon" Property="Symbol" Value="Checkmark"/>
                             <Setter TargetName="SymbolIcon" Property="Symbol" Value="CheckmarkFilled"/>
                         </Trigger>
 
                         <Trigger Property="Type" Value="Update">
+                            <Setter TargetName="BackgroundSymbolIcon" Property="Symbol" Value="ArrowSyncCircle"/>
                             <Setter TargetName="SymbolIcon" Property="Symbol" Value="ArrowSyncCircleFilled"/>
                         </Trigger>
 

@@ -1,4 +1,5 @@
 using ScreenToGif.Domain.Enums;
+using System.Collections;
 using System.IO.Compression;
 using System.Windows;
 using System.Windows.Input;
@@ -705,6 +706,39 @@ public partial class UserSettings
     {
         get => (WindowState)GetValue(ExporterWindowStateOriginal);
         set => SetValue(value, ExporterWindowStateOriginal);
+    }
+
+    //Previewer
+
+    private const bool ExporterLoopedPlaybackOriginal = true;
+    public bool ExporterLoopedPlayback
+    {
+        get => (bool)GetValue(ExporterLoopedPlaybackOriginal);
+        set => SetValue(value, ExporterLoopedPlaybackOriginal);
+    }
+
+    private const int ExporterPlaybackFramerateOriginal = 60;
+    public int ExporterPlaybackFramerate
+    {
+        get => (int)GetValue(ExporterPlaybackFramerateOriginal);
+        set => SetValue(value, ExporterPlaybackFramerateOriginal);
+    }
+
+    //Exporter
+
+    //TODO: Rename ExportFormat
+    private const ExportFormats ExportFormatOriginal = ExportFormats.Gif;
+    public ExportFormats SaveType
+    {
+        get => (ExportFormats)GetValue(ExportFormatOriginal);
+        set => SetValue(value, ExportFormatOriginal);
+    }
+
+    private readonly ArrayList _exportPresetsOriginal = new();
+    public ArrayList ExportPresets
+    {
+        get => (ArrayList)GetValue(_exportPresetsOriginal);
+        set => SetValue(value, _exportPresetsOriginal);
     }
 
     #endregion

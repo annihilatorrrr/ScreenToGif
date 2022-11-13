@@ -50,7 +50,7 @@ internal static class RegionSelectHelper
         foreach (var monitor in monitors)
         {
             var selector = new RegionSelector();
-            selector.Select(monitor, mode, monitor.Handle == currentMonitor?.Handle ? previousRegion : Rect.Empty, RegionSelected, RegionChanged, RegionGotHover, RegionAborted);
+            //selector.Select(monitor, mode, monitor.Handle == currentMonitor?.Handle ? previousRegion : Rect.Empty, RegionSelected, RegionChanged, RegionGotHover, RegionAborted);
 
             Selectors.Add(selector);
         }

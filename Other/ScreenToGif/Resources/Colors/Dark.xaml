@@ -118,13 +118,13 @@
     <!--ContextMenu-->
     <SolidColorBrush x:Key="Brush.ContextMenu.Background" Color="#2E2E2E"/>
     <SolidColorBrush x:Key="Brush.ContextMenu.Border" Color="#33000000"/>
-    <DropShadowEffect x:Key="Brush.ContextMenu.Shadow" Color="#000000" BlurRadius="16" ShadowDepth="8" Opacity="0.26" RenderingBias="Performance"/>
+    <DropShadowEffect x:Key="Brush.ContextMenu.Shadow" Color="#000000" BlurRadius="6" ShadowDepth="3" Opacity="0.2" RenderingBias="Performance"/>
 
     <!--ComboBox-->
     <DropShadowEffect x:Key="Brush.ComboBox.Shadow" Color="#000000" BlurRadius="8" ShadowDepth="0" Opacity="0.14" RenderingBias="Performance"/>
 
     <!--Tooltip-->
-    <DropShadowEffect x:Key="Brush.Tooltip.Shadow" Color="#000000" BlurRadius="6" ShadowDepth="0" Opacity="0.26" RenderingBias="Performance"/>
+    <DropShadowEffect x:Key="Brush.Tooltip.Shadow" Color="#000000" BlurRadius="6" ShadowDepth="0" Opacity="0.20" RenderingBias="Performance"/>
 
     <!--ListItem • MenuItem-->
     <SolidColorBrush x:Key="Brush.Item.Foreground" Color="#FFFFFF"/>

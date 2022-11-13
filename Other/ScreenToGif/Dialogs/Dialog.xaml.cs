@@ -1,8 +1,8 @@
 using ScreenToGif.Controls;
 using ScreenToGif.Domain.Enums;
+using ScreenToGif.Util;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace ScreenToGif.Dialogs;
@@ -16,81 +16,88 @@ public partial class Dialog : ExWindow
 
     public static bool Ok(string titleId, string detailsId)
     {
-        return Show(titleId, detailsId, DialogButtons.Ok);
+        return ShowStatic(titleId, detailsId, "S.Ok");
     }
 
     public static bool OkStatic(string title, string details)
     {
-        return ShowStatic(title, details, DialogButtons.Ok);
+        return ShowStatic(title, details, LocalizationHelper.Get("S.Ok"));
     }
 
-    public static bool OkCancel(string titleId, string detailsId)
+    public static bool OkCancel(string titleId, string detailsId, int main = 0)
     {
-        return Show(titleId, detailsId, DialogButtons.OkCancel);
+        return Show(titleId, detailsId, "S.Ok", main, "S.Cancel");
     }
 
-    public static bool OkCancelStatic(string title, string details)
+    public static bool OkCancelStatic(string title, string details, int main = 0)
     {
-        return ShowStatic(title, details, DialogButtons.OkCancel);
+        return ShowStatic(title, details, LocalizationHelper.Get("S.Ok"), main, LocalizationHelper.Get("S.Cancel"));
     }
 
-    public static bool Ask(string titleId, string detailsId)
+    public static bool Ask(string titleId, string detailsId, string yesId = "S.Yes", string noId = "S.No")
     {
-        return Show(titleId, detailsId, DialogButtons.YesNo);
+        return Show(titleId, detailsId, yesId, 0, noId);
     }
 
-    public static bool AskStatic(string title, string details)
+    public static bool AskStatic(string title, string details, string yes = null, string no = null)
     {
-        return ShowStatic(title, details, DialogButtons.YesNo);
+        return ShowStatic(title, details, yes ?? LocalizationHelper.Get("S.No"), 0, no ?? LocalizationHelper.Get("S.Yes"));
     }
 
-    public static bool Show(string titleId, string detailsId, DialogButtons buttons)
+    public static bool Show(string titleId, string detailsId, string positiveId, int main = 0, string negativeId = null)
     {
         var dialog = new Dialog();
-        dialog.SetData(titleId, detailsId, buttons);
+        dialog.SetData(titleId, detailsId, positiveId, main, negativeId);
 
         return dialog.ShowDialog() ?? false;
     }
 
-    public static bool ShowStatic(string title, string details, DialogButtons buttons)
+    public static bool ShowStatic(string title, string details, string positive, int main = 0, string negative = null)
     {
         var dialog = new Dialog();
-        dialog.SetData(title, details, buttons, true);
+        dialog.SetDataStatic(title, details, positive, main, negative);
 
         return dialog.ShowDialog() ?? false;
     }
 
-    private void SetData(string title, string details, DialogButtons buttons, bool isStatic = false)
+    private void SetData(string title, string details, string positiveId, int main = 0, string negativeId = null)
     {
-        if (isStatic)
-        {
-            TitleTextBlock.Text = title;
-            DetailsTextBlock.Text = details;
-        }
-        else
-        {
-            TitleTextBlock.SetResourceReference(TextBlock.TextProperty, title);
-            DetailsTextBlock.SetResourceReference(TextBlock.TextProperty, details);
-        }
+        TitleTextBlock.SetResourceReference(TextBlock.TextProperty, title);
+        DetailsTextBlock.SetResourceReference(TextBlock.TextProperty, details);
 
-        switch (buttons)
-        {
-            case DialogButtons.Ok:
-            {
-                NegativeButton.Visibility = Visibility.Collapsed;
-                Grid.SetColumn(PositiveButton, 1);
-                break;
-            }
-
-            case DialogButtons.YesNo:
-            {
-                PositiveButton.SetResourceReference(ContentProperty, "S.Yes");
-                NegativeButton.SetResourceReference(ContentProperty, "S.No");
-                break;
-            }
-        }
-        
+        PositiveButton.SetResourceReference(ContentProperty, positiveId);
+        PositiveButton.IsAccented = main == 0;
         PositiveButton.Focus();
+
+        if (negativeId == null)
+        {
+            NegativeButton.Visibility = Visibility.Collapsed;
+            Grid.SetColumn(PositiveButton, 1);
+            return;
+        }
+
+        NegativeButton.SetResourceReference(ContentProperty, negativeId);
+        NegativeButton.IsAccented = main == 1;
+    }
+
+    private void SetDataStatic(string title, string details, string positive, int main = 0, string negative = null)
+    {
+        TitleTextBlock.Text = title;
+        DetailsTextBlock.Text = details;
+
+        PositiveButton.Content = positive;
+        PositiveButton.IsAccented = main == 0;
+        PositiveButton.Focus();
+
+        if (negative == null)
+        {
+            NegativeButton.Visibility = Visibility.Collapsed;
+            Grid.SetColumn(PositiveButton, 1);
+            return;
+        }
+
+        NegativeButton.Content = negative;
+        NegativeButton.IsAccented = main == 1;
     }
 
     private void Dialog_KeyDown(object sender, KeyEventArgs e)

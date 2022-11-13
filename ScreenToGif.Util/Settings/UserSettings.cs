@@ -583,6 +583,16 @@ public partial class UserSettings : INotifyPropertyChanged
 
     #endregion
 
+    #region Editor • Save As
+
+    public bool IsSaveTypeExpanded
+    {
+        get => (bool)GetValue();
+        set => SetValue(value);
+    }
+
+    #endregion
+
     #endregion
 
 
@@ -1090,8 +1100,6 @@ public partial class UserSettings : INotifyPropertyChanged
 
     #region Editor
 
-    
-
     public PasteBehaviors PasteBehavior
     {
         get => (PasteBehaviors)GetValue();
@@ -1105,8 +1113,6 @@ public partial class UserSettings : INotifyPropertyChanged
     }
 
     #endregion
-
-
 
     #region Editor • New Animation
 
@@ -1125,28 +1131,6 @@ public partial class UserSettings : INotifyPropertyChanged
     public Color NewAnimationColor
     {
         get => (Color)GetValue();
-        set => SetValue(value);
-    }
-
-    #endregion
-
-    #region Editor • Save As
-
-    public bool IsSaveTypeExpanded
-    {
-        get => (bool)GetValue();
-        set => SetValue(value);
-    }
-
-    public ExportFormats SaveType
-    {
-        get => (ExportFormats)GetValue();
-        set => SetValue(value);
-    }
-
-    public ArrayList ExportPresets
-    {
-        get => (ArrayList)GetValue();
         set => SetValue(value);
     }
 

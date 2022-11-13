@@ -61,7 +61,12 @@
     <s:String x:Key="S.Padding">Padding:</s:String>
     <s:String x:Key="S.MinHeight">Min height:</s:String>
     <s:String x:Key="S.AndOr">and/or</s:String>
-    
+
+    <!--Imperative-->
+    <s:String x:Key="S.Imperative.Discard">Discard</s:String>
+    <s:String x:Key="S.Imperative.Keep">Keep</s:String>
+    <s:String x:Key="S.Imperative.SeeMore">See more</s:String>
+
     <!--Warnings-->
     <s:String x:Key="S.Crash">Oh no, the app crashed :(</s:String>
     <s:String x:Key="S.Required">Required field</s:String>

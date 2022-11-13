@@ -8,6 +8,6 @@ public enum ProjectSources
     Unknown = 0,
     ScreenRecorder = 1,
     WebcamRecorder = 2,
-    BoardRecorder = 3,
+    SketchboardRecorder = 3,
     Editor = 4
 }

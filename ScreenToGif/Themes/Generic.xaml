@@ -893,18 +893,18 @@
                         </Popup>
 
                         <Menu Grid.Row="0" Grid.Column="2" Effect="{x:Null}" Background="Transparent" VerticalAlignment="Center">
-                            <controls:ExMenuItem x:Name="ExtrasMenuItem" Header="{DynamicResource S.Editor.Extras}" Icon="{DynamicResource Vector.Editor}" ContentHeight="16" ContentWidth="16" BorderThickness="0">
+                            <controls:ExMenuItem x:Name="ExtrasMenuItem" Header="{DynamicResource S.Editor.Extras}" Icon="{DynamicResource Vector.Editor}" BorderThickness="0">
                                 <controls:ExMenuItem x:Name="OptionsMenuItem" Header="{DynamicResource S.StartUp.Options}" Icon="{DynamicResource Vector.Options}" 
-                                                           ContentHeight="16" ContentWidth="16" Command="{TemplateBinding OptionsCommand}"/>
+                                                           Command="{TemplateBinding OptionsCommand}"/>
                                 <controls:ExMenuItem x:Name="FeedbackMenuItem" Header="{DynamicResource S.Feedback.Feedback}" Icon="{DynamicResource Vector.Application}" 
-                                                           ContentHeight="16" ContentWidth="16" Command="{TemplateBinding FeedbackCommand}"/>
+                                                           Command="{TemplateBinding FeedbackCommand}"/>
                                 <controls:ExMenuItem x:Name="TroubleshootMenuItem" Header="{DynamicResource S.Troubleshoot.Title}" Icon="{DynamicResource Vector.Warning}" 
-                                                           ContentHeight="16" ContentWidth="16" Command="{TemplateBinding TroubleshootCommand}"/>
+                                                           Command="{TemplateBinding TroubleshootCommand}"/>
                                 
                                 <Separator Height="1"/>
 
                                 <controls:ExMenuItem x:Name="HelpMenuItem" Header="{DynamicResource S.Editor.Help}" Icon="{DynamicResource Vector.Question}" 
-                                                           ContentHeight="16" ContentWidth="16" Command="{TemplateBinding HelpCommand}"/>
+                                                           Command="{TemplateBinding HelpCommand}"/>
                             </controls:ExMenuItem>
                         </Menu>
 

@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Windows.Data;
 
 using ScreenToGif.ViewModel;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Gif;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 
 #endregion
 
@@ -20,7 +20,7 @@ public class PresetToSubViewModelConverter : IValueConverter
     #region Methods
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        => value is KGySoftGifPreset kGySoftGifPreset
+        => value is KGySoftGifPresetViewModel kGySoftGifPreset
             ? new KGySoftGifOptionsViewModel(kGySoftGifPreset)
             : value;
 

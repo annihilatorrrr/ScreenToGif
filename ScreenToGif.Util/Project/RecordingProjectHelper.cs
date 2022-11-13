@@ -81,7 +81,7 @@ public static class RecordingProjectHelper
         writeStream.WritePascalStringUInt16(project.Path); //Project's last used path, 2 bytes + X bytes (32_767 max).
 
         //Tracks (Frames and Cursor/Key events).
-        if (project.CreatedBy != ProjectSources.BoardRecorder)
+        if (project.CreatedBy != ProjectSources.SketchboardRecorder)
         {
             await CachedProjectHelper.CreateFrameTrack(recording, project);
             await CachedProjectHelper.CreateCursorTrack(recording, project);
@@ -107,6 +107,10 @@ public static class RecordingProjectHelper
             File.Delete(project.FramesCachePath);
             File.Delete(project.MouseEventsCachePath);
             File.Delete(project.KeyboardEventsCachePath);
+
+            project.Frames.Clear();
+            project.MouseEvents.Clear();
+            project.KeyboardEvents.Clear();
 
             return true;
         }

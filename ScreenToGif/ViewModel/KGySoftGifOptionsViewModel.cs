@@ -18,13 +18,13 @@ using KGySoft.Drawing.Imaging;
 
 using ScreenToGif.Util;
 using ScreenToGif.Util.Extensions;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Gif;
 
 #endregion
 
 #region Used Aliases
 
 using Color = System.Windows.Media.Color;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 
 #endregion
 
@@ -33,7 +33,7 @@ using Color = System.Windows.Media.Color;
 namespace ScreenToGif.ViewModel;
 
 /// <summary>
-/// Provides the ViewModel class for the <see cref="KGySoftGifPreset"/> model type.
+/// Provides the ViewModel class for the <see cref="KGySoftGifPresetViewModel"/> model type.
 /// </summary>
 public class KGySoftGifOptionsViewModel : ObservableObjectBase
 {
@@ -78,7 +78,7 @@ public class KGySoftGifOptionsViewModel : ObservableObjectBase
 
     #region Instance Fields
 
-    private readonly KGySoftGifPreset _preset;
+    private readonly KGySoftGifPresetViewModel _preset;
 
     private WriteableBitmap _previewBitmap;
     private IReadableBitmapData _currentFrame;
@@ -133,7 +133,7 @@ public class KGySoftGifOptionsViewModel : ObservableObjectBase
 
     #region Constructors
 
-    public KGySoftGifOptionsViewModel(KGySoftGifPreset preset)
+    public KGySoftGifOptionsViewModel(KGySoftGifPresetViewModel preset)
     {
         _preset = preset;
         _lastDitherer = preset.DithererId;

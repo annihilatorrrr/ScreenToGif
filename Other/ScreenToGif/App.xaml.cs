@@ -174,14 +174,14 @@ public partial class App : Application
             return;
         }
 
-        var startup = UserSettings.All.StartUp;
+        var startup = UserSettings.All.StartupWindow;
 
         if (UserSettings.All.StartMinimized)
-            startup = -1;
+            startup = StartupWindows.Undefined;
 
         //If files are being sent via parameter, force the editor to open.
         if (Arguments.FileNames.Any())
-            startup = 4;
+            startup = StartupWindows.Editor;
 
         ViewModel.LaunchCommand.Execute(startup);
 
@@ -232,14 +232,14 @@ public partial class App : Application
                 return;
             }
 
-            var startup = UserSettings.All.StartUp;
+            var startup = UserSettings.All.StartupWindow;
 
             if (UserSettings.All.StartMinimized)
-                startup = -1;
+                startup = StartupWindows.Undefined;
 
             //If files are being sent via parameter, force the editor to open.
             if (Arguments.FileNames.Any())
-                startup = 4;
+                startup = StartupWindows.Editor;
 
             ViewModel.LaunchCommand.Execute(startup);
         }

@@ -1,11 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.22621.0</TargetFramework>
+    <TargetFramework>net7.0-windows10.0.22621.0</TargetFramework>
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
-    <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
     <Company>Nicke Manarin</Company>
     <Description>Screen, webcam and sketchboard recorder, with integrated editor!</Description>
     <Copyright>Copyright© Nicke Manarin 2022</Copyright>
@@ -20,35 +19,31 @@
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <Version>$(AssemblyVersion)</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="app.manifest" />
     <None Remove="Resources\Logo.ico" />
   </ItemGroup>
-
   <ItemGroup>
     <AdditionalFiles Include="app.manifest" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="MdXaml" Version="1.16.1" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\ScreenToGif.Controls\ScreenToGif.Controls.csproj" />
     <ProjectReference Include="..\..\ScreenToGif.ViewModel\ScreenToGif.ViewModel.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Resources\Logo.ico" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Dialogs\Dialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <Page Update="Dialogs\Dialog.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
@@ -147,9 +142,7 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if exist &quot;$(DevEnvDir)..\..\VC\Auxiliary\Build\vsvars32.bat&quot; (&#xD;&#xA;  call &quot;$(DevEnvDir)..\..\VC\Auxiliary\Build\vsvars32.bat&quot;&#xD;&#xA;  editbin /largeaddressaware &quot;$(TargetPath)&quot;&#xD;&#xA;)" />
   </Target>
-
 </Project>

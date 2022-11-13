@@ -32,12 +32,6 @@ using ScreenToGif.Util.Extensions;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel;
 using ScreenToGif.ViewModel.ExportPresets;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Apng;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Gif;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Webp;
-using ScreenToGif.ViewModel.ExportPresets.Image;
-using ScreenToGif.ViewModel.ExportPresets.Other;
-using ScreenToGif.ViewModel.ExportPresets.Video;
 using ScreenToGif.ViewModel.UploadPresets;
 using ScreenToGif.Windows.Other;
 
@@ -45,6 +39,12 @@ using Color = System.Windows.Media.Color;
 using Encoder = ScreenToGif.Windows.Other.Encoder;
 using LegacyGifEncoder = ScreenToGif.Util.Codification.Gif.LegacyEncoder.GifEncoder;
 using KGySoftGifEncoder = KGySoft.Drawing.Imaging.GifEncoder;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Apng;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Webp;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
+using ScreenToGif.ViewModel.Presets.Export.Other;
+using ScreenToGif.ViewModel.Presets.Export.Image;
+using ScreenToGif.ViewModel.Presets.Export.Video;
 
 namespace ScreenToGif.Util;
 
@@ -71,7 +71,7 @@ internal class EncodingManager
 
     #endregion
 
-    internal static void StartEncoding(ExportProject project, ExportPreset preset)
+    internal static void StartEncoding(ExportProject project, ExportPresetOld preset)
     {
         //If the user still wants an encoder window, here's when it should be opened.
         if (UserSettings.All.DisplayEncoder)
@@ -479,7 +479,7 @@ internal class EncodingManager
 
     #region Encoding
 
-    private static async Task Encode(ExportProject project, ExportPreset preset, int id, CancellationTokenSource tokenSource)
+    private static async Task Encode(ExportProject project, ExportPresetOld preset, int id, CancellationTokenSource tokenSource)
     {
         var processing = LocalizationHelper.Get("S.Encoder.Processing");
         var watch = new Stopwatch();
@@ -519,7 +519,7 @@ internal class EncodingManager
                     {
                         case EncoderTypes.ScreenToGif:
                         {
-                            if (preset is not EmbeddedApngPreset embApngPreset)
+                            if (preset is not EmbeddedApngPresetViewModel embApngPreset)
                                 return;
 
                             #region Cut/Paint Unchanged Pixels
@@ -619,7 +619,7 @@ internal class EncodingManager
 
                             Update(id, 0, LocalizationHelper.Get("S.Encoder.Analyzing"));
 
-                            if (preset is not EmbeddedGifPreset embGifPreset)
+                            if (preset is not EmbeddedGifPresetViewModel embGifPreset)
                                 return;
 
                             if (embGifPreset.EnableTransparency)
@@ -712,7 +712,7 @@ internal class EncodingManager
                             break;
 
                         case EncoderTypes.KGySoft:
-                            if (preset is not KGySoftGifPreset kgySoftGifPreset)
+                            if (preset is not KGySoftGifPresetViewModel kgySoftGifPreset)
                                 return;
 
                             await EncodeKGySoftGif(kgySoftGifPreset, project.FramesFiles, id, tokenSource.Token);
@@ -722,7 +722,7 @@ internal class EncodingManager
 
                             #region System encoding
 
-                            if (preset is not SystemGifPreset systemGifPreset)
+                            if (preset is not SystemGifPresetViewModel systemGifPreset)
                                 return;
 
                             using (var stream = new MemoryStream())
@@ -777,7 +777,7 @@ internal class EncodingManager
 
                             Update(id, EncodingStatus.Processing, null, true);
 
-                            if (preset is not GifskiGifPreset gifskiGifPreset)
+                            if (preset is not GifskiGifPresetViewModel gifskiGifPreset)
                                 return;
 
                             if (!Other.IsGifskiPresent())
@@ -905,7 +905,7 @@ internal class EncodingManager
                 case ExportFormats.Jpeg:
                 case ExportFormats.Png:
                 {
-                    if (preset is not ImagePreset imagePreset)
+                    if (preset is not ImagePresetViewModel imagePreset)
                         return;
 
                     var padLength = project.FramesFiles.Select(s => s.Index).Max().ToString().Length;
@@ -1047,7 +1047,7 @@ internal class EncodingManager
                 {
                     #region Psd
 
-                    if (preset is not PsdPreset psdPreset)
+                    if (preset is not PsdPresetViewModel psdPreset)
                         return;
 
                     using (var stream = new MemoryStream())
@@ -1090,7 +1090,7 @@ internal class EncodingManager
                 {
                     #region Project
 
-                    if (preset is not StgPreset stgPreset)
+                    if (preset is not StgPresetViewModel stgPreset)
                         return;
 
                     Update(id, EncodingStatus.Processing, null, true);
@@ -1324,7 +1324,7 @@ internal class EncodingManager
         }
     }
 
-    private static async Task EncodeKGySoftGif(KGySoftGifPreset preset, IList<IFrame> frames, int id, CancellationToken cancellationToken)
+    private static async Task EncodeKGySoftGif(KGySoftGifPresetViewModel preset, IList<IFrame> frames, int id, CancellationToken cancellationToken)
     {
         #region Local Methods
 
@@ -1374,7 +1374,7 @@ internal class EncodingManager
             await stream.FlushAsync(cancellationToken);
     }
 
-    private static void EncodeWithFfmpeg(ExportPreset preset, List<IFrame> listFrames, int id, CancellationTokenSource tokenSource, string processing)
+    private static void EncodeWithFfmpeg(ExportPresetOld preset, List<IFrame> listFrames, int id, CancellationTokenSource tokenSource, string processing)
     {
         Update(id, EncodingStatus.Processing, null, true);
 
@@ -1415,7 +1415,7 @@ internal class EncodingManager
             {
                 #region Gif
 
-                if (preset is not FfmpegGifPreset gifPreset)
+                if (preset is not FfmpegGifPresetViewModel gifPreset)
                     return;
 
                 //ffmpeg -vsync 0 {I} -loop 0 -lavfi palettegen=stats_mode=single[pal],[0:v][pal]paletteuse=new=1:dither=sierra2_4a:diff_mode=rectangle -f gif {O}
@@ -1457,7 +1457,7 @@ internal class EncodingManager
             {
                 #region Apng
 
-                if (preset is not FfmpegApngPreset apngPreset)
+                if (preset is not FfmpegApngPresetViewModel apngPreset)
                     return;
 
                 //ffmpeg -vsync 0 {I} -pred mixed -plays 0 -f apng {O}
@@ -1497,7 +1497,7 @@ internal class EncodingManager
             {
                 #region Webp
 
-                if (preset is not FfmpegWebpPreset webpPreset)
+                if (preset is not FfmpegWebpPresetViewModel webpPreset)
                     return;
 
                 //ffmpeg -vsync 0 {I} -c:v libwebp_anim -lossless 0 -quality 75 -loop 0 -f webp {O}
@@ -1548,7 +1548,7 @@ internal class EncodingManager
             {
                 #region Video
 
-                if (preset is not VideoPreset videoPreset)
+                if (preset is not VideoPresetViewModel videoPreset)
                     return;
 
                 if (videoPreset.SettingsMode == VideoSettingsModes.Advanced)

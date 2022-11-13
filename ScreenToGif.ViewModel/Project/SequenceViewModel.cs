@@ -20,7 +20,7 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
     private ObservableCollection<object> _effects = new();
     private ulong _streamPosition = 0;
     private string _cachePath = "";
-    private IEditorViewModel _editorViewModel = null;
+    private IPreviewerViewModel _previewerViewModel = null;
 
     public int Id
     {
@@ -41,7 +41,7 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
         {
             SetProperty(ref _startTime, value);
 
-            EditorViewModel?.Render();
+            PreviewerViewModel?.Render();
         }
     }
 
@@ -52,7 +52,7 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
         {
             SetProperty(ref _endTime, value);
 
-            EditorViewModel?.Render();
+            PreviewerViewModel?.Render();
         }
     }
 
@@ -63,7 +63,7 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
         {
             SetProperty(ref _opacity, value);
 
-            EditorViewModel?.Render();
+            PreviewerViewModel?.Render();
         }
     }
 
@@ -74,7 +74,7 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
         {
             SetProperty(ref _background, value);
 
-            EditorViewModel?.Render();
+            PreviewerViewModel?.Render();
         }
     }
 
@@ -96,13 +96,13 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
         set => SetProperty(ref _cachePath, value);
     }
 
-    internal IEditorViewModel EditorViewModel
+    internal IPreviewerViewModel PreviewerViewModel
     {
-        get => _editorViewModel;
-        set => SetProperty(ref _editorViewModel, value);
+        get => _previewerViewModel;
+        set => SetProperty(ref _previewerViewModel, value);
     }
 
-    public static SequenceViewModel FromModel(Sequence sequence, IEditorViewModel baseViewModel)
+    public static SequenceViewModel FromModel(Sequence sequence, IPreviewerViewModel baseViewModel)
     {
         switch (sequence)
         {

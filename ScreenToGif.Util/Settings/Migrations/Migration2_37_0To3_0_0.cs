@@ -52,7 +52,7 @@ internal class Migration2_37_0To3_0_0
         // 4: Welcome,
         // 5: None,
 
-
+        //ExportPreset => Migrate namespaces
 
         //Update namespaces.
         //Remove settings.

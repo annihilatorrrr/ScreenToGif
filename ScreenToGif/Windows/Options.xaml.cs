@@ -1220,7 +1220,7 @@ public partial class Options : Window, INotification
         //Update the upload preset in all export presets.
         if (current.Title != preset.CurrentPreset.Title)
         {
-            foreach (var exportPreset in UserSettings.All.ExportPresets.OfType<ExportPreset>().Where(w => w.UploadService == current.Title))
+            foreach (var exportPreset in UserSettings.All.ExportPresets.OfType<ExportPresetOld>().Where(w => w.UploadService == current.Title))
                 exportPreset.UploadService = preset.CurrentPreset.Title;
         }
 
@@ -1245,7 +1245,7 @@ public partial class Options : Window, INotification
         UserSettings.All.UploadPresets = new ArrayList(_uploadList.ToArray());
 
         //Remove the upload preset from all export presets.
-        foreach (var exportPreset in UserSettings.All.ExportPresets.OfType<ExportPreset>().Where(w => w.UploadService == selected.Title))
+        foreach (var exportPreset in UserSettings.All.ExportPresets.OfType<ExportPresetOld>().Where(w => w.UploadService == selected.Title))
             exportPreset.UploadService = null;
     }
 

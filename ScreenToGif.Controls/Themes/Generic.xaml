@@ -5,10 +5,13 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Button.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/CheckBox.xaml"/>
+        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/CommandBar.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/ComboBox.xaml"/>
+        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/ComboBoxItem.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/DisplayTimer.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Hyperlink.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/InfoBar.xaml"/>
+        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/ProgressRing.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/MenuItem.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/ScreenSelector.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/SplitButton.xaml"/>

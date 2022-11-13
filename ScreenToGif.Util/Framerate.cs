@@ -13,6 +13,7 @@ public class CaptureStopwatch
     private Stopwatch _stopwatch;
 
     private int _interval = 15;
+    private long _totalFixed = 0;
     private long _intervalInTicks = 150000;
     private bool _started = true;
     private bool _fixedRate;
@@ -31,6 +32,7 @@ public class CaptureStopwatch
 
         _interval = interval;
         _intervalInTicks = TimeSpan.FromMilliseconds(interval).Ticks;
+        _totalFixed = 0;
 
         _fixedRate = UserSettings.All.FixedFrameRate;
     }
@@ -46,18 +48,19 @@ public class CaptureStopwatch
 
         _interval = interval;
         _fixedRate = useFixed;
+        _totalFixed = 0;
     }
 
     /// <summary>
     /// Gets the diff between the last call.
     /// </summary>
     /// <returns>The amount of seconds.</returns>
-    [Obsolete]
+    [Obsolete] //TODO: Remove later.
     public int GetMilliseconds()
     {
         if (_fixedRate)
             return _interval;
-
+        
         if (_started)
         {
             _started = false;
@@ -75,10 +78,15 @@ public class CaptureStopwatch
     /// Gets the elapsed ticks since the start of the stopwatch.
     /// Returns a fixed value for non automatic capture.
     /// </summary>
-    public long GetElapsedTicks()
+    public long GetElapsedTicks(bool peek = false)
     {
         if (_fixedRate)
-            return _intervalInTicks;
+        {
+            if (!peek)
+                _totalFixed += _intervalInTicks;
+
+            return _totalFixed;
+        }
 
         if (_stopwatch.IsRunning)
             return _stopwatch?.ElapsedTicks ?? -1L;

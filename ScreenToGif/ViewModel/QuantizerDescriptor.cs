@@ -10,7 +10,7 @@ using KGySoft.Reflection;
 
 using ScreenToGif.Util;
 using ScreenToGif.Util.Extensions;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Gif;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 
 #endregion
 
@@ -100,7 +100,7 @@ public class QuantizerDescriptor
 
     internal static QuantizerDescriptor GetById(string id) => _quantizersById.GetValueOrDefault(id);
 
-    internal static IQuantizer Create(string id, KGySoftGifPreset preset)
+    internal static IQuantizer Create(string id, KGySoftGifPresetViewModel preset)
     {
         var descriptor = _quantizersById.GetValueOrDefault(id ?? _quantizers[0].Id) ?? throw new ArgumentException($"Invalid {id}", nameof(id));
 

@@ -10,7 +10,7 @@ using KGySoft.Drawing.Imaging;
 using KGySoft.Reflection;
 
 using ScreenToGif.Util;
-using ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Gif;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 
 #endregion
 
@@ -122,7 +122,7 @@ public class DithererDescriptor
 
     #region Methods
 
-    internal static IDitherer Create(string id, KGySoftGifPreset preset)
+    internal static IDitherer Create(string id, KGySoftGifPresetViewModel preset)
     {
         if (id == null)
             return null;

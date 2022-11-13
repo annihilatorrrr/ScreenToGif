@@ -1,8 +1,9 @@
-﻿namespace ScreenToGif.Domain.Enums;
+namespace ScreenToGif.Domain.Enums;
 
 public enum StartupWindows
 {
-    ScreenRecorder,
+    Undefined = -1,
+    ScreenRecorder = 0,
     WebcamRecorder,
     SketchboardRecorder,
     Editor,

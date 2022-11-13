@@ -124,7 +124,7 @@ public partial class ScreenRecorder : BaseScreenRecorder
         CommandBindings.AddRange(new CommandBindingCollection
         {
             //new CommandBinding(ViewModel.CloseCommand, (_, _) => Close(),
-            //    (_, args) => args.CanExecute = Stage == RecorderStages.Stopped || (UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && (Project == null || !Project.Any))),
+            //    (_, args) => args.CanExecute = Stage == RecorderStages.Stopped || (ViewModel.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && (Project == null || !Project.Any))),
 
             new CommandBinding(ViewModel.OptionsCommand, ShowOptions, (_, args) => args.CanExecute = ViewModel.CanOpenOptions),
             new CommandBinding(ViewModel.SwitchFrequencyCommand, SwitchFrequency, (_, args) => args.CanExecute = (args.Parameter != null && !args.Parameter.Equals("Switch")) || ViewModel.CanSwitchFrequency),
@@ -448,8 +448,10 @@ public partial class ScreenRecorder : BaseScreenRecorder
         AdjustSelectionToScreen();
         RepositionCaptureControls();
 
+        //TODO: Reload settings?
+
         //If not recording (or recording in manual/interactive mode, but with no frames captured yet), adjust the maximum bounds for the recorder.
-        if (ViewModel.Stage == RecorderStages.Stopped || (UserSettings.All.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && ViewModel.Stage == RecorderStages.Recording && ViewModel.FrameCount == 0))
+        if (ViewModel.Stage == RecorderStages.Stopped || (ViewModel.CaptureFrequency is CaptureFrequencies.Manual or CaptureFrequencies.Interaction && ViewModel.Stage == RecorderStages.Recording && ViewModel.FrameCount == 0))
             ViewModel.IsDirectMode = UserSettings.All.UseDesktopDuplication;
 
         Topmost = true;
@@ -869,7 +871,7 @@ public partial class ScreenRecorder : BaseScreenRecorder
     {
         Pause(sender, e);
 
-        if (UserSettings.All.NotifyRecordingDiscard && !Dialog.Ask("S.Recorder.Discard.Instruction", "S.Recorder.Discard.Message"))
+        if (UserSettings.All.NotifyRecordingDiscard && !Dialog.Ask("S.Recorder.Discard.Instruction", "S.Recorder.Discard.Message", "S.Imperative.Discard", "S.Imperative.Keep"))
             return;
 
         await StopCapture();
@@ -1055,7 +1057,7 @@ public partial class ScreenRecorder : BaseScreenRecorder
                     return;
 
                 case RecorderStages.Recording:
-                    if (UserSettings.All.CaptureFrequency != CaptureFrequencies.Manual)
+                    if (ViewModel.CaptureFrequency != CaptureFrequencies.Manual)
                         TaskbarItemInfo.Overlay = RecordThumbInfo.ImageSource;
                     else
                         TaskbarItemInfo.Overlay = null;
@@ -1104,14 +1106,14 @@ public partial class ScreenRecorder : BaseScreenRecorder
         {
             if (Arguments.FrequencyType.HasValue)
             {
-                UserSettings.All.CaptureFrequency = Arguments.FrequencyType.Value;
-                UserSettings.All.LatestFps = Arguments.Frequency;
+                ViewModel.CaptureFrequency = Arguments.FrequencyType.Value;
+                ViewModel.Framerate = Arguments.Frequency;
                 DetectCaptureFrequency();
 
                 Arguments.FrequencyType = null;
             }
 
-            if (Arguments.StartCapture && UserSettings.All.CaptureFrequency >= CaptureFrequencies.PerSecond)
+            if (Arguments.StartCapture && ViewModel.CaptureFrequency >= CaptureFrequencies.PerSecond)
             {
                 if (Arguments.Limit > TimeSpan.Zero)
                 {
@@ -1161,8 +1163,8 @@ public partial class ScreenRecorder : BaseScreenRecorder
 
         if (Capture != null)
         {
-            Capture.Left = (int)ViewModel.Selection.Left;
-            Capture.Top = (int)ViewModel.Selection.Top;
+            Capture.Left = (int)ViewModel.SelectionScaled.Left;
+            Capture.Top = (int)ViewModel.SelectionScaled.Top;
         }
     }
 
@@ -1365,7 +1367,7 @@ public partial class ScreenRecorder : BaseScreenRecorder
         //Record/snap or pause.
         if (Keyboard.Modifiers.HasFlag(UserSettings.All.StartPauseModifiers) && e.Key == UserSettings.All.StartPauseShortcut)
         {
-            if (UserSettings.All.CaptureFrequency == CaptureFrequencies.Manual)
+            if (ViewModel.CaptureFrequency == CaptureFrequencies.Manual)
             {
                 ViewModel.SnapCommand.Execute(null, this);
                 return;

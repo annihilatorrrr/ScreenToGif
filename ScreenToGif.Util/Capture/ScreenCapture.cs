@@ -179,7 +179,7 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
 
         var recordingEvent = new CursorEvent
         {
-            TimeStampInTicks = Stopwatch.GetElapsedTicks(),
+            TimeStampInTicks = Stopwatch.GetElapsedTicks(true),
             Left = x - Left,
             Top = y - Top,
             LeftButton = left,
@@ -194,14 +194,14 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
         _eventConsumer.Add(recordingEvent);
     }
 
-    public void RegisterCursorDataEvent(int type, byte[] pixels, int width, int height, int left, int top, int xHotspot, int yHotspot)
+    public void RegisterCursorDataEvent(int type, byte[] pixels, int width, int height, int left, int top, int xHotspot, int yHotspot, bool force = false)
     {
-        if (!IsAcceptingEvents || !Stopwatch.IsRunning)
+        if (!IsAcceptingEvents || (!Stopwatch.IsRunning && !force))
             return;
 
         var recordingEvent = new CursorDataEvent
         {
-            TimeStampInTicks = Stopwatch.GetElapsedTicks(),
+            TimeStampInTicks = Stopwatch.GetElapsedTicks(true),
             CursorType = type,
             Left = left,
             Top = top,
@@ -223,7 +223,7 @@ public abstract class ScreenCapture : BaseCapture, IScreenCapture
 
         var recordingEvent = new KeyEvent
         {
-            TimeStampInTicks = Stopwatch.GetElapsedTicks(),
+            TimeStampInTicks = Stopwatch.GetElapsedTicks(true),
             Key = key,
             Modifiers = modifiers,
             IsUppercase = isUppercase,

@@ -26,7 +26,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
         set => SetProperty(ref _frames, value);
     }
 
-    public static FrameSequenceViewModel FromModel(FrameSequence sequence, IEditorViewModel baseViewModel)
+    public static FrameSequenceViewModel FromModel(FrameSequence sequence, IPreviewerViewModel baseViewModel)
     {
         return new FrameSequenceViewModel
         {
@@ -38,7 +38,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
             Effects = new ObservableCollection<object>(sequence.Effects), //TODO
             StreamPosition = sequence.StreamPosition,
             CachePath = sequence.CachePath,
-            EditorViewModel = baseViewModel,
+            PreviewerViewModel = baseViewModel,
             Left = sequence.Left,
             Top = sequence.Top,
             Width = sequence.Width,
@@ -55,7 +55,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
         };
     }
 
-    public static FrameSequenceViewModel FromModel(RecordingProject project, IEditorViewModel baseViewModel)
+    public static FrameSequenceViewModel FromModel(RecordingProject project, IPreviewerViewModel baseViewModel)
     {
         return new FrameSequenceViewModel
         {
@@ -64,7 +64,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
             EndTime = TimeSpan.FromTicks(project.Frames.LastOrDefault()?.Ticks ?? 0),
             StreamPosition = 0,
             CachePath = project.FramesCachePath,
-            EditorViewModel = baseViewModel,
+            PreviewerViewModel = baseViewModel,
             Left = 0,
             Top = 0,
             Width = (ushort)project.Width,

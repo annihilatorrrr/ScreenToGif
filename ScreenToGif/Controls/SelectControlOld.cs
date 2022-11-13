@@ -286,14 +286,14 @@ public class SelectControlOld : Control
         //    _sizeTextBlock.Cursor = Cursors.Hand;
         //}
 
-        Monitors = MonitorHelper.AllMonitorsScaled(Scale, true);
+        //Monitors = MonitorHelper.AllMonitorsScaled(Scale, true);
     }
 
     private void SystemEvents_DisplaySettingsChanged(object o, EventArgs eventArgs)
     {
         Scale = this.GetVisualScale();
 
-        Monitors = MonitorHelper.AllMonitorsScaled(Scale, true);
+        //Monitors = MonitorHelper.AllMonitorsScaled(Scale, true);
 
         //TODO: Adjust the selection and the UI when this happens.
     }

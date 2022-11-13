@@ -54,9 +54,9 @@ using ScreenToGif.Util.Extensions;
 using ScreenToGif.Util.Native;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel.ExportPresets;
-using ScreenToGif.ViewModel.ExportPresets.Image;
-using ScreenToGif.ViewModel.ExportPresets.Other;
 using ScreenToGif.ViewModel.Editor;
+using ScreenToGif.ViewModel.Presets.Export.Other;
+using ScreenToGif.ViewModel.Presets.Export.Image;
 
 namespace ScreenToGif.Windows
 {
@@ -5154,7 +5154,7 @@ namespace ScreenToGif.Windows
             #endregion
         }
 
-        private bool SaveAsync(ExportPreset preset)
+        private bool SaveAsync(ExportPresetOld preset)
         {
             ShowProgress(LocalizationHelper.Get("S.Editor.PreparingSaving"), 1, true);
 
@@ -5268,7 +5268,7 @@ namespace ScreenToGif.Windows
             #region Last minute validation
 
             //Validates each file name when saving multiple images (if more than one image, that will not be zipped).
-            if (preset is ImagePreset { ZipFiles: false })
+            if (preset is ImagePresetViewModel { ZipFiles: false })
             {
                 if (preset.OverwriteMode != OverwriteModes.Allow)
                 {
@@ -5318,7 +5318,7 @@ namespace ScreenToGif.Windows
                 var copiedAux = Project.CopyToExport(indexes, true);
 
                 //Get default project encoder settings.
-                var projectPreset = (UserSettings.All.ExportPresets.OfType<StgPreset>().FirstOrDefault(f => f.IsSelectedForEncoder) ?? UserSettings.All.ExportPresets.OfType<StgPreset>().FirstOrDefault() ?? StgPreset.Default).ShallowCopy();
+                var projectPreset = (UserSettings.All.ExportPresets.OfType<StgPresetViewModel>().FirstOrDefault(f => f.IsSelectedForEncoder) ?? UserSettings.All.ExportPresets.OfType<StgPresetViewModel>().FirstOrDefault() ?? StgPresetViewModel.Default).ShallowCopy();
                 projectPreset.OutputFolder = preset.OutputFolder;
                 projectPreset.OutputFilename = preset.OutputFilename;
                 projectPreset.ResolvedFilename = preset.ResolvedFilename;
