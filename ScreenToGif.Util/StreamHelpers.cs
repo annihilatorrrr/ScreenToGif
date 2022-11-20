@@ -3,6 +3,7 @@ using System.Text;
 
 namespace ScreenToGif.Util;
 
+[Obsolete("Use BinaryWriter/Reader")]
 public static class StreamHelpers
 {
     #region Peek
@@ -98,7 +99,12 @@ public static class StreamHelpers
         var read = ms.Read(buffer, 0, count);
 
         while (read < count)
+        {
             read += ms.Read(buffer, read, count - read);
+
+            if (read == 0)
+                break;
+        }
 
         if (read != count)
             throw new EndOfStreamException("End reached.");
@@ -127,6 +133,25 @@ public static class StreamHelpers
     }
     
     public static byte[] ReadBytesUntilFull(this Stream stream, int count)
+    {
+        var innerBuffer = new byte[count];
+        var buffer = new Span<byte>(innerBuffer);
+
+        var totalRead = 0;
+        while (totalRead < buffer.Length)
+        {
+            var bytesRead = stream.Read(buffer.Slice(totalRead));
+
+            if (bytesRead == 0)
+                break;
+
+            totalRead += bytesRead;
+        }
+
+        return buffer.ToArray();
+    }
+
+    public static byte[] ReadBytesUntilFull(this Stream stream, long count)
     {
         var innerBuffer = new byte[count];
         var buffer = new Span<byte>(innerBuffer);
@@ -178,6 +203,21 @@ public static class StreamHelpers
     public static ulong ReadUInt64(this Stream ms)
     {
         return BitConverter.ToUInt64(ReadBytes(ms, 8), 0);
+    }
+
+    public static float ReadSingle(this Stream ms)
+    {
+        return BitConverter.ToSingle(ReadBytes(ms, 4), 0);
+    }
+
+    public static string ReadPascalString(this Stream ms)
+    {
+        var size = ms.ReadByte();
+
+        if (size <= 0)
+            return null;
+
+        return Encoding.UTF8.GetString(ms.ReadBytes(size));
     }
 
     #endregion Read

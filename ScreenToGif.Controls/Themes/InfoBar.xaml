@@ -84,9 +84,9 @@
                                           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
 
-                            <n:ExButton Grid.Row="0" Grid.Column="4" x:Name="SuppressButton" MinWidth="30" Style="{DynamicResource Style.Button.Borderless}"
+                            <n:ExButton Grid.Row="0" Grid.Column="4" x:Name="SuppressButton" Padding="4,0" Style="{DynamicResource Style.Button.Borderless}"
                                         ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
-                                <n:SymbolIcon Symbol="Dismiss"/>
+                                <n:SymbolIcon Symbol="Dismiss" FontSize="18"/>
                             </n:ExButton>
                         </Grid>
                     </Border>

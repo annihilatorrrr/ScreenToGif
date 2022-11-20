@@ -3,10 +3,11 @@ using System.Globalization;
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Models.Upload.Gfycat;
 using ScreenToGif.Util;
+using ScreenToGif.ViewModel.Presets.Upload;
 
 namespace ScreenToGif.ViewModel.UploadPresets.Gfycat;
 
-public class GfycatPreset : UploadPreset
+public class GfycatPresetViewModel : UploadPresetViewModel
 {
     private string _accessToken = "";
     private string _refreshToken = "";
@@ -100,10 +101,9 @@ public class GfycatPreset : UploadPreset
             string.Format(LocalizationHelper.Get("S.Options.Upload.Preset.Info.Valid"), RefreshTokenExpiryDate.Value.ToLocalTime().ToString("g", CultureInfo.CurrentUICulture));
 
 
-    public GfycatPreset() : base(null, TimeSpan.FromMinutes(1))
+    public GfycatPresetViewModel() : base(null, TimeSpan.FromMinutes(1))
     {
         Type = UploadDestinations.Gfycat;
-        ImageId = "Vector.Gfycat";
         AllowedTypes = new List<ExportFormats>
         {
             ExportFormats.Gif,

@@ -4,9 +4,9 @@ using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Apng;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Apng;
 
-public class ApngPresetViewModel : AnimatedImagePresetViewModel
+public abstract class ApngPresetViewModel : AnimatedImagePresetViewModel
 {
-    public ApngPresetViewModel()
+    protected ApngPresetViewModel()
     {
         Type = ExportFormats.Apng;
         Extension = ".apng";

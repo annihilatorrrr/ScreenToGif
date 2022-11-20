@@ -849,7 +849,7 @@ public partial class App
             return false;
         }
     }
-
+    
     //Maybe turn into a helper
     private static long GetSize(string path)
     {
@@ -871,12 +871,11 @@ public partial class App
                     ShowExporter(window, window.Project);
                 else
                     await ShowEditor(window.Project);
-
-                caller?.Close();
+                
                 return;
             }
 
-            await editor.LoadProject(window.Project);
+            await editor.LoadFromProject(window.Project);
             return;
         }
 
@@ -884,13 +883,10 @@ public partial class App
         {
             caller?.Show();
             CloseOrNot();
-            return;
         }
-
-        await editor.LoadProject(null);
     }
 
-    internal static async Task ShowEditor(RecordingProject project = null, bool openMedia = false)
+    internal static async Task ShowEditor(RecordingProject project = null, string path = null, bool openMedia = false)
     {
         var editor = Current.Windows.OfType<Editor>().FirstOrDefault(f => !f.HasProjectLoaded);
 
@@ -908,50 +904,69 @@ public partial class App
         }
 
         if (project != null)
-            await editor.LoadProject(project);
+            await editor.LoadFromProject(project);
+        else if (path != null)
+            await editor.LoadFromPath(path);
         else if (openMedia)
             editor.LoadFromArguments();
 
         Current.MainWindow = editor;
         editor.Activate();
     }
-
-    private static void ShowExporter(Window caller, RecordingProject project)
+    
+    internal static void ShowExporter(Window caller, RecordingProject project = null, string path = null)
     {
         var exporter = new Exporter();
-        exporter.Closed += (_, _) =>
-        {
-            //When called by any recorder:
-            //  Open new window of the same type.
-            //  If screen recorder, maybe re-set the size/position. 
-            //When called by editor/startup (recent projects):
-            //  Display again the editor, since it should be still be opened.
-            
-            if (caller.IsLoaded)
-            {
-                caller.Show();
-                return;
-            }
-
-            switch (project.CreatedBy)
-            {
-                case ProjectSources.ScreenRecorder:
-                    Launch(StartupWindows.ScreenRecorder);
-                    break;
-                case ProjectSources.WebcamRecorder:
-                    Launch(StartupWindows.WebcamRecorder);
-                    break;
-                case ProjectSources.SketchboardRecorder:
-                    Launch(StartupWindows.SketchboardRecorder);
-                    break;
-            }
-        };
+        exporter.Closed += (_, _) => ExporterCallback(exporter, caller, project);
         exporter.Show();
 
-        exporter.LoadProject(project);
+        if (project != null)
+            exporter.LoadRecordingProject(project);
+        else
+            exporter.LoadRecordingProject(path);
 
         Current.MainWindow = exporter;
         exporter.Activate();
+    }
+    
+    private static async void ExporterCallback(Exporter exporter, Window caller, RecordingProject project = null, string path = null)
+    {
+        //When called by any recorder:
+        //  Open new window of the same type.
+        //  If screen recorder, maybe re-set the size/position. 
+        //When called by editor/startup (recent projects):
+        //  Display again the editor, since it should be still be opened.
+
+        if (caller != null && caller.IsLoaded)
+        {
+            caller.Show();
+            return;
+        }
+
+        if (exporter.OpenInEditor)
+        {
+            await ShowEditor(project, path);
+            return;
+        }
+
+        switch (project?.CreatedBy)
+        {
+            case ProjectSources.ScreenRecorder:
+                Launch(StartupWindows.ScreenRecorder);
+                break;
+
+            case ProjectSources.WebcamRecorder:
+                Launch(StartupWindows.WebcamRecorder);
+                break;
+
+            case ProjectSources.SketchboardRecorder:
+                Launch(StartupWindows.SketchboardRecorder);
+                break;
+
+            default:
+                Launch(StartupWindows.Welcome);
+                break;
+        }
     }
 
     private static void Interact(NotificationIconActions action, StartupWindows open)

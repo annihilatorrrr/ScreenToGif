@@ -52,8 +52,40 @@ internal class Migration2_37_0To3_0_0
         // 4: Welcome,
         // 5: None,
 
-        //ExportPreset => Migrate namespaces
+        var exportPresets = properties.FirstOrDefault(a => a.Key == "ExportPresets");
 
+        if (exportPresets != null)
+        {
+            foreach (var presetsChild in exportPresets.Children)
+            {
+                //clr-namespace:ScreenToGif.ViewModel.ExportPresets.AnimatedImage.Gif;assembly=ScreenToGif.ViewModel
+                //clr-namespace:ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Gif;assembly=ScreenToGif.Domain
+
+                presetsChild.NameSpace = presetsChild.NameSpace.Replace("ScreenToGif.ViewModel.ExportPresets", "ScreenToGif.Domain.Models.Preset.Export")
+                    .Replace("assembly=ScreenToGif.ViewModel", "assembly=ScreenToGif.Domain");
+
+                presetsChild.Attributes.RemoveAll(r => r.Key == "DefaultExtension" ||
+                                                       r.Key == "IsEncoderExpanded" ||
+                                                       r.Key == "IsEncoderOptionsExpanded" ||
+                                                       r.Key == "IsExportOptionsExpanded" ||
+                                                       r.Key == "IsPartialExportExpanded" ||
+                                                       r.Key == "IsOutputExpanded" ||
+                                                       r.Key == "IsUploadExpanded" ||
+                                                       r.Key == "ExportPartially" ||
+                                                       r.Key == "PartialExport");
+            }
+        }
+
+        var uploadPreset = properties.FirstOrDefault(a => a.Key == "UploadPresets");
+
+        if (uploadPreset != null)
+        {
+            foreach (var presetsChild in uploadPreset.Children)
+            {
+                //UploadPreset => Migrate namespaces
+            }
+        }
+        
         //Update namespaces.
         //Remove settings.
 

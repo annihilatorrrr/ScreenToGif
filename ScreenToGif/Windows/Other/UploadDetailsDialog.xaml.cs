@@ -16,7 +16,7 @@ public partial class UploadDetailsDialog : Window
 
     #region Methods
 
-    private void PrepareOk(GfycatPreset preset)
+    private void PrepareOk(GfycatPresetViewModel preset)
     {
         TitleTextBox.Text = preset.DefaultTitle;
         DescriptionTextBox.Text = preset.DefaultDescription;
@@ -27,7 +27,7 @@ public partial class UploadDetailsDialog : Window
         AcceptButton.Focus();
     }
 
-    private void PrepareOkCancel(GfycatPreset preset)
+    private void PrepareOkCancel(GfycatPresetViewModel preset)
     {
         TitleTextBox.Text = preset.DefaultTitle;
         DescriptionTextBox.Text = preset.DefaultDescription;
@@ -62,7 +62,7 @@ public partial class UploadDetailsDialog : Window
     /// Shows a Ok dialog.
     /// </summary>
     /// <returns>True if Ok</returns>
-    public static GfycatCreateRequest Ok(GfycatPreset preset)
+    public static GfycatCreateRequest Ok(GfycatPresetViewModel preset)
     {
         var dialog = new UploadDetailsDialog();
         dialog.PrepareOk(preset);
@@ -87,7 +87,7 @@ public partial class UploadDetailsDialog : Window
     /// Shows a Ok/Cancel dialog.
     /// </summary>
     /// <returns>True if Ok</returns>
-    public static GfycatCreateRequest OkCancel(GfycatPreset preset)
+    public static GfycatCreateRequest OkCancel(GfycatPresetViewModel preset)
     {
         var dialog = new UploadDetailsDialog();
         dialog.PrepareOkCancel(preset);

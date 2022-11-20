@@ -18,7 +18,7 @@ public class Gfycat : IUploader
 {
     public async Task<IHistory> UploadFileAsync(IUploadPreset preset, string path, CancellationToken cancellationToken, IProgress<double> progressCallback = null)
     {
-        if (preset is not GfycatPreset gfycatPreset)
+        if (preset is not GfycatPresetViewModel gfycatPreset)
             throw new Exception("Gfycat preset is null.");
 
         if (!await IsAuthorized(gfycatPreset))
@@ -35,7 +35,7 @@ public class Gfycat : IUploader
         return await Upload(gfycatPreset, path, headers);
     }
 
-    private async Task<History> Upload(GfycatPreset preset, string path, NameValueCollection headers)
+    private async Task<History> Upload(GfycatPresetViewModel preset, string path, NameValueCollection headers)
     {
         var create = preset.AskForDetails ? Application.Current.Dispatcher.Invoke<GfycatCreateRequest>(() => UploadDetailsDialog.OkCancel(preset)) : preset.ToCreateRequest();
 
@@ -177,7 +177,7 @@ public class Gfycat : IUploader
     }
 
 
-    public static async Task<bool> GetTokens(GfycatPreset preset)
+    public static async Task<bool> GetTokens(GfycatPresetViewModel preset)
     {
         var auth = new GfycatAuthRequest
         {
@@ -189,7 +189,7 @@ public class Gfycat : IUploader
         return await GetTokens(preset, auth);
     }
 
-    public static async Task<bool> GetTokens(GfycatPreset preset, string username, string password)
+    public static async Task<bool> GetTokens(GfycatPresetViewModel preset, string username, string password)
     {
         var auth = new GfycatAuthRequest
         {
@@ -203,7 +203,7 @@ public class Gfycat : IUploader
         return await GetTokens(preset, auth);
     }
 
-    public static async Task<bool> RefreshToken(GfycatPreset preset)
+    public static async Task<bool> RefreshToken(GfycatPresetViewModel preset)
     {
         var auth = new GfycatAuthRequest
         {
@@ -217,14 +217,14 @@ public class Gfycat : IUploader
     }
 
 
-    public static bool IsAuthorizationExpired(GfycatPreset preset)
+    public static bool IsAuthorizationExpired(GfycatPresetViewModel preset)
     {
         return DateTime.UtcNow > preset.AccessTokenExpiryDate;
     }
 
     public static async Task<bool> IsAuthorized(IUploadPreset preset)
     {
-        if (preset is not GfycatPreset gfycatPreset)
+        if (preset is not GfycatPresetViewModel gfycatPreset)
             return false;
 
         //When in anonymous mode, only the access token is used.
@@ -249,7 +249,7 @@ public class Gfycat : IUploader
     }
 
         
-    private static async Task<bool> GetTokens(GfycatPreset preset, GfycatAuthRequest auth)
+    private static async Task<bool> GetTokens(GfycatPresetViewModel preset, GfycatAuthRequest auth)
     {
         var response = await WebHelper.Post("https://api.gfycat.com/v1/oauth/token", Serializer.Serialize(auth));
 

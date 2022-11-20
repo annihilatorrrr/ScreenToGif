@@ -134,7 +134,7 @@ public class GfycatHistory : History
 
     public override string GetLink(IPreset preset)
     {
-        if (!(preset is GfycatPreset gfycatPreset) || !gfycatPreset.UseDirectLinks)
+        if (!(preset is GfycatPresetViewModel gfycatPreset) || !gfycatPreset.UseDirectLinks)
             return Link;
 
         switch (gfycatPreset.UrlType)

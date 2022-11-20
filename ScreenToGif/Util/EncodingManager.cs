@@ -32,7 +32,6 @@ using ScreenToGif.Util.Extensions;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel;
 using ScreenToGif.ViewModel.ExportPresets;
-using ScreenToGif.ViewModel.UploadPresets;
 using ScreenToGif.Windows.Other;
 
 using Color = System.Windows.Media.Color;
@@ -45,6 +44,7 @@ using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 using ScreenToGif.ViewModel.Presets.Export.Other;
 using ScreenToGif.ViewModel.Presets.Export.Image;
 using ScreenToGif.ViewModel.Presets.Export.Video;
+using ScreenToGif.ViewModel.Presets.Upload;
 
 namespace ScreenToGif.Util;
 
@@ -1133,7 +1133,7 @@ internal class EncodingManager
                 {
                     //Get selected preset.
                     var presetType = preset.Extension == ".zip" ? ExportFormats.Zip : preset.Type;
-                    var uploadPreset = UserSettings.All.UploadPresets.OfType<UploadPreset>().FirstOrDefault(f => (f.AllowedTypes.Count == 0 || f.AllowedTypes.Contains(presetType)) && f.Title == preset.UploadService);
+                    var uploadPreset = UserSettings.All.UploadPresets.OfType<UploadPresetViewModel>().FirstOrDefault(f => (f.AllowedTypes.Count == 0 || f.AllowedTypes.Contains(presetType)) && f.Title == preset.UploadService);
 
                     if (uploadPreset == null)
                         throw new Exception($"Missing upload preset called {preset.UploadService}");

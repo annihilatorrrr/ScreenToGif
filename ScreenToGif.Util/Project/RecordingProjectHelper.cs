@@ -1,10 +1,11 @@
 using ScreenToGif.Domain.Enums;
-using ScreenToGif.Domain.Models.Project.Cached;
 using ScreenToGif.Domain.Models.Project.Recording;
+using ScreenToGif.Domain.Models.Project.Recording.Events;
 using ScreenToGif.Util.Settings;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
-using System.Windows.Media;
+using System.Windows.Input;
 
 namespace ScreenToGif.Util.Project;
 
@@ -44,57 +45,143 @@ public static class RecordingProjectHelper
         fileStream.WritePascalString("ScreenToGif"); //App name, 1 byte + X bytes (255 max).
         fileStream.WritePascalString(UserSettings.All.VersionText); //App version, 1 byte + X bytes (255 max).
         fileStream.WriteByte((byte) project.CreatedBy); //Recording source, 1 byte.
-        fileStream.WriteUInt64((ulong) project.CreationDate.Ticks); //Creation date, 8 bytes.
+        fileStream.WriteInt64(project.CreationDate.Ticks); //Creation date, 8 bytes.
     }
 
-    //Read and Parse RecordingProject from cache, when for example the project failed to be converted to CachedProject.
-
-    public static async Task<CachedProject> ConvertToCachedProject(this RecordingProject recording)
+    public static async Task<RecordingProject> ReadFromPath(string path)
     {
-        var project = CachedProjectHelper.Create(recording.CreationDate);
-        project.Width = (ushort) recording.Width;
-        project.Height = (ushort) recording.Height;
-        project.VerticalDpi = recording.Dpi;
-        project.HorizontalDpi = recording.Dpi;
-        project.Background = Brushes.White;
-        project.ChannelCount = recording.ChannelCount;
-        project.BitsPerChannel = recording.BitsPerChannel;
-        project.Version = UserSettings.All.Version;
-        project.CreatedBy = recording.CreatedBy;
+        var propertiesPath = Path.Combine(path, "Properties.cache");
+        var framesPath = Path.Combine(path, "Frames.cache");
+        var strokesPath = Path.Combine(path, "Strokes.cache");
+        var cursorEventsPath = Path.Combine(path, "MouseEvents.cache");
+        var keyEventsPath = Path.Combine(path, "KeyboardEvents.cache");
+
+        //TODO: Use BinaryReader instead.
 
         //Properties.
-        await using var writeStream = new FileStream(project.PropertiesCachePath, FileMode.Create, FileAccess.Write, FileShare.None);
-        writeStream.WriteBytes(Encoding.ASCII.GetBytes("stgC")); //Signature, 4 bytes.
-        writeStream.WriteUInt16(1); //File version, 2 bytes.
-        writeStream.WriteUInt16(project.Width); //Width, 2 bytes.
-        writeStream.WriteUInt16(project.Height); //Height, 2 bytes.
-        writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(project.HorizontalDpi))); //DPI, 4 bytes.
-        writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(project.VerticalDpi))); //DPI, 4 bytes.
-        writeStream.WritePascalStringUInt32(await project.Background.ToXamlStringAsync());
-        writeStream.WriteByte(project.ChannelCount); //Number of channels, 1 byte.
-        writeStream.WriteByte(project.BitsPerChannel); //Bits per channels, 1 byte.
-        writeStream.WritePascalString("ScreenToGif"); //App name, 1 byte + X bytes (255 max).
-        writeStream.WritePascalString(UserSettings.All.VersionText); //App version, 1 byte + X bytes (255 max).
-        writeStream.WriteByte((byte)project.CreatedBy); //Recording source, 1 byte.
-        writeStream.WriteUInt64((ulong)project.CreationDate.Ticks); //Creation date, 8 bytes.
-        writeStream.WritePascalString(project.Name); //Project's name, 1 byte + X bytes (255 max).
-        writeStream.WritePascalStringUInt16(project.Path); //Project's last used path, 2 bytes + X bytes (32_767 max).
+        await using var readStream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-        //Tracks (Frames and Cursor/Key events).
-        if (project.CreatedBy != ProjectSources.SketchboardRecorder)
+        var sign = Encoding.ASCII.GetString(await readStream.ReadBytesAsync(4)); //Signature, 4 bytes.
+
+        if (sign != "stgR") //Signature, 4 bytes.
+            throw new Exception($"Unsupported file format. Signature: '{sign}'.");
+
+        var version = readStream.ReadUInt16(); //File version, 2 bytes.
+
+        if (version != 1)
+            throw new Exception($"Unsupported file version. Version: '{version}'.");
+
+        var project = new RecordingProject
         {
-            await CachedProjectHelper.CreateFrameTrack(recording, project);
-            await CachedProjectHelper.CreateCursorTrack(recording, project);
-            await CachedProjectHelper.CreateKeyTrack(recording, project);
-        }
-        else
-        {
-            //await CachedProjectHelper.CreateStrokeTrack(recording.FramesCachePath, project);
-        }
+            PropertiesCachePath = propertiesPath,
+            FramesCachePath = framesPath,
+            MouseEventsCachePath = cursorEventsPath,
+            KeyboardEventsCachePath = keyEventsPath
+        };
+
+        project.Width = readStream.ReadUInt16(); //Width, 2 bytes.
+        project.Height = readStream.ReadUInt16(); //Height, 2 bytes.
+        project.Dpi = Convert.ToDouble(readStream.ReadSingle()); //DPI, 4 bytes.
+        project.ChannelCount = (byte)readStream.ReadByte(); //Number of channels, 1 byte.
+        project.BitsPerChannel = (byte)readStream.ReadByte(); //Bits per channels, 1 byte.
         
-        //Create ActionStack cache?
+        readStream.ReadPascalString(); //App name, 1 byte + X bytes (255 max).
+        readStream.ReadPascalString(); //App version, 1 byte + X bytes (255 max).
 
-        await Task.Run(() => Discard(recording));
+        project.CreatedBy = (ProjectSources)readStream.ReadByte(); //Recording source, 1 byte.
+        project.CreationDate = new DateTime(readStream.ReadInt64()); //Creation date, 8 bytes.
+
+        //Frames.
+        if (File.Exists(framesPath))
+        {
+            await using var readFramesStream = new FileStream(framesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            readFramesStream.Position += 71;
+
+            while (readFramesStream.Position < readFramesStream.Length)
+            {
+                var frame = new RecordingFrame
+                {
+                    StreamPosition = readFramesStream.Position
+                };
+
+                readFramesStream.Position += 1;
+                
+                frame.TimeStampInTicks = readFramesStream.ReadInt64();
+
+                readFramesStream.Position += 30;
+
+                frame.DataLength = readFramesStream.ReadInt64();
+
+                await using var compressStream = new DeflateStream(readFramesStream, CompressionMode.Decompress, true);
+                    compressStream.ReadBytesUntilFull(frame.DataLength);
+                
+                project.Frames.Add(frame);
+            }
+        }
+
+        if (File.Exists(strokesPath))
+        {
+            await using var readFramesStream = new FileStream(strokesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            //TODO: Read strokes.
+            //How are they going to get stored?
+        }
+
+        if (File.Exists(cursorEventsPath))
+        {
+            await using var readFramesStream = new FileStream(cursorEventsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            var type = readFramesStream.ReadByte();
+
+            if (type == 0)
+            {
+                //Cursor
+                var cursor = new CursorEvent();
+                cursor.TimeStampInTicks = readFramesStream.ReadInt64();
+                cursor.Left = readFramesStream.ReadInt32();
+                cursor.Top = readFramesStream.ReadInt32();
+                cursor.LeftButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                cursor.RightButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                cursor.MiddleButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                cursor.FirstExtraButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                cursor.SecondExtraButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                cursor.MouseDelta = readFramesStream.ReadInt16();
+
+                project.MouseEvents.Add(cursor);
+            }
+            else
+            {
+                //Cursor data.
+                var cursorData = new CursorDataEvent();
+                cursorData.TimeStampInTicks = readFramesStream.ReadInt64();
+                cursorData.CursorType = readFramesStream.ReadByte();
+                cursorData.Left = readFramesStream.ReadInt32();
+                cursorData.Top = readFramesStream.ReadInt32();
+
+                cursorData.Width = readFramesStream.ReadInt32();
+                cursorData.Height = readFramesStream.ReadInt32();
+                cursorData.XHotspot = readFramesStream.ReadInt32();
+                cursorData.YHotspot = readFramesStream.ReadInt32();
+                cursorData.PixelsLength = readFramesStream.ReadInt64();
+
+                project.MouseEvents.Add(cursorData);
+            }
+        }
+
+        if (File.Exists(keyEventsPath))
+        {
+            await using var readFramesStream = new FileStream(keyEventsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            readFramesStream.Position += 1; //Type.
+
+            var key = new KeyEvent();
+            key.TimeStampInTicks = readFramesStream.ReadInt64();
+            key.Key = (Key)readFramesStream.ReadInt32();
+            key.Modifiers = (ModifierKeys)readFramesStream.ReadByte();
+            key.IsUppercase = readFramesStream.ReadByte() == 1;
+            key.WasInjected = readFramesStream.ReadByte() == 1;
+
+            project.KeyboardEvents.Add(key);
+        }
 
         return project;
     }

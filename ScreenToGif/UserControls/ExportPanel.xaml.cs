@@ -22,7 +22,7 @@ using ScreenToGif.ViewModel.Presets.Export.Video.Mkv;
 using ScreenToGif.ViewModel.Presets.Export.Video.Mov;
 using ScreenToGif.ViewModel.Presets.Export.Video.Mp4;
 using ScreenToGif.ViewModel.Presets.Export.Video.Webm;
-using ScreenToGif.ViewModel.UploadPresets;
+using ScreenToGif.ViewModel.Presets.Upload;
 using ScreenToGif.Windows;
 using ScreenToGif.Windows.Other;
 using System;
@@ -356,10 +356,10 @@ public partial class ExportPanel : UserControl, IPanel
             PresetComboBox.SelectedItem = toLoad ?? list.FirstOrDefault(f => f.IsSelected) ?? list.FirstOrDefault();
     }
 
-    private void LoadUploadPresets(ExportPresetOld preset, UploadPreset uploadPreset = null)
+    private void LoadUploadPresets(ExportPresetOld preset, UploadPresetViewModel uploadPreset = null)
     {
         var type = (preset.Extension ?? preset.DefaultExtension) == ".zip" ? ExportFormats.Zip : preset.Type;
-        var list = UserSettings.All.UploadPresets?.OfType<UploadPreset>().Where(w => w.AllowedTypes.Count == 0 || w.AllowedTypes.Contains(type)).ToList() ?? new List<UploadPreset>();
+        var list = UserSettings.All.UploadPresets?.OfType<UploadPresetViewModel>().Where(w => w.AllowedTypes.Count == 0 || w.AllowedTypes.Contains(type)).ToList() ?? new List<UploadPresetViewModel>();
 
         //No need to adding grouping when there's no item to be displayed.
         if (list.Count == 0)
@@ -781,7 +781,7 @@ public partial class ExportPanel : UserControl, IPanel
         if (CurrentPreset.UploadFile)
         {
             var presetType = CurrentPreset.Extension == ".zip" ? ExportFormats.Zip : CurrentPreset.Type;
-            var upload = UserSettings.All.UploadPresets.OfType<UploadPreset>().FirstOrDefault(f => (f.AllowedTypes.Count == 0 || f.AllowedTypes.Contains(presetType)) && f.Title == CurrentPreset.UploadService);
+            var upload = UserSettings.All.UploadPresets.OfType<UploadPresetViewModel>().FirstOrDefault(f => (f.AllowedTypes.Count == 0 || f.AllowedTypes.Contains(presetType)) && f.Title == CurrentPreset.UploadService);
 
             args = await PresetExtensions.IsValid(upload);
 
@@ -1598,7 +1598,7 @@ public partial class ExportPanel : UserControl, IPanel
         if (PresetComboBox.SelectedItem is not ExportPresetOld preset)
             return;
 
-        if (UploadPresetComboBox.SelectedItem is not UploadPreset selected)
+        if (UploadPresetComboBox.SelectedItem is not UploadPresetViewModel selected)
             return;
 
         var upload = new Upload { CurrentPreset = selected.ShallowCopy(), IsEditing = true };
@@ -1623,7 +1623,7 @@ public partial class ExportPanel : UserControl, IPanel
 
     private void HistoryUploadPreset_Click(object sender, RoutedEventArgs e)
     {
-        if (UploadPresetComboBox.SelectedItem is not UploadPreset selected)
+        if (UploadPresetComboBox.SelectedItem is not UploadPresetViewModel selected)
             return;
 
         var history = new UploadHistory
@@ -1639,7 +1639,7 @@ public partial class ExportPanel : UserControl, IPanel
             return;
 
         //Ask if the user really wants to remove the preset.
-        if (UploadPresetComboBox.SelectedItem is not UploadPreset selected || !Dialog.Ask(LocalizationHelper.Get("S.SaveAs.Upload.Ask.Delete.Title"), LocalizationHelper.Get("S.SaveAs.Upload.Ask.Delete.Instruction"),
+        if (UploadPresetComboBox.SelectedItem is not UploadPresetViewModel selected || !Dialog.Ask(LocalizationHelper.Get("S.SaveAs.Upload.Ask.Delete.Title"), LocalizationHelper.Get("S.SaveAs.Upload.Ask.Delete.Instruction"),
                 LocalizationHelper.Get("S.SaveAs.Upload.Ask.Delete.Message")))
             return;
 

@@ -31,10 +31,10 @@ public abstract class RasterSubSequence : RectSubSequence
     /// <summary>
     /// The number of bytes of the capture content.
     /// </summary>
-    public ulong DataLength { get; set; }
+    public long DataLength { get; set; }
 
     /// <summary>
     /// The position of the stream of pixels (StreamPosition + the size of the headers).
     /// </summary>
-    public abstract ulong DataStreamPosition { get; }
+    public abstract long DataStreamPosition { get; }
 }

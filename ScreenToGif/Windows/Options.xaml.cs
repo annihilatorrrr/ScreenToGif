@@ -23,8 +23,8 @@ using ScreenToGif.Util.InterProcessChannel;
 using ScreenToGif.Util.Native;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel.ExportPresets;
+using ScreenToGif.ViewModel.Presets.Upload;
 using ScreenToGif.ViewModel.Tasks;
-using ScreenToGif.ViewModel.UploadPresets;
 using ScreenToGif.Windows.Other;
 using Localization = ScreenToGif.Windows.Other.Localization;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -82,7 +82,7 @@ public partial class Options : Window, INotification
     /// <summary>
     /// List of upload presets.
     /// </summary>
-    private ObservableCollection<UploadPreset> _uploadList;
+    private ObservableCollection<UploadPresetViewModel> _uploadList;
 
     /// <summary>
     /// The latest size of the grid before being altered.
@@ -1173,9 +1173,9 @@ public partial class Options : Window, INotification
 
     private void CloudGrid_Loaded(object sender, RoutedEventArgs e)
     {
-        var list = UserSettings.All.UploadPresets?.Cast<UploadPreset>().ToList() ?? new List<UploadPreset>();
+        var list = UserSettings.All.UploadPresets?.Cast<UploadPresetViewModel>().ToList() ?? new List<UploadPresetViewModel>();
 
-        UploadDataGrid.ItemsSource = _uploadList = new ObservableCollection<UploadPreset>(list);
+        UploadDataGrid.ItemsSource = _uploadList = new ObservableCollection<UploadPresetViewModel>(list);
     }
 
     private void AddUpload_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -1274,7 +1274,7 @@ public partial class Options : Window, INotification
 
         if (e.Key == Key.Space)
         {
-            if (UploadDataGrid.SelectedItem is not UploadPreset selected)
+            if (UploadDataGrid.SelectedItem is not UploadPresetViewModel selected)
                 return;
 
             selected.IsEnabled = !selected.IsEnabled;

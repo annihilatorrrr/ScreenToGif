@@ -7,7 +7,9 @@ using ScreenToGif.Domain.Models.Project.Recording.Events;
 using ScreenToGif.Util.Settings;
 using System.IO;
 using System.IO.Compression;
+using System.Text;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ScreenToGif.Util.Project;
 
@@ -65,13 +67,13 @@ public static class CachedProjectHelper
         var track = await CreateTrack(project, "Frames");
 
         //Sequence. BUG: Sometimes, the last frame comes with Ticks == 0;
-        var lastFrame = recording.Frames.LastOrDefault(l => l.Ticks > 0) ?? recording.Frames.First();
+        var lastFrame = recording.Frames.LastOrDefault(l => l.TimeStampInTicks > 0) ?? recording.Frames.First();
 
         var sequence = new FrameSequence
         {
             Id = 1,
             StartTime = TimeSpan.Zero,
-            EndTime = TimeSpan.FromTicks((long) lastFrame.Ticks), //TODO: Decide for how long to display last frame.
+            EndTime = TimeSpan.FromTicks((long) lastFrame.TimeStampInTicks), //TODO: Decide for how long to display last frame.
             //Opacity = 1,
             //Background = null,
             //Effects = new(),
@@ -98,8 +100,8 @@ public static class CachedProjectHelper
         //Sequence details.
         writeStream.WriteUInt16(sequence.Id); //2 bytes.
         writeStream.WriteByte((byte)sequence.Type); //1 bytes.
-        writeStream.WriteUInt64((ulong)sequence.StartTime.Ticks); //8 bytes.
-        writeStream.WriteUInt64((ulong)sequence.EndTime.Ticks); //8 bytes.
+        writeStream.WriteInt64(sequence.StartTime.Ticks); //8 bytes.
+        writeStream.WriteInt64(sequence.EndTime.Ticks); //8 bytes.
         writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(sequence.Opacity))); //4 bytes.
         writeStream.WritePascalStringUInt32(await sequence.Background.ToXamlStringAsync()); //4 bytes + (0 - 2^32)
 
@@ -130,8 +132,8 @@ public static class CachedProjectHelper
         {
             var sub = new FrameSubSequence
             {
-                TimeStampInTicks = (ulong)frame.Ticks,
-                StreamPosition = (ulong)writeStream.Position,
+                TimeStampInTicks = frame.TimeStampInTicks,
+                StreamPosition = writeStream.Position,
                 Width = sequence.Width,
                 Height = sequence.Height,
                 OriginalWidth = sequence.OriginalWidth,
@@ -145,7 +147,7 @@ public static class CachedProjectHelper
 
             //Sub-sequence.
             writeStream.WriteByte((byte) sub.Type); //1 byte.
-            writeStream.WriteUInt64(sub.TimeStampInTicks); //8 bytes.
+            writeStream.WriteInt64(sub.TimeStampInTicks); //8 bytes.
 
             //Rect sub-sequence.
             writeStream.WriteInt32(sub.Left); //4 bytes.
@@ -166,11 +168,11 @@ public static class CachedProjectHelper
             deflateStream.ReadByte(); //1 byte, Frame event type.
             deflateStream.ReadUInt64(); //8 bytes, Ticks.
 
-            if (sub.DataStreamPosition != (ulong)writeStream.Position + 16)
+            if (sub.DataStreamPosition != writeStream.Position + 16)
                 System.Diagnostics.Debugger.Break();
 
             //Data size, Pixels = 8 + X bytes.
-            await using (var subStream = new SubStream(deflateStream, 8L + (long)sub.DataLength))
+            await using (var subStream = new SubStream(deflateStream, 8L + sub.DataLength))
                 await subStream.CopyToAsync(writeStream);
             
             sequence.Frames.Add(sub);
@@ -211,8 +213,8 @@ public static class CachedProjectHelper
         //Sequence details.
         writeStream.WriteUInt16(sequence.Id); //2 bytes.
         writeStream.WriteByte((byte)sequence.Type); //1 bytes.
-        writeStream.WriteUInt64((ulong)sequence.StartTime.Ticks); //8 bytes.
-        writeStream.WriteUInt64((ulong)sequence.EndTime.Ticks); //8 bytes.
+        writeStream.WriteInt64(sequence.StartTime.Ticks); //8 bytes.
+        writeStream.WriteInt64(sequence.EndTime.Ticks); //8 bytes.
         writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(sequence.Opacity))); //4 bytes.
         writeStream.WritePascalStringUInt32(await sequence.Background.ToXamlStringAsync()); //4 bytes + (0 - 2^32)
 
@@ -238,8 +240,8 @@ public static class CachedProjectHelper
         {
             var sub = new CursorSubSequence
             {
-                TimeStampInTicks = (ulong)(entry?.TimeStampInTicks ?? 0),
-                StreamPosition = (ulong)writeStream.Position
+                TimeStampInTicks = entry?.TimeStampInTicks ?? 0,
+                StreamPosition = writeStream.Position
             };
 
             //If only data, ignore press states
@@ -288,7 +290,7 @@ public static class CachedProjectHelper
 
             //Sub-sequence details.
             writeStream.WriteByte((byte)sub.Type); //1 byte.
-            writeStream.WriteUInt64(sub.TimeStampInTicks); //8 bytes.
+            writeStream.WriteInt64(sub.TimeStampInTicks); //8 bytes.
 
             //Rect sub-sequence details.
             writeStream.WriteInt32(sub.Left); //4 bytes.
@@ -304,7 +306,7 @@ public static class CachedProjectHelper
             writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(sub.VerticalDpi))); //4 bytes.
             writeStream.WriteByte(sub.ChannelCount); //1 byte.
             writeStream.WriteByte(sub.BitsPerChannel); //1 byte.
-            writeStream.WriteUInt64(sub.DataLength); //8 bytes.
+            writeStream.WriteInt64(sub.DataLength); //8 bytes.
 
             //Cursor sub-sequence details.
             writeStream.WriteByte(sub.CursorType); //1 byte.
@@ -317,11 +319,11 @@ public static class CachedProjectHelper
             writeStream.WriteBoolean(sub.IsSecondExtraButtonDown); //1 byte.
             writeStream.WriteInt16(sub.MouseWheelDelta); //2 bytes.
 
-            if (sub.DataStreamPosition != (ulong)writeStream.Position)
+            if (sub.DataStreamPosition != writeStream.Position)
                 System.Diagnostics.Debugger.Break();
 
             //The pixel location is 42 bytes after the start of the event stream position.
-            await using (var part = new SubStream(readStream, 42L + (cursorData?.StreamPosition ?? 0L), (long)sub.DataLength))
+            await using (var part = new SubStream(readStream, 42L + (cursorData?.StreamPosition ?? 0L), sub.DataLength))
                 await part.CopyToAsync(writeStream);
 
             sequence.CursorEvents.Add(sub);
@@ -378,16 +380,16 @@ public static class CachedProjectHelper
         {
             var sub = new KeySubSequence
             {
-                TimeStampInTicks = (ulong)keyEvent.TimeStampInTicks,
+                TimeStampInTicks = keyEvent.TimeStampInTicks,
                 Key = keyEvent.Key,
                 Modifiers = keyEvent.Modifiers,
                 IsUppercase = keyEvent.IsUppercase,
                 WasInjected = keyEvent.WasInjected,
-                StreamPosition = (ulong)writeStream.Position
+                StreamPosition = writeStream.Position
             };
 
             writeStream.WriteByte((byte)sub.Type); //1 byte.
-            writeStream.WriteUInt64(sub.TimeStampInTicks); //8 bytes.
+            writeStream.WriteInt64(sub.TimeStampInTicks); //8 bytes.
             writeStream.WriteByte((byte)sub.Key); //1 byte.
             writeStream.WriteByte((byte)sub.Modifiers); //1 byte.
             writeStream.WriteBoolean(sub.IsUppercase); //1 byte.
@@ -400,7 +402,62 @@ public static class CachedProjectHelper
         project.Tracks.Add(track);
     }
 
-    //Read from disk, to load recent projects.
+    public static async Task<CachedProject> ConvertFromRecordingProject(this RecordingProject recording)
+    {
+        var project = Create(recording.CreationDate);
+        project.Width = (ushort)recording.Width;
+        project.Height = (ushort)recording.Height;
+        project.VerticalDpi = recording.Dpi;
+        project.HorizontalDpi = recording.Dpi;
+        project.Background = Brushes.White;
+        project.ChannelCount = recording.ChannelCount;
+        project.BitsPerChannel = recording.BitsPerChannel;
+        project.Version = UserSettings.All.Version;
+        project.CreatedBy = recording.CreatedBy;
+
+        //Properties.
+        await using var writeStream = new FileStream(project.PropertiesCachePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        writeStream.WriteBytes(Encoding.ASCII.GetBytes("stgC")); //Signature, 4 bytes.
+        writeStream.WriteUInt16(1); //File version, 2 bytes.
+        writeStream.WriteUInt16(project.Width); //Width, 2 bytes.
+        writeStream.WriteUInt16(project.Height); //Height, 2 bytes.
+        writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(project.HorizontalDpi))); //DPI, 4 bytes.
+        writeStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(project.VerticalDpi))); //DPI, 4 bytes.
+        writeStream.WritePascalStringUInt32(await project.Background.ToXamlStringAsync());
+        writeStream.WriteByte(project.ChannelCount); //Number of channels, 1 byte.
+        writeStream.WriteByte(project.BitsPerChannel); //Bits per channels, 1 byte.
+        writeStream.WritePascalString("ScreenToGif"); //App name, 1 byte + X bytes (255 max).
+        writeStream.WritePascalString(UserSettings.All.VersionText); //App version, 1 byte + X bytes (255 max).
+        writeStream.WriteByte((byte)project.CreatedBy); //Recording source, 1 byte.
+        writeStream.WriteInt64(project.CreationDate.Ticks); //Creation date, 8 bytes.
+        writeStream.WritePascalString(project.Name); //Project's name, 1 byte + X bytes (255 max).
+        writeStream.WritePascalStringUInt16(project.Path); //Project's last used path, 2 bytes + X bytes (32_767 max).
+
+        //Tracks (Frames and Cursor/Key events).
+        if (project.CreatedBy != ProjectSources.SketchboardRecorder)
+        {
+            await CreateFrameTrack(recording, project);
+            await CreateCursorTrack(recording, project);
+            await CreateKeyTrack(recording, project);
+        }
+        else
+        {
+            //await CreateStrokeTrack(recording.FramesCachePath, project);
+        }
+
+        //Create ActionStack cache?
+
+        await Task.Run(recording.Discard);
+
+        return project;
+    }
+
+    public static async Task<CachedProject> ReadFromPath(string path)
+    {
+
+
+        return null;
+    }
 
     //Discard?
 

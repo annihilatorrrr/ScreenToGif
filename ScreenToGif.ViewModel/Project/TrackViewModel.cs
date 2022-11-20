@@ -11,13 +11,13 @@ namespace ScreenToGif.ViewModel.Project;
 
 public class TrackViewModel : BaseViewModel, ITrack
 {
-    private int _id = 0;
+    private int _id;
     private bool _isVisible = true;
-    private bool _isLocked = false;
+    private bool _isLocked;
     private string _name = "";
     private Brush _accent = Brushes.Transparent;
     private string _cachePath = "";
-    private readonly IPreviewerViewModel _previewerViewModel = null;
+    private readonly IPreviewerViewModel _previewerViewModel;
     private ObservableCollection<ISequence> _sequences = new();
 
     public int Id
@@ -93,11 +93,11 @@ public class TrackViewModel : BaseViewModel, ITrack
 
     public static ObservableCollection<TrackViewModel> FromModel(RecordingProject project, IPreviewerViewModel previewerViewModel)
     {
-        //TODO: If it's a sketchboard recording, I won't have raster images.
+        var tracks = new ObservableCollection<TrackViewModel>();
 
-        var tracks = new ObservableCollection<TrackViewModel>
+        if (project.Frames.Any())
         {
-            new()
+            tracks.Add(new()
             {
                 Id = 0,
                 Name = "Frames", //TODO: Localizable.
@@ -107,9 +107,12 @@ public class TrackViewModel : BaseViewModel, ITrack
                 {
                     FrameSequenceViewModel.FromModel(project, previewerViewModel)
                 }
-            }
-        };
+            });
+        }
 
+        //TODO: Sketches.
+        //Mainly for Sketchboard recordings, but also available for screen recordings.
+        
         if (project.MouseEvents.Any())
         {
             tracks.Add(new()

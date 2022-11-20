@@ -1,5 +1,6 @@
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
+using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.Other;
 
 namespace ScreenToGif.ViewModel.Presets.Export.Other;
@@ -75,6 +76,38 @@ public class PsdPresetViewModel : ExportPresetViewModel
             CompressImage = preset.CompressImage,
             SaveTimeline = preset.SaveTimeline,
             MaximizeCompatibility = preset.MaximizeCompatibility,
+        };
+    }
+
+    public override ExportPreset ToModel()
+    {
+        return new PsdPreset
+        {
+            Title = Title,
+            TitleKey = TitleKey,
+            Description = Description,
+            DescriptionKey = DescriptionKey,
+            IsSelected = IsSelected,
+            IsSelectedForEncoder = IsSelectedForEncoder,
+            IsDefault = IsDefault,
+            HasAutoSave = HasAutoSave,
+            CreationDate = CreationDate,
+            PickLocation = PickLocation,
+            OverwriteMode = OverwriteMode,
+            ExportAsProjectToo = ExportAsProjectToo,
+            UploadFile = UploadFile,
+            UploadService = UploadService,
+            SaveToClipboard = SaveToClipboard,
+            CopyType = CopyType,
+            ExecuteCustomCommands = ExecuteCustomCommands,
+            CustomCommands = CustomCommands,
+            OutputFolder = OutputFolder,
+            OutputFilename = OutputFilename,
+            OutputFilenameKey = OutputFilenameKey,
+            Extension = Extension,
+            CompressImage = CompressImage,
+            SaveTimeline = SaveTimeline,
+            MaximizeCompatibility = MaximizeCompatibility,
         };
     }
 }

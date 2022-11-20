@@ -1,6 +1,7 @@
 using KGySoft.Drawing.Imaging;
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
+using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Gif;
 using System.Windows.Media;
 
@@ -268,6 +269,53 @@ public class KGySoftGifPresetViewModel : GifPresetViewModel
             AllowDeltaFrames = preset.AllowDeltaFrames,
             AllowClippedFrames = preset.AllowClippedFrames,
             DeltaTolerance = preset.DeltaTolerance,
+        };
+    }
+
+    public override ExportPreset ToModel()
+    {
+        return new KGySoftGifPreset
+        {
+            Title = Title,
+            TitleKey = TitleKey,
+            Description = Description,
+            DescriptionKey = DescriptionKey,
+            IsSelected = IsSelected,
+            IsSelectedForEncoder = IsSelectedForEncoder,
+            IsDefault = IsDefault,
+            HasAutoSave = HasAutoSave,
+            CreationDate = CreationDate,
+            PickLocation = PickLocation,
+            OverwriteMode = OverwriteMode,
+            ExportAsProjectToo = ExportAsProjectToo,
+            UploadFile = UploadFile,
+            UploadService = UploadService,
+            SaveToClipboard = SaveToClipboard,
+            CopyType = CopyType,
+            ExecuteCustomCommands = ExecuteCustomCommands,
+            CustomCommands = CustomCommands,
+            OutputFolder = OutputFolder,
+            OutputFilename = OutputFilename,
+            OutputFilenameKey = OutputFilenameKey,
+            Extension = Extension,
+            Looped = Looped,
+            RepeatForever = RepeatForever,
+            RepeatCount = RepeatCount,
+            UseGlobalColorTable = UseGlobalColorTable,
+            QuantizerId = QuantizerId,
+            BackColor = BackColor,
+            AlphaThreshold = AlphaThreshold,
+            WhiteThreshold = WhiteThreshold,
+            DirectMapping = DirectMapping,
+            PaletteSize = PaletteSize,
+            BitLevel = BitLevel,
+            DithererId = DithererId,
+            Strength = Strength,
+            Seed = Seed,
+            IsSerpentineProcessing = IsSerpentineProcessing,
+            AllowDeltaFrames = AllowDeltaFrames,
+            AllowClippedFrames = AllowClippedFrames,
+            DeltaTolerance = DeltaTolerance,
         };
     }
 }

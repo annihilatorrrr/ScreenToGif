@@ -1,0 +1,124 @@
+<c:ExWindow x:Class="ScreenToGif.Views.PresetSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
+        xmlns:vm="clr-namespace:ScreenToGif.ViewModel.Presets.Export;assembly=ScreenToGif.ViewModel"
+        Title="Preset Settings" Icon="../Resources/Logo.ico" Height="760" Width="1100" MinHeight="600" MinWidth="1000"
+        ShowMaximizeButton="False" ExtendIntoTitleBar="False" Closing="Window_Closing">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding PresetSettingsSectionWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=200}" MinWidth="250" MaxWidth="600"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition MinWidth="600"/>
+        </Grid.ColumnDefinitions>
+
+        <ListView Grid.Row="1" Grid.Column="0" Margin="10"
+                  HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                  ItemsSource="{Binding Presets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedItem="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  IsEnabled="{Binding IsListEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:ExportPresetViewModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="1"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+
+                        <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Title}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}"
+                                   VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="2" ResizeBehavior="PreviousAndNext" Background="Transparent" IsTabStop="False" FocusVisualStyle="{x:Null}"/>
+
+        <!--Settings-->
+        <Border Grid.Row="1" Grid.Column="2" Background="{DynamicResource Brush.Dialog.Background.Alt}" BorderThickness="1" BorderBrush="{DynamicResource Brush.Separator.Background}" CornerRadius="10,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
+                    <c:ExButton Padding="4" Style="{StaticResource Style.Button.Borderless}" Command="{Binding AddPresetCommand}"
+                                ToolTip="Add new preset" ToolTipService.Placement="Top">
+                        <StackPanel Orientation="Horizontal">
+                            <c:SymbolIcon Symbol="Add"/>
+                            <TextBlock Text="Add" VerticalAlignment="Center" Margin="8,0" FontSize="14"/>
+                        </StackPanel>
+                    </c:ExButton>
+
+                    <c:ExButton Padding="4" Style="{StaticResource Style.Button.Borderless}" Command="{Binding DuplicatePresetCommand}"
+                                ToolTip="Duplicate selected preset" ToolTipService.Placement="Top">
+                        <StackPanel Orientation="Horizontal">
+                            <c:SymbolIcon Symbol="ImageCopy"/>
+                            <TextBlock Text="Duplicate" VerticalAlignment="Center" Margin="8,0" FontSize="14"/>
+                        </StackPanel>
+                    </c:ExButton>
+
+                    <c:ExButton Padding="4" Style="{StaticResource Style.Button.Borderless}" Command="{Binding ResetPresetCommand}"
+                                ToolTip="Reset to the default settings" ToolTipService.Placement="Top">
+                        <StackPanel Orientation="Horizontal">
+                            <c:SymbolIcon Symbol="ImageCopy"/>
+                            <TextBlock Text="Duplicate" VerticalAlignment="Center" Margin="8,0" FontSize="14"/>
+                        </StackPanel>
+                    </c:ExButton>
+
+                    <c:ExButton Padding="4" Style="{StaticResource Style.Button.Borderless}" Command="{Binding ResetPresetCommand}"
+                                ToolTip="Reset to the default settings" ToolTipService.Placement="Top">
+                        <StackPanel Orientation="Horizontal">
+                            <c:SymbolIcon Symbol="ArrowSync"/>
+                            <TextBlock Text="Reset" VerticalAlignment="Center" Margin="8,0" FontSize="14"/>
+                        </StackPanel>
+                    </c:ExButton>
+
+                    <c:ExButton Padding="4" Style="{StaticResource Style.Button.Borderless}" Command="{Binding RemovePresetCommand}"
+                                ToolTip="Remove the selected preset" ToolTipService.Placement="Top">
+                        <StackPanel Orientation="Horizontal">
+                            <c:SymbolIcon Symbol="Delete"/>
+                            <TextBlock Text="Remove" VerticalAlignment="Center" Margin="8,0" FontSize="14"/>
+                        </StackPanel>
+                    </c:ExButton>
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="1">
+                    <StackPanel>
+                        <Expander MaxWidth="400">
+                            <Expander.Header>
+                                <Grid>
+
+                                </Grid>
+                            </Expander.Header>
+
+
+                        </Expander>
+
+                        <!--Generic Preset settings-->
+                        <!--Per preset settings-->
+                    </StackPanel>
+                </ScrollViewer>
+
+                <c:ProgressRing Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="70" Height="70"
+                                IsIndeterminate="True" IsActive="{Binding IsLoading, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</c:ExWindow>

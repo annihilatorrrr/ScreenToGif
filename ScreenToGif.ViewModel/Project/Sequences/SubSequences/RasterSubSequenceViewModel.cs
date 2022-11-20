@@ -8,7 +8,7 @@ public abstract class RasterSubSequenceViewModel : RectSubSequenceViewModel
     private double _verticalDpi;
     private byte _channelCount = 4;
     private byte _bitsPerChannel = 8;
-    private ulong _dataLength;
+    private long _dataLength;
 
     /// <summary>
     /// The original width (pre-resize) of the raster image.
@@ -63,7 +63,7 @@ public abstract class RasterSubSequenceViewModel : RectSubSequenceViewModel
     /// <summary>
     /// The number of bytes of the capture content.
     /// </summary>
-    public ulong DataLength
+    public long DataLength
     {
         get => _dataLength;
         set => SetProperty(ref _dataLength, value);
@@ -72,5 +72,5 @@ public abstract class RasterSubSequenceViewModel : RectSubSequenceViewModel
     /// <summary>
     /// The position of the stream of pixels (StreamPosition + the size of the headers).
     /// </summary>
-    public abstract ulong DataStreamPosition { get; }
+    public abstract long DataStreamPosition { get; }
 }

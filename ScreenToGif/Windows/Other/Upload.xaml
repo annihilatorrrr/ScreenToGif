@@ -86,10 +86,10 @@
                     </DataTemplate>
                 </u:ComboBoxItemTemplateSelector.DropDownTemplate>
 
-                <p:UploadPreset ImageId="Vector.Info"/>
-                <i:ImgurPreset x:Name="ImgurPresetItem" ImageId="Vector.Imgur"/>
-                <g:GfycatPreset x:Name="GfycatPresetItem"  ImageId="Vector.Gfycat"/>
-                <y:YandexPreset x:Name="YandexPresetItem" ImageId="Vector.YandexDisk"/>
+                <p:UploadPresetViewModel ImageId="Vector.Info"/>
+                <i:ImgurPresetViewModel x:Name="ImgurPresetItem" ImageId="Vector.Imgur"/>
+                <g:GfycatPresetViewModel x:Name="GfycatPresetItem"  ImageId="Vector.Gfycat"/>
+                <y:YandexPresetViewModel x:Name="YandexPresetItem" ImageId="Vector.YandexDisk"/>
             </ComboBox>
         </Grid>
 

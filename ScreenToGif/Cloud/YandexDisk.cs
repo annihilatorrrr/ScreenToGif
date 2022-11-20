@@ -23,17 +23,17 @@ public class YandexDisk : IUploader
 
         var fileName = Path.GetFileName(path);
 
-        var link = await GetAsync<Link>(preset as YandexPreset, "https://cloud-api.yandex.net/v1/disk/resources/upload?path=app:/" + fileName + "&overwrite=true", cancellationToken);
+        var link = await GetAsync<Link>(preset as YandexPresetViewModel, "https://cloud-api.yandex.net/v1/disk/resources/upload?path=app:/" + fileName + "&overwrite=true", cancellationToken);
             
         if (string.IsNullOrEmpty(link?.Href)) 
             throw new UploadException("Unknown error");
 
         await using (var fileSteram = new FileStream(path, FileMode.Open, FileAccess.Read))
         {
-            await PutAsync(preset as YandexPreset, link.Href, new StreamContent(fileSteram), cancellationToken);
+            await PutAsync(preset as YandexPresetViewModel, link.Href, new StreamContent(fileSteram), cancellationToken);
         }
 
-        var downloadLink = await GetAsync<Link>(preset as YandexPreset, "https://cloud-api.yandex.net/v1/disk/resources/download?path=app:/" + fileName, cancellationToken);
+        var downloadLink = await GetAsync<Link>(preset as YandexPresetViewModel, "https://cloud-api.yandex.net/v1/disk/resources/download?path=app:/" + fileName, cancellationToken);
 
         var history = new History
         {
@@ -47,7 +47,7 @@ public class YandexDisk : IUploader
         return history;
     }
 
-    private async Task<T> GetAsync<T>(YandexPreset preset, string url, CancellationToken cancellationToken)
+    private async Task<T> GetAsync<T>(YandexPresetViewModel preset, string url, CancellationToken cancellationToken)
     {
         var handler = new HttpClientHandler
         {
@@ -81,7 +81,7 @@ public class YandexDisk : IUploader
         }
     }
 
-    private async Task PutAsync(YandexPreset preset, string url, HttpContent content, CancellationToken cancellationToken)
+    private async Task PutAsync(YandexPresetViewModel preset, string url, HttpContent content, CancellationToken cancellationToken)
     {
         var handler = new HttpClientHandler
         {
@@ -117,7 +117,7 @@ public class YandexDisk : IUploader
         return WebHelper.AppendQuery($"https://oauth.yandex.{(UserSettings.All.LanguageCode.StartsWith("ru") ? "ru" : "com")}/authorize", args);
     }
 
-    public static bool IsAuthorized(YandexPreset preset)
+    public static bool IsAuthorized(YandexPresetViewModel preset)
     {
         return !string.IsNullOrWhiteSpace(preset.OAuthToken);
     }

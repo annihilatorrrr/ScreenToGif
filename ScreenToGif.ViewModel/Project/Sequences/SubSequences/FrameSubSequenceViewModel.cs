@@ -6,24 +6,13 @@ namespace ScreenToGif.ViewModel.Project.Sequences.SubSequences;
 
 public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
 {
-    private long _delay; //TODO: remove
-    
-    /// <summary>
-    /// Frame delay in milliseconds.
-    /// </summary>
-    public long Delay
-    {
-        get => _delay;
-        set => SetProperty(ref _delay, value);
-    }
-
     /// <summary>
     /// The position of the data stream after the headers of this sub sequence.
     /// The size of the headers is 55 bytes.
     /// </summary>
-    public override ulong DataStreamPosition => StreamPosition + 47; //55;
+    public override long DataStreamPosition => StreamPosition + 47; //55;
 
-    public static FrameSubSequenceViewModel FromModel(FrameSubSequence sequence, IPreviewerViewModel baseViewModel)
+    public static FrameSubSequenceViewModel FromModel(FrameSubSequence sequence)
     {
         return new FrameSubSequenceViewModel
         {
@@ -44,11 +33,11 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
         };
     }
 
-    public static FrameSubSequenceViewModel FromModel(RecordingProject project, RecordingFrame frame, IPreviewerViewModel baseViewModel)
+    public static FrameSubSequenceViewModel FromModel(RecordingProject project, RecordingFrame frame, bool adjustTiming)
     {
         return new FrameSubSequenceViewModel
         {
-            TimeStampInTicks = (ulong)frame.Ticks,
+            TimeStampInTicks = adjustTiming ? 0 : frame.TimeStampInTicks,
             StreamPosition = frame.StreamPosition,
             Left = 0,
             Top = 0,

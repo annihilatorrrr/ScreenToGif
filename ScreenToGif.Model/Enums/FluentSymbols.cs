@@ -43,6 +43,8 @@ public enum FluentSymbols
     Dismiss = 0xE54E,
     DismissCircleFilled = 0xE54F,
     DismissCircle = 0xE550,
+    DocumentFilled = 0xE561,
+    Document = 0xE562,
     EditFilled = 0xE66B,
     Edit = 0xE66C,
     FolderOpenFilled = 0xE70E,

@@ -12,15 +12,9 @@ namespace ScreenToGif.Domain.Interfaces
         bool ExportAsProjectToo { get; set; }
         bool UploadFile { get; set; }
         string UploadService { get; set; }
-
-        bool ExportPartially { get; set; }
-        PartialExportModes PartialExport { get; set; }
-        string PartialExportFrameExpression { get; set; }
-
         string OutputFolder { get; set; }
         string OutputFilename { get; set; }
-
-        bool RequiresFfmpeg { get; set; }
-        bool RequiresGifski { get; set; }
+        bool RequiresFfmpeg { get; }
+        bool RequiresGifski { get; }
     }
 }

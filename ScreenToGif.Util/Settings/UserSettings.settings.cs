@@ -726,6 +726,13 @@ public partial class UserSettings
 
     //Exporter
 
+    private const double ExporterSectionWidthOriginal = 400;
+    public double ExporterSectionWidth
+    {
+        get => (double)GetValue(ExporterSectionWidthOriginal);
+        set => SetValue(value, ExporterSectionWidthOriginal);
+    }
+
     //TODO: Rename ExportFormat
     private const ExportFormats ExportFormatOriginal = ExportFormats.Gif;
     public ExportFormats SaveType
@@ -739,6 +746,24 @@ public partial class UserSettings
     {
         get => (ArrayList)GetValue(_exportPresetsOriginal);
         set => SetValue(value, _exportPresetsOriginal);
+    }
+
+    private readonly ArrayList _uploadPresetsOriginal = new();
+    public ArrayList UploadPresets
+    {
+        get => (ArrayList)GetValue(_uploadPresetsOriginal);
+        set => SetValue(value, _uploadPresetsOriginal);
+    }
+
+    #endregion
+
+    #region Preset Settings
+
+    private const double PresetSettingsSectionWidthOriginal = 350;
+    public double PresetSettingsSectionWidth
+    {
+        get => (double)GetValue(PresetSettingsSectionWidthOriginal);
+        set => SetValue(value, PresetSettingsSectionWidthOriginal);
     }
 
     #endregion

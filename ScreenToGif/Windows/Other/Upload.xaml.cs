@@ -5,7 +5,7 @@ using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.UserControls;
 using ScreenToGif.Util;
-using ScreenToGif.ViewModel.UploadPresets;
+using ScreenToGif.ViewModel.Presets.Upload;
 using ScreenToGif.ViewModel.UploadPresets.Gfycat;
 using ScreenToGif.ViewModel.UploadPresets.Imgur;
 using ScreenToGif.ViewModel.UploadPresets.Yandex;
@@ -14,7 +14,7 @@ namespace ScreenToGif.Windows.Other;
 
 public partial class Upload : Window
 {
-    public UploadPreset CurrentPreset { get; set; }
+    public UploadPresetViewModel CurrentPreset { get; set; }
 
     public bool IsEditing { get; set; }
 
@@ -72,13 +72,13 @@ public partial class Upload : Window
             switch ((UploadDestinations)TypeComboBox.SelectedIndex)
             {
                 case UploadDestinations.Imgur:
-                    CurrentPreset = new ImgurPreset();
+                    CurrentPreset = new ImgurPresetViewModel();
                     break;
                 case UploadDestinations.Gfycat:
-                    CurrentPreset = new GfycatPreset();
+                    CurrentPreset = new GfycatPresetViewModel();
                     break;
                 case UploadDestinations.Yandex:
-                    CurrentPreset = new YandexPreset();
+                    CurrentPreset = new YandexPresetViewModel();
                     break;
             }
         }

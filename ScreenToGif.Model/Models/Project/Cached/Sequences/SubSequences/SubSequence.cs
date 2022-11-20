@@ -9,10 +9,10 @@ public abstract class SubSequence
     /// <summary>
     /// Ticks since the start of the sequence.
     /// </summary>
-    public ulong TimeStampInTicks { get; set; }
+    public long TimeStampInTicks { get; set; }
 
     /// <summary>
     /// Position of this sub-sequence in the stream.
     /// </summary>
-    public ulong StreamPosition { get; set; }
+    public long StreamPosition { get; set; }
 }

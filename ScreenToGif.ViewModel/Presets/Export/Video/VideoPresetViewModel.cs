@@ -1,5 +1,6 @@
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
+using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.Video;
 
 namespace ScreenToGif.ViewModel.Presets.Export.Video;
@@ -163,7 +164,7 @@ public class VideoPresetViewModel : ExportPresetViewModel
 
     public bool IsAncientContainer => Type == ExportFormats.Avi;
 
-    public VideoPresetViewModel()
+    protected VideoPresetViewModel()
     {
         OutputFilenameKey = "S.Preset.Filename.Video";
     }
@@ -216,6 +217,56 @@ public class VideoPresetViewModel : ExportPresetViewModel
             Framerate = preset.Framerate,
             CustomFramerate = preset.CustomFramerate,
             Vsync = preset.Vsync,
+        };
+    }
+
+    public override ExportPreset ToModel()
+    {
+        return new VideoPreset
+        {
+            Title = Title,
+            TitleKey = TitleKey,
+            Description = Description,
+            DescriptionKey = DescriptionKey,
+            IsSelected = IsSelected,
+            IsSelectedForEncoder = IsSelectedForEncoder,
+            IsDefault = IsDefault,
+            HasAutoSave = HasAutoSave,
+            CreationDate = CreationDate,
+            PickLocation = PickLocation,
+            OverwriteMode = OverwriteMode,
+            ExportAsProjectToo = ExportAsProjectToo,
+            UploadFile = UploadFile,
+            UploadService = UploadService,
+            SaveToClipboard = SaveToClipboard,
+            CopyType = CopyType,
+            ExecuteCustomCommands = ExecuteCustomCommands,
+            CustomCommands = CustomCommands,
+            OutputFolder = OutputFolder,
+            OutputFilename = OutputFilename,
+            OutputFilenameKey = OutputFilenameKey,
+            Extension = Extension,
+            SettingsMode = SettingsMode,
+            Parameters = Parameters,
+            VideoCodec = VideoCodec,
+            CodecPreset = CodecPreset,
+            HardwareAcceleration = HardwareAcceleration,
+            Pass = Pass,
+            IsVariableBitRate = IsVariableBitRate,
+            ConstantRateFactor = ConstantRateFactor,
+            BitRate = BitRate,
+            QualityLevel = QualityLevel,
+            BitRateUnit = BitRateUnit,
+            MinimumBitRate = MinimumBitRate,
+            MinimumBitRateUnit = MinimumBitRateUnit,
+            MaximumBitRate = MaximumBitRate,
+            MaximumBitRateUnit = MaximumBitRateUnit,
+            RateControlBuffer = RateControlBuffer,
+            RateControlBufferUnit = RateControlBufferUnit,
+            PixelFormat = PixelFormat,
+            Framerate = Framerate,
+            CustomFramerate = CustomFramerate,
+            Vsync = Vsync,
         };
     }
 }

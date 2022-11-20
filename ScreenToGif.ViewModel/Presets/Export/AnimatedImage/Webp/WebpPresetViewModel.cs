@@ -4,9 +4,9 @@ using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Webp;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Webp;
 
-public class WebpPresetViewModel : AnimatedImagePresetViewModel
+public abstract class WebpPresetViewModel : AnimatedImagePresetViewModel
 {
-    public WebpPresetViewModel()
+    protected WebpPresetViewModel()
     {
         Type = ExportFormats.Webp;
         Extension = ".webp";

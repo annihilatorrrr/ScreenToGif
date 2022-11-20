@@ -55,7 +55,7 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
         {
             var sub = new CursorSubSequenceViewModel
             {
-                TimeStampInTicks = (ulong)(entry?.TimeStampInTicks ?? 0)
+                TimeStampInTicks = (entry?.TimeStampInTicks ?? 0)
             };
 
             //If only data, ignore press states
@@ -81,7 +81,7 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
                 sub.IsFirstExtraButtonDown = state.FirstExtraButton == MouseButtonState.Pressed;
                 sub.IsSecondExtraButtonDown = state.SecondExtraButton == MouseButtonState.Pressed;
                 sub.MouseWheelDelta = state.MouseDelta;
-                sub.StreamPosition = (ulong)(cursorData?.StreamPosition ?? 0);
+                sub.StreamPosition = cursorData?.StreamPosition ?? 0;
             }
             else if (entry is CursorDataEvent data)
             {
@@ -99,7 +99,7 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
                 sub.CursorType = (byte)data.CursorType;
                 sub.XHotspot = (ushort)data.XHotspot;
                 sub.YHotspot = (ushort)data.YHotspot;
-                sub.StreamPosition = (ulong)data.StreamPosition;
+                sub.StreamPosition = data.StreamPosition;
 
                 cursorData = data;
             }
@@ -123,10 +123,8 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
 
     public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath)
     {
-        var ticks = (ulong)timestamp;
-
         //Get last cursor that appears after current timestamp.
-        var cursor = CursorEvents.LastOrDefault(f => f.TimeStampInTicks <= ticks);
+        var cursor = CursorEvents.LastOrDefault(f => f.TimeStampInTicks <= timestamp);
 
         if (cursor == null)
             return;

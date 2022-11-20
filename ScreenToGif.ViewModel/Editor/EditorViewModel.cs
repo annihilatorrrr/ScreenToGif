@@ -1,10 +1,14 @@
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Domain.ViewModels;
+using ScreenToGif.Native.Helpers;
+using ScreenToGif.Util;
 using ScreenToGif.Util.Project;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel.Project;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -16,11 +20,20 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
 {
     #region Variables
 
+    private readonly AutoResetEvent _event = new(false);
+    private readonly BackgroundWorker _renderWorker = new() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
+    private readonly BackgroundWorker _playbackWorker = new() { WorkerSupportsCancellation = true };
+
     private ProjectViewModel _project;
-    private long _current;
-    private int _currentIndex = -1;
     private WriteableBitmap _renderedImage;
     private IntPtr _renderedImageBackBuffer;
+    private long _currentTime;
+    private long _startTime;
+    private long _endTime;
+    private bool _hasImprecisePlayback;
+    private bool _isPlaybackEnabled;
+    private bool _loopedPlayback;
+    private int _playbackFramerate;
     private double _zoom = 1d;
     private double _quality = 1d;
     private double _viewportTop = 0d;
@@ -54,22 +67,47 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
         }
     }
 
-    public long Current
+    public long CurrentTime
     {
-        get => _current;
+        get => _currentTime;
         set
         {
-            SetProperty(ref _current, value);
+            SetProperty(ref _currentTime, value);
 
-            Render();
+            if (RenderedImage != null)
+                _event.Set();
         }
     }
 
-    public int CurrentIndex
+    public long StartTime
     {
-        get => _currentIndex;
-        set => SetProperty(ref _currentIndex, value);
+        get => _startTime;
+        set
+        {
+            SetProperty(ref _startTime, value);
+
+            OnPropertyChanged(nameof(TimeLeft));
+            OnPropertyChanged(nameof(TimeLeftAsTimeSpan));
+        }
     }
+    
+    public long EndTime
+    {
+        get => _endTime;
+        set
+        {
+            SetProperty(ref _endTime, value);
+
+            OnPropertyChanged(nameof(TimeLeft));
+            OnPropertyChanged(nameof(TimeLeftAsTimeSpan));
+        }
+    }
+
+    public long TimeLeft => EndTime - CurrentTime - StartTime;
+
+    public TimeSpan CurrentTimeAsTimeSpan => TimeSpan.FromTicks(CurrentTime);
+
+    public TimeSpan TimeLeftAsTimeSpan => TimeSpan.FromTicks(TimeLeft);
 
     public WriteableBitmap RenderedImage
     {
@@ -80,6 +118,42 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
 
             _renderedImageBackBuffer = value.BackBuffer;
         }
+    }
+
+    public bool HasImprecisePlayback
+    {
+        get => _hasImprecisePlayback;
+        set => SetProperty(ref _hasImprecisePlayback, value);
+    }
+
+    public bool IsPlaybackEnabled
+    {
+        get => _isPlaybackEnabled;
+        set
+        {
+            SetProperty(ref _isPlaybackEnabled, value);
+
+            OnPropertyChanged(nameof(PlayButtonVisibility));
+            OnPropertyChanged(nameof(PauseButtonVisibility));
+        }
+    }
+
+    public bool LoopedPlayback
+    {
+        get => _loopedPlayback;
+        set
+        {
+            SetProperty(ref _loopedPlayback, value);
+
+            OnPropertyChanged(nameof(LoopedPlaybackVisibility));
+            OnPropertyChanged(nameof(LoopedPlaybackOffVisibility));
+        }
+    }
+
+    public int PlaybackFramerate
+    {
+        get => _playbackFramerate;
+        set => SetProperty(ref _playbackFramerate, value);
     }
 
     public double Zoom
@@ -140,27 +214,21 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
 
     public GridLength MinTimelineHeight => HasProject ? _minTimelineHeight : new GridLength(0);
 
+    public Visibility PlayButtonVisibility => IsPlaybackEnabled ? Visibility.Collapsed : Visibility.Visible;
+
+    public Visibility PauseButtonVisibility => IsPlaybackEnabled ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility LoopedPlaybackVisibility => LoopedPlayback ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility LoopedPlaybackOffVisibility => LoopedPlayback ? Visibility.Collapsed : Visibility.Visible;
+
     public ExportViewModel Export
     {
         get => _export;
         set => SetProperty(ref _export, value);
     }
 
-    /// <summary>
-    /// The list of frames. TODO: Erase it later.
-    /// </summary>
-    public ObservableCollection<FrameViewModel> Frames
-    {
-        get => _frames;
-        set => SetProperty(ref _frames, value);
-    }
-
     #endregion
-
-    public EditorViewModel()
-    {
-        //?
-    }
 
     #region Methods
 
@@ -175,7 +243,26 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
         //  Pass token.
         //TODO: The conversion is not that difficult anymore.
 
-        var cached = await project.ConvertToCachedProject();
+        var cached = await project.ConvertFromRecordingProject();
+        Project = ProjectViewModel.FromModel(cached, this);
+
+        InitializePreview();
+
+        IsLoading = false;
+    }
+
+    public async Task ImportFromRecording(string path)
+    {
+        IsLoading = true;
+
+        //Show progress.
+        //  Create list of progresses.
+        //  Pass the created progress reporter.
+        //Cancelable.
+        //  Pass token.
+        //TODO: The conversion is not that difficult anymore.
+
+        var cached = await RecordingProjectHelper.ReadFromPath(path);
         Project = ProjectViewModel.FromModel(cached, this);
 
         InitializePreview();
@@ -187,72 +274,12 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
     {
         RenderedImage = new WriteableBitmap(Project.Width, Project.Height, Project.HorizontalDpi, Project.VerticalDpi, PixelFormats.Bgra32, null);
 
-        Render();
+        _event.Set();
     }
 
     public void Render()
     {
-        if (RenderedImage == null)
-            return;
-
-        //Pre-render adjustments:
-        //  Adjust rendering based on zoom, position, and size.
-        //  Quality (maybe, as a plus later).
-
-        //How to render?
-        //  Directly to WriteableBitmap address.
-        //  Only render what's inside the canvas.
-        //  Some sequences can be resized and have a defined rendering size.
-        //  Maybe: Viewport details need to be passed along so that the rendering is accurate and within bounds.
-
-        //After rendering?
-        //  Cache somehow?
-        //      I only need to cache the result frames or the layers.
-        //          But since this app will work based on timestamp, how to decide what to render?
-        //          Based on changes? Frame event or other event.
-        //          Sequences are going to have internal FPS.
-        //          Sequence rendering will probably have a high cost, specially because there's tons of data.? 
-        //      
-        //      MemoryCache
-        //      or
-        //      CachedContent<T>
-        //          Id
-        //          IsValid
-        //  Invalidate cache
-        //      Mark cache list as invalid and request render again.
-
-        //using (var context = RenderedImage.GetBitmapContext())
-        //    RenderedImage.DrawRectangle(0, 0, 100, 100, 100);
-
-        System.Diagnostics.Debug.WriteLine("Render start");
-        var sw = System.Diagnostics.Stopwatch.StartNew();
-
-        DrawBackground();
-
-        foreach (var track in Project.Tracks)
-            track.RenderAt(_renderedImageBackBuffer, Project.Width, Project.Height, Current, Quality);
-
-        Dispatcher.CurrentDispatcher.Invoke(() =>
-        {
-            RenderedImage.Lock();
-            RenderedImage.AddDirtyRect(new Int32Rect(0, 0, RenderedImage.PixelWidth, RenderedImage.PixelHeight));
-            RenderedImage.Unlock();
-        }, DispatcherPriority.Render);
-
-        System.Diagnostics.Debug.WriteLine("Finished: " + sw.Elapsed);
-
-        //How are previews going to work?
-        //  Text rendering
-        //  Rendering that needs access to the all layers.
-        //  Rendering that changes the size of the canvas.
-
-        //Preview quality.
-        //Render the list preview for the frames.
-
-        //Decorator Layer
-        //  Needs access to the position, size and angle of the sequence objects.
-        //  Altering the size/position/angle needs to directly alter the value of the sequences and subsequences.
-        //  Maybe pass Project directly to the decorator layer and let that control read/change the values.
+        _event.Set();
     }
 
     private void DrawBackground()
@@ -288,13 +315,24 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
         //By seeking, display the updated info in Statistic tab.
         //Frame count will be hard to know for sure, as multiple sequences can coexist and apart from each other.
 
-        Current = timeStamp;
+        CurrentTime = timeStamp;
     }
 
     internal void Play()
     {
         //Clock based on a selected fps.
         //Maybe variable? By detecting the sub-sequences.
+    }
+
+    public void EndPreview()
+    {
+        _renderWorker.CancelAsync();
+        _playbackWorker.CancelAsync();
+        _event.Close();
+
+        _renderWorker.DoWork -= RenderWorker_DoWork;
+        _renderWorker.ProgressChanged -= RenderWorker_ProgressChanged;
+        _playbackWorker.DoWork -= PlaybackWorder_DoWork;
     }
 
     //How are the frames/data going to be stored in the disk?
@@ -307,4 +345,126 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
     //I also need to store in memory for faster usage.
 
     #endregion
+
+    //Pre-render adjustments:
+    //  Adjust rendering based on zoom, position, and size.
+    //  Quality (maybe, as a plus later).
+
+    //How to render?
+    //  Directly to WriteableBitmap address.
+    //  Only render what's inside the canvas.
+    //  Some sequences can be resized and have a defined rendering size.
+    //  Maybe: Viewport details need to be passed along so that the rendering is accurate and within bounds.
+
+    //After rendering?
+    //  Cache somehow?
+    //      I only need to cache the result frames or the layers.
+    //          But since this app will work based on timestamp, how to decide what to render?
+    //          Based on changes? Frame event or other event.
+    //          Sequences are going to have internal FPS.
+    //          Sequence rendering will probably have a high cost, specially because there's tons of data.? 
+    //      
+    //      MemoryCache
+    //      or
+    //      CachedContent<T>
+    //          Id
+    //          IsValid
+    //  Invalidate cache
+    //      Mark cache list as invalid and request render again.
+
+    //using (var context = RenderedImage.GetBitmapContext())
+    //    RenderedImage.DrawRectangle(0, 0, 100, 100, 100);
+
+    //How are previews going to work?
+    //  Text rendering
+    //  Rendering that needs access to the all layers.
+    //  Rendering that changes the size of the canvas.
+
+    //Preview quality.
+    //Render the list preview for the frames.
+
+    //Decorator Layer
+    //  Needs access to the position, size and angle of the sequence objects.
+    //  Altering the size/position/angle needs to directly alter the value of the sequences and subsequences.
+    //  Maybe pass Project directly to the decorator layer and let that control read/change the values.
+
+    private void RenderWorker_DoWork(object sender, DoWorkEventArgs e)
+    {
+        while (!_renderWorker.CancellationPending)
+        {
+            _event.WaitOne();
+
+            //TODO: Send crop params, to render in time.
+            //Send Time + TrimStart
+            //Maybe detect if current sequence/subsequence changed, if so rerender frame.
+
+            DrawBackground();
+
+            foreach (var track in Project.Tracks)
+                track.RenderAt(_renderedImageBackBuffer, Project.Width, Project.Height, CurrentTime, 100);
+
+            _renderWorker.ReportProgress(1);
+        }
+    }
+
+    private void RenderWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+    {
+        Dispatcher.CurrentDispatcher.Invoke(() =>
+        {
+            RenderedImage.Lock();
+            RenderedImage.AddDirtyRect(new Int32Rect(0, 0, RenderedImage.PixelWidth, RenderedImage.PixelHeight));
+            RenderedImage.Unlock();
+        }, DispatcherPriority.Render);
+    }
+
+    private void PlaybackWorder_DoWork(object sender, DoWorkEventArgs e)
+    {
+        IsPlaybackEnabled = true;
+        HasImprecisePlayback = false;
+
+        using (var resolution = new TimerResolution(1))
+        {
+            if (!resolution.SuccessfullySetTargetResolution)
+            {
+                LogWriter.Log($"Imprecise timer resolution... Target: {resolution.TargetResolution}, Current: {resolution.CurrentResolution}");
+                HasImprecisePlayback = true;
+            }
+
+            //TODO: Implement option to control playback speed, based on a set FPS or based on the available timings of the tracks.
+
+            //Reset timing if at the end (or past it).
+            //When LoopedPlayback is disable, this is necessary.
+            if (CurrentTime >= EndTime)
+                CurrentTime = StartTime;
+
+            var sw = new Stopwatch();
+
+            while (!_playbackWorker.CancellationPending)
+            {
+                sw.Restart();
+
+                if (CurrentTime >= EndTime)
+                {
+                    if (!LoopedPlayback)
+                    {
+                        e.Cancel = true;
+                        break;
+                    }
+
+                    CurrentTime = StartTime;
+                }
+
+                CurrentTime += TimeSpan.FromMilliseconds(60).Ticks;
+
+                //Wait rest of actual frame delay time
+                if (sw.ElapsedMilliseconds >= 60)
+                    continue;
+
+                while (sw.Elapsed.TotalMilliseconds < 60)
+                    Thread.Sleep(1);
+            }
+        }
+
+        IsPlaybackEnabled = false;
+    }
 }

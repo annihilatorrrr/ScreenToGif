@@ -383,7 +383,6 @@
                         <Setter Property="MinWidth" Value="0"/>
                         <Setter Property="Height" Value="12"/>
                         <Setter Property="MinHeight" Value="12"/>
-                        <Setter Property="BorderThickness" Value="0,1"/>
 
                         <Setter Property="Template">
                             <Setter.Value>
@@ -397,7 +396,7 @@
                                             </Grid.ColumnDefinitions>
 
                                             <RepeatButton Grid.Column="0" x:Name="PART_LineLeftButton" Command="{x:Static ScrollBar.LineLeftCommand}" IsEnabled="{TemplateBinding IsMouseOver}" Style="{StaticResource Style.ScrollBar.Button}" 
-                                                      Content="m0 4q0-0.4 0.2-0.7 0.1-0.3 0.4-0.5l3.8-2.6q0.2-0.1 0.3-0.2 0.1 0 0.3 0 0.2 0 0.4 0.1 0.2 0.1 0.3 0.2 0.1 0.1 0.2 0.3 0.1 0.2 0.1 0.4v6q0 0.2-0.1 0.4-0.1 0.2-0.2 0.3-0.1 0.1-0.3 0.2-0.2 0.1-0.4 0.1-0.3 0-0.6-0.2l-3.8-2.6q-0.3-0.2-0.4-0.5-0.2-0.3-0.2-0.7z" />
+                                                          Content="m0 4q0-0.4 0.2-0.7 0.1-0.3 0.4-0.5l3.8-2.6q0.2-0.1 0.3-0.2 0.1 0 0.3 0 0.2 0 0.4 0.1 0.2 0.1 0.3 0.2 0.1 0.1 0.2 0.3 0.1 0.2 0.1 0.4v6q0 0.2-0.1 0.4-0.1 0.2-0.2 0.3-0.1 0.1-0.3 0.2-0.2 0.1-0.4 0.1-0.3 0-0.6-0.2l-3.8-2.6q-0.3-0.2-0.4-0.5-0.2-0.3-0.2-0.7z" />
 
                                             <Track Grid.Column="1" x:Name="PART_Track" IsEnabled="{TemplateBinding IsMouseOver}">
                                                 <Track.DecreaseRepeatButton>
@@ -414,7 +413,7 @@
                                             </Track>
 
                                             <RepeatButton Grid.Column="2" x:Name="PART_LineRightButton" Command="{x:Static ScrollBar.LineRightCommand}" IsEnabled="{TemplateBinding IsMouseOver}" Style="{StaticResource Style.ScrollBar.Button}" 
-                                                      Content="m0 7v-6q0-0.2 0.1-0.4 0.1-0.2 0.2-0.3 0.1-0.1 0.3-0.2 0.2-0.1 0.4-0.1 0.3 0 0.6 0.2l3.8 2.6q0.3 0.2 0.4 0.5 0.2 0.3 0.2 0.7 0 0.4-0.2 0.7-0.1 0.3-0.4 0.5l-3.8 2.6q-0.3 0.2-0.6 0.2-0.2 0-0.4-0.1-0.2-0.1-0.3-0.2-0.1-0.1-0.2-0.3-0.1-0.2-0.1-0.4z" />
+                                                          Content="m0 7v-6q0-0.2 0.1-0.4 0.1-0.2 0.2-0.3 0.1-0.1 0.3-0.2 0.2-0.1 0.4-0.1 0.3 0 0.6 0.2l3.8 2.6q0.3 0.2 0.4 0.5 0.2 0.3 0.2 0.7 0 0.4-0.2 0.7-0.1 0.3-0.4 0.5l-3.8 2.6q-0.3 0.2-0.6 0.2-0.2 0-0.4-0.1-0.2-0.1-0.3-0.2-0.1-0.1-0.2-0.3-0.1-0.2-0.1-0.4z" />
                                         </Grid>
                                     </Border>
                                     
@@ -469,6 +468,132 @@
                     </Trigger>
                 </ControlTemplate.Triggers>
             </ControlTemplate>
+
+            <!--ScrollViewer-->
+            <Style TargetType="{x:Type ScrollViewer}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                            <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <ScrollContentPresenter Grid.Row="0" Grid.Column="0" x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" 
+                                                        CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}"/>
+
+                                <ScrollBar Grid.Row="0" Grid.Column="1" x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow"
+                                           Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" 
+                                           Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
+
+                                <ScrollBar Grid.Row="1" Grid.Column="0" x:Name="PART_HorizontalScrollBar" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" 
+                                           Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" 
+                                           Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--ListView-->
+            <Style TargetType="{x:Type ListView}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+            </Style>
+
+            <!--ListViewItem-->
+            <Style TargetType="{x:Type ListViewItem}">
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Item.Foreground}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+                <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Padding" Value="9,6"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListViewItem}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Margin="2"
+                                    Background="{TemplateBinding Background}" SnapsToDevicePixels="True" CornerRadius="4" Uid="Border_39">
+                                <Grid>
+                                    <Border x:Name="CheckedBorder" Background="{DynamicResource Brush.Item.Glyph}" Height="16" Width="3" CornerRadius="1.5"
+                                            VerticalAlignment="Center" HorizontalAlignment="Left" Visibility="Collapsed"/>
+
+                                    <ContentPresenter x:Name="ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}"
+                                                      ContentSource="Header" RecognizesAccessKey="True" TextBlock.Foreground="{TemplateBinding Foreground}" TextElement.Foreground="{TemplateBinding Foreground}" 
+                                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Uid="ContentPresenter_39" VerticalAlignment="Center">
+                                        <ContentPresenter.Resources>
+                                            <Style TargetType="{x:Type TextBlock}" BasedOn="{x:Null}"/>
+                                            <!--To avoid using style defined in app.xaml-->
+                                        </ContentPresenter.Resources>
+                                    </ContentPresenter>
+                                </Grid>
+                            </Border>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="CheckedBorder" Property="Visibility" Value="Visible"/>
+                                </Trigger>
+
+                                <Trigger Property="IsMouseCaptured" Value="True">
+                                    <Setter TargetName="CheckedBorder" Property="Height" Value="10"/>
+                                    <Setter TargetName="CheckedBorder" Property="Visibility" Value="Visible"/>
+                                </Trigger>
+
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="CheckedBorder" Property="Background" Value="{DynamicResource Brush.Item.Glyph.Disabled}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsSelected" Value="False"/>
+                            <Condition Property="IsMouseOver" Value="True"/>
+                        </MultiTrigger.Conditions>
+
+                        <Setter Property="Background" Value="{DynamicResource Brush.Item.Background.Hover}"/>
+                    </MultiTrigger>
+
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsSelected" Value="True"/>
+                            <Condition Property="IsMouseOver" Value="False"/>
+                        </MultiTrigger.Conditions>
+
+                        <Setter Property="Background" Value="{DynamicResource Brush.Item.Background.Hover}"/>
+                    </MultiTrigger>
+
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsSelected" Value="True"/>
+                            <Condition Property="IsMouseOver" Value="True"/>
+                        </MultiTrigger.Conditions>
+
+                        <Setter Property="Background" Value="{DynamicResource Brush.Item.Background.Pressed}"/>
+                    </MultiTrigger>
+
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="{DynamicResource Brush.Item.Background.Disabled}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.Item.Foreground.Disabled}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
 
             <!--Slider-->
             <Style TargetType="{x:Type Slider}">

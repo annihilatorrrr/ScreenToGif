@@ -110,7 +110,7 @@ public class DirectChangedCapture : DirectCapture
             //Set frame details.
             FrameCount++;
 
-            frame.Ticks = Stopwatch.GetElapsedTicks();
+            frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
             //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
             frame.Pixels = new byte[stream.Length];
 
@@ -280,7 +280,7 @@ public class DirectChangedCapture : DirectCapture
             //Sets the frame details.
             FrameCount++;
 
-            frame.Ticks = Stopwatch.GetElapsedTicks();
+            frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
             //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
             frame.Pixels = new byte[stream.Length];
 

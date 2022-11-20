@@ -30,6 +30,8 @@ public partial class Exporter : ExWindow
 {
     private readonly ExporterViewModel _viewModel = new();
 
+    public bool OpenInEditor { get; set; }
+
     public Exporter()
     {
         InitializeComponent();
@@ -53,11 +55,11 @@ public partial class Exporter : ExWindow
             new CommandBinding(_viewModel.SettingsCommand, Settings_Executed, (_, args) => args.CanExecute = true),
             new CommandBinding(_viewModel.MouseSettingsCommand, SkipForward_Executed, (_, args) => args.CanExecute = _viewModel.HasMouseTrack),
             new CommandBinding(_viewModel.KeyboardSettingsCommand, SkipForward_Executed, (_, args) => args.CanExecute = _viewModel.HasKeyboardTrack),
-            
-            //Preset actions
-            //Exporter option
-            //?
 
+            new CommandBinding(_viewModel.PresetSettingsCommand, PresetSettings_Executed, (_, args) => args.CanExecute = true),
+            new CommandBinding(_viewModel.UploadPresetSettingsCommand, UploadPresetSettings_Executed, (_, args) => args.CanExecute = _viewModel.SelectedExportPreset?.UploadFile == true),
+            new CommandBinding(_viewModel.FileAutomationSettingsCommand, FileAutomationSettings_Executed, (_, args) => args.CanExecute = _viewModel.SelectedExportPreset?.PickLocation == true),
+            
             new CommandBinding(_viewModel.ExportCommand, Export_Executed, (_, args) => args.CanExecute = true),
             new CommandBinding(_viewModel.CancelCommand, Cancel_Executed, (_, args) => args.CanExecute = true),
         });
@@ -85,6 +87,8 @@ public partial class Exporter : ExWindow
 
     private void Layers_Executed(object sender, ExecutedRoutedEventArgs e)
     {
+        //_viewModel.L
+
         //Enter layer selection mode
         //Hide Exporter part
         //Show controls there instead
@@ -104,9 +108,9 @@ public partial class Exporter : ExWindow
         //Show controls there instead
     }
 
-    private async void Edit_Executed(object sender, ExecutedRoutedEventArgs e)
+    private void Edit_Executed(object sender, ExecutedRoutedEventArgs e)
     {
-        await App.ShowEditor(_viewModel.ProjectSource);
+        OpenInEditor = true;
 
         Close();
     }
@@ -115,6 +119,39 @@ public partial class Exporter : ExWindow
     {
         //Open settings (maybe redirect to exporter tab, if it exists)
         //On return, refresh page.
+
+        _viewModel.PersistSettings();
+
+        var settings = new Options();
+
+        if (settings.ShowDialog() == true)
+            _viewModel.LoadSettings();
+    }
+
+    private void PresetSettings_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        _viewModel.PersistSettings();
+
+        var settings = new PresetSettings(_viewModel.SelectedExportPreset);
+
+        if (settings.ShowDialog() == true)
+            _viewModel.LoadSettings();
+    }
+
+    private void UploadPresetSettings_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        _viewModel.PersistSettings();
+
+        var settings = new PresetSettings(_viewModel.SelectedExportPreset);
+
+        if (settings.ShowDialog() == true)
+            _viewModel.LoadSettings();
+    }
+
+    private void FileAutomationSettings_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        //Open window, passing preset.
+        //On return, decide how to show data
     }
 
     private void Export_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -170,12 +207,17 @@ public partial class Exporter : ExWindow
         UserSettings.Save();
     }
     
-    public void LoadProject(RecordingProject project)
+    public void LoadRecordingProject(RecordingProject project)
     {
         _viewModel.ImportFromRecording(project);
     }
 
-    public void LoadProject(CachedProject project)
+    public async void LoadRecordingProject(string path)
+    {
+        await _viewModel.ImportFromRecording(path);
+    }
+
+    public void LoadCachedProject(CachedProject project)
     {
         _viewModel.ImportFromEditor(project);
     }

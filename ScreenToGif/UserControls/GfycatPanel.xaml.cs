@@ -7,7 +7,7 @@ using ScreenToGif.Cloud;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Settings;
-using ScreenToGif.ViewModel.UploadPresets;
+using ScreenToGif.ViewModel.Presets.Upload;
 using ScreenToGif.ViewModel.UploadPresets.Gfycat;
 using ScreenToGif.Windows.Other;
 
@@ -32,7 +32,7 @@ public partial class GfycatPanel : UserControl, IPanel
 
     private async void AuthorizeButton_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is not GfycatPreset preset)
+        if (DataContext is not GfycatPresetViewModel preset)
             return;
 
         if (string.IsNullOrWhiteSpace(UserTextBox.Text) || PasswordTextBox.SecurePassword.Length < 1)
@@ -74,7 +74,7 @@ public partial class GfycatPanel : UserControl, IPanel
 
     public async Task<bool> IsValid()
     {
-        if (DataContext is not GfycatPreset preset)
+        if (DataContext is not GfycatPresetViewModel preset)
             return false;
 
         if (string.IsNullOrWhiteSpace(preset.Title))
@@ -83,7 +83,7 @@ public partial class GfycatPanel : UserControl, IPanel
             return false;
         }
 
-        if (UserSettings.All.UploadPresets.OfType<UploadPreset>().Any(a => a.Title != _originalTitle && a.Title == preset.Title.Trim()))
+        if (UserSettings.All.UploadPresets.OfType<UploadPresetViewModel>().Any(a => a.Title != _originalTitle && a.Title == preset.Title.Trim()))
         {
             StatusBand.Warning(LocalizationHelper.Get("S.Options.Upload.Preset.Warning.Repeated"));
             return false;
@@ -98,8 +98,8 @@ public partial class GfycatPanel : UserControl, IPanel
         return true;
     }
 
-    public UploadPreset GetPreset()
+    public UploadPresetViewModel GetPreset()
     {
-        return DataContext as GfycatPreset;
+        return DataContext as GfycatPresetViewModel;
     }
 }

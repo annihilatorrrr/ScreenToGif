@@ -1,5 +1,6 @@
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
+using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Webp;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Webp;
@@ -144,6 +145,47 @@ public class FfmpegWebpPresetViewModel : WebpPresetViewModel, IFfmpegPreset
             Framerate = preset.Framerate,
             CustomFramerate = preset.CustomFramerate,
             Vsync = preset.Vsync,
+        };
+    }
+
+    public override ExportPreset ToModel()
+    {
+        return new FfmpegWebpPreset
+        {
+            Title = Title,
+            TitleKey = TitleKey,
+            Description = Description,
+            DescriptionKey = DescriptionKey,
+            IsSelected = IsSelected,
+            IsSelectedForEncoder = IsSelectedForEncoder,
+            IsDefault = IsDefault,
+            HasAutoSave = HasAutoSave,
+            CreationDate = CreationDate,
+            PickLocation = PickLocation,
+            OverwriteMode = OverwriteMode,
+            ExportAsProjectToo = ExportAsProjectToo,
+            UploadFile = UploadFile,
+            UploadService = UploadService,
+            SaveToClipboard = SaveToClipboard,
+            CopyType = CopyType,
+            ExecuteCustomCommands = ExecuteCustomCommands,
+            CustomCommands = CustomCommands,
+            OutputFolder = OutputFolder,
+            OutputFilename = OutputFilename,
+            OutputFilenameKey = OutputFilenameKey,
+            Extension = Extension,
+            Looped = Looped,
+            RepeatForever = RepeatForever,
+            RepeatCount = RepeatCount,
+            SettingsMode = SettingsMode,
+            Parameters = Parameters,
+            CodecPreset = CodecPreset,
+            Quality = Quality,
+            Lossless = Lossless,
+            PixelFormat = PixelFormat,
+            Framerate = Framerate,
+            CustomFramerate = CustomFramerate,
+            Vsync = Vsync,
         };
     }
 }

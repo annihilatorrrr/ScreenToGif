@@ -105,7 +105,7 @@ public class ImgurHistory : History
 
     public override string GetLink(IPreset preset)
     {
-        if (preset is not ImgurPreset imgurPreset)
+        if (preset is not ImgurPresetViewModel imgurPreset)
             return Link;
 
         if (imgurPreset.UseDirectLinks)

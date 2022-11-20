@@ -1,5 +1,6 @@
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
+using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Apng;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Apng;
@@ -129,6 +130,45 @@ public class FfmpegApngPresetViewModel : ApngPresetViewModel, IFfmpegPreset
             Framerate = preset.Framerate,
             CustomFramerate = preset.CustomFramerate,
             Vsync = preset.Vsync,
+        };
+    }
+
+    public override ExportPreset ToModel()
+    {
+        return new FfmpegApngPreset
+        {
+            Title = Title,
+            TitleKey = TitleKey,
+            Description = Description,
+            DescriptionKey = DescriptionKey,
+            IsSelected = IsSelected,
+            IsSelectedForEncoder = IsSelectedForEncoder,
+            IsDefault = IsDefault,
+            HasAutoSave = HasAutoSave,
+            CreationDate = CreationDate,
+            PickLocation = PickLocation,
+            OverwriteMode = OverwriteMode,
+            ExportAsProjectToo = ExportAsProjectToo,
+            UploadFile = UploadFile,
+            UploadService = UploadService,
+            SaveToClipboard = SaveToClipboard,
+            CopyType = CopyType,
+            ExecuteCustomCommands = ExecuteCustomCommands,
+            CustomCommands = CustomCommands,
+            OutputFolder = OutputFolder,
+            OutputFilename = OutputFilename,
+            OutputFilenameKey = OutputFilenameKey,
+            Extension = Extension,
+            Looped = Looped,
+            RepeatForever = RepeatForever,
+            RepeatCount = RepeatCount,
+            SettingsMode = SettingsMode,
+            Parameters = Parameters,
+            PredictionMethod = PredictionMethod,
+            PixelFormat = PixelFormat,
+            Framerate = Framerate,
+            CustomFramerate = CustomFramerate,
+            Vsync = Vsync,
         };
     }
 }

@@ -232,7 +232,7 @@ public partial class Editor : ExWindow
         return true;
     }
 
-    public async Task LoadProject(RecordingProject project)
+    public async Task LoadFromProject(RecordingProject project)
     {
         Activate();
 
@@ -240,6 +240,19 @@ public partial class Editor : ExWindow
 
         if (project?.Any == true)
             await _viewModel.ImportFromRecording(project);
+
+        //Encoder.Restore();
+        ShowInTaskbar = true;
+        WindowState = WindowState == WindowState.Minimized ? WindowState.Normal : WindowState;
+    }
+
+    public async Task LoadFromPath(string path)
+    {
+        Activate();
+
+        //TODO: Possible to be cancelled.
+
+        await _viewModel.ImportFromRecording(path);
 
         //Encoder.Restore();
         ShowInTaskbar = true;

@@ -1,9 +1,10 @@
 using System.Runtime.Serialization;
 using ScreenToGif.Domain.Enums;
+using ScreenToGif.ViewModel.Presets.Upload;
 
 namespace ScreenToGif.ViewModel.UploadPresets.Yandex;
 
-public class YandexPreset : UploadPreset
+public class YandexPresetViewModel : UploadPresetViewModel
 {
     private string _oAuthToken = "";
 
@@ -14,10 +15,9 @@ public class YandexPreset : UploadPreset
         set => SetProperty(ref _oAuthToken, value);
     }
 
-    public YandexPreset()
+    public YandexPresetViewModel()
     {
         Type = UploadDestinations.Yandex;
-        ImageId = "Vector.YandexDisk";
         AllowedTypes = new List<ExportFormats>();
     }
 }

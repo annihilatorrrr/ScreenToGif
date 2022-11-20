@@ -10,8 +10,6 @@ public interface IUploadPreset : IPreset
 
     public bool IsEnabled { get; set; }
 
-    public string ImageId { get; set; }
-
     public bool IsAnonymous { get; set; }
 
     public ArrayList History { get; set; }

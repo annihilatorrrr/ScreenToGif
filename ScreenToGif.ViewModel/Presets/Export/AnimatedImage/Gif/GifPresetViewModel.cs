@@ -4,7 +4,7 @@ using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Gif;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 
-public class GifPresetViewModel : AnimatedImagePresetViewModel
+public abstract class GifPresetViewModel : AnimatedImagePresetViewModel
 {
     private bool _useGlobalColorTable;
     
@@ -13,8 +13,8 @@ public class GifPresetViewModel : AnimatedImagePresetViewModel
         get => _useGlobalColorTable;
         set => SetProperty(ref _useGlobalColorTable, value);
     }
-    
-    public GifPresetViewModel()
+
+    protected GifPresetViewModel()
     {
         Type = ExportFormats.Gif;
         Extension = ".gif";

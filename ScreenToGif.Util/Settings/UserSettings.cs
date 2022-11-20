@@ -2,13 +2,11 @@ using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Ink;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
@@ -1069,13 +1067,6 @@ public partial class UserSettings : INotifyPropertyChanged
     public string ProxyPassword
     {
         get => (string)GetValue();
-        set => SetValue(value);
-    }
-
-    //Presets.
-    public ArrayList UploadPresets
-    {
-        get => (ArrayList)GetValue();
         set => SetValue(value);
     }
 

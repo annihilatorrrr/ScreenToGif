@@ -44,7 +44,7 @@ public class CursorSubSequence : RasterSubSequence
     /// The position of the data stream after the headers of this sub sequence.
     /// The size of the headers is 59 bytes.
     /// </summary>
-    public override ulong DataStreamPosition => StreamPosition + 59;
+    public override long DataStreamPosition => StreamPosition + 59;
 
     public CursorSubSequence()
     {

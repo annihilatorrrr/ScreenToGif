@@ -58,6 +58,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\Preset\Upload\Gfycat\" />
-    <Folder Include="Models\Preset\Upload\Imgur\" />
   </ItemGroup>
 </Project>

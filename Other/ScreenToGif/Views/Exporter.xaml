@@ -3,8 +3,9 @@
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
             xmlns:v="clr-namespace:ScreenToGif.Util.Converters;assembly=ScreenToGif.Util"
-            xmlns:m="clr-namespace:ScreenToGif.Domain.Models;assembly=ScreenToGif.Domain"
             xmlns:e="clr-namespace:ScreenToGif.Domain.Enums;assembly=ScreenToGif.Domain"
+            xmlns:vm="clr-namespace:ScreenToGif.ViewModel.Presets.Export;assembly=ScreenToGif.ViewModel"
+            xmlns:u="clr-namespace:ScreenToGif.ViewModel.Presets.Upload;assembly=ScreenToGif.ViewModel"
             Title="ScreenToGif • Exporter" Icon="../Resources/Logo.ico" ExtendIntoTitleBar="False"
             Height="650" Width="1000" MinWidth="1000" MinHeight="650"
             Loaded="Window_Loaded" Closing="Window_Closing">
@@ -17,7 +18,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition MinWidth="400"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto" MinWidth="350" MaxWidth="550"/>
+            <ColumnDefinition Width="{Binding ExporterSectionWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=400}" MinWidth="350" MaxWidth="600"/>
         </Grid.ColumnDefinitions>
 
         <!--Previewer-->
@@ -224,9 +225,9 @@
 
                         <TextBlock Grid.Column="0" Text="{DynamicResource S.SaveAs.Type}" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" Margin="10,5,5,5"/>
 
-                        <c:ExButton Grid.Column="1" Padding="4,0" Margin="0,5,5,0" Style="{StaticResource Style.Button.Borderless}"
+                        <c:ExButton Grid.Column="1" Padding="4,0" Margin="0,5,5,0" Command="{Binding PresetSettingsCommand}" Style="{StaticResource Style.Button.Borderless}"
                                     ToolTip="{DynamicResource S.Imperative.SeeMore}" ToolTipService.Placement="Top">
-                            <c:SymbolIcon Symbol="MoreHorizontal" FontSize="16"/>
+                            <c:SymbolIcon Symbol="Setting" FontSize="16"/>
                         </c:ExButton>
                     </Grid>
 
@@ -270,15 +271,111 @@
                     </c:ExComboBox>
 
                     <!--Preset-->
-                    <c:ExComboBox Margin="10,5,5,5" Height="50" SelectedIndex="0" ToolTip="Presets"/>
+                    <c:ExComboBox Margin="10,5,5,5" Height="50" MaxDropDownHeight="400"
+                                  SelectedItem="{Binding SelectedExportPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding FilteredExportPresets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip="{DynamicResource S.SaveAs.Type.Preset}">
+
+                        <c:ExComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:ExportPresetViewModel}">
+                                <Grid ToolTip="{Binding Description}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="1"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+
+                                    <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+
+                                    <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Title}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}" VerticalAlignment="Center"
+                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </DataTemplate>
+                        </c:ExComboBox.ItemTemplate>
+                    </c:ExComboBox>
 
                     <!--Type Options-->
                     <!--Export Options-->
                     <!--Upload Options-->
-                    <!--This will all be locatred in a separated window, controlled by the presets.-->
+                    <!--This will all be located in a separated window, controlled by the presets.-->
+
+                    <!--Upload-->
+                    <StackPanel Visibility="{Binding UploadVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="{DynamicResource S.SaveAs.Upload}" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" Margin="10,5,5,5"/>
+
+                            <c:ExButton Grid.Column="1" Padding="4,0" Margin="0,5,5,0" Style="{StaticResource Style.Button.Borderless}"
+                                        ToolTip="{DynamicResource S.Imperative.SeeMore}" ToolTipService.Placement="Top">
+                                <c:SymbolIcon Symbol="Setting" FontSize="16"/>
+                            </c:ExButton>
+                        </Grid>
+
+                        <c:ExComboBox Margin="10,5,5,5" Height="50" SelectedValuePath="Title" IsEnabled="{Binding IsUploadComboBoxEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemsSource="{Binding FilteredUploadPresets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValue="{Binding SelectedExportPreset.UploadPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{DynamicResource S.SaveAs.Upload.Info}">
+                            <c:ExComboBox.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.HeaderTemplate>
+                                        <DataTemplate>
+                                            <TextBlock x:Name="HeaderTextBlock" Text="{Binding Name}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Brush.Foreground}" Margin="3,6"/>
+
+                                            <DataTemplate.Triggers>
+                                                <Trigger Property="Name" Value="{x:Null}">
+                                                    <Setter TargetName="HeaderTextBlock" Property="Visibility" Value="Collapsed"/>
+                                                </Trigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                </GroupStyle>
+                            </c:ExComboBox.GroupStyle>
+
+                            <c:ExComboBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type u:UploadPresetViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="1"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+
+                                        <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+
+                                        <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Title}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </c:ExComboBox.ItemTemplate>
+
+                            <c:ExComboBox.EmptyItem>
+                                <u:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Unavailable.Title}" Description="{StaticResource S.SaveAs.Upload.Unavailable.Description}"/>
+                            </c:ExComboBox.EmptyItem>
+
+                            <c:ExComboBox.NoSelectionItem>
+                                <u:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Select.Title}" Description="{StaticResource S.SaveAs.Upload.Select.Description}"/>
+                            </c:ExComboBox.NoSelectionItem>
+                        </c:ExComboBox>
+                    </StackPanel>
 
                     <!--File-->
-                    <StackPanel>
+                    <StackPanel Visibility="{Binding OutputVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
@@ -300,13 +397,13 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <c:ExTextBox Grid.Column="0" x:Name="FolderTextBox" Text="{Binding OutputFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                         Margin="0,4,2,4" VerticalContentAlignment="Top" TextWrapping="Wrap" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5"
+                            <c:ExTextBox Grid.Column="0" x:Name="FolderTextBox" Text="{Binding SelectedExportPreset.OutputFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                         Margin="0,4,2,4" VerticalContentAlignment="Center" TextWrapping="Wrap" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5"
                                          ToolTip="{DynamicResource S.SaveAs.File.Location}"/>
 
-                            <c:ExButton Grid.Column="1" x:Name="ChooseLocatioButton" Padding="10,0" Margin="2,4,4,4" Height="30" Command="{Binding SelectFolderCommand}"
+                            <c:ExButton Grid.Column="1" Padding="10,6" Margin="2,4,4,4" VerticalAlignment="Center" Command="{Binding SelectFolderCommand}"
                                         ToolTip="{DynamicResource S.SaveAs.File.Choose}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
-                                <c:SymbolIcon Symbol="FolderOpen" FontSize="16"/>
+                                <c:SymbolIcon Symbol="FolderOpen" FontSize="15"/>
                             </c:ExButton>
                         </Grid>
 
@@ -319,75 +416,32 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <c:ExTextBox Grid.Column="0" x:Name="FilenameTextBox" Text="{Binding OutputFilename, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            <c:ExTextBox Grid.Column="0" x:Name="FilenameTextBox" Text="{Binding SelectedExportPreset.OutputFilename, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                          Margin="0,4,2,4" VerticalContentAlignment="Center" ToolTip="{DynamicResource S.SaveAs.File.Name}" ToolTipService.Placement="Bottom" ToolTipService.HorizontalOffset="-5"
                                          TextWrapping="Wrap"/>
 
                             <c:ExComboBox Grid.Column="1" Margin="2,4" ToolTip="{DynamicResource S.SaveAs.File.Format}"
-                                          SelectedItem="{Binding Extension, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                          ItemsSource="{Binding Extensions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedItem="{Binding SelectedExportPreset.Extension, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                            <c:ExButton Grid.Column="2" Padding="10,0" Margin="2,4" Command="{Binding IncreaseFileNumberCommand}"
+                            <c:ExButton Grid.Column="2" Padding="10,6" Margin="2,4" VerticalAlignment="Center" Command="{Binding IncreaseFileNumberCommand}"
                                         ToolTip="{DynamicResource S.SaveAs.File.Increase}" ToolTipService.Placement="Bottom">
-                                <c:SymbolIcon Symbol="Add" FontSize="16"/>
+                                <c:SymbolIcon Symbol="Add" FontSize="15"/>
                             </c:ExButton>
 
-                            <c:ExButton Grid.Column="3" Padding="10,0" Margin="2,4,4,4" Command="{Binding DecreaseFileNumberCommand}"
+                            <c:ExButton Grid.Column="3" Padding="10,6" Margin="2,4,4,4" VerticalAlignment="Center" Command="{Binding DecreaseFileNumberCommand}"
                                         ToolTip="{DynamicResource S.SaveAs.File.Decrease}" ToolTipService.Placement="Bottom">
-                                <c:SymbolIcon Symbol="Subtract" FontSize="16"/>
+                                <c:SymbolIcon Symbol="Subtract" FontSize="15"/>
                             </c:ExButton>
                         </Grid>
                         <!--TODO: Display special element if filename is automated-->
 
                         <!--File already exists-->
                         <c:InfoBar Type="Warning" Title="File already exists" IsClosable="False" Margin="10,5,5,0" Visibility="Collapsed">
-                            <c:HyperlinkButton Content="Open File"/>
+                            <c:HyperlinkButton Content="Open File" Command="{Binding OpenExistingFileCommand}"/>
                         </c:InfoBar>
                     </StackPanel>
-
-                    <!--Upload-->
-                    <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Grid.Column="0" Text="{DynamicResource S.SaveAs.Upload}" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" Margin="10,5,5,5"/>
-
-                            <c:ExButton Grid.Column="1" Padding="4,0" Margin="0,5,5,0" Style="{StaticResource Style.Button.Borderless}"
-                                        ToolTip="{DynamicResource S.Imperative.SeeMore}" ToolTipService.Placement="Top">
-                                <c:SymbolIcon Symbol="MoreHorizontal" FontSize="16"/>
-                            </c:ExButton>
-                        </Grid>
-                        
-                        <c:ExComboBox Margin="10,5,5,5" Height="50" SelectedValuePath="Title"
-                                      SelectedValue="{Binding UploadService, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ToolTip="{DynamicResource S.SaveAs.Upload.Info}">
-                            <c:ExComboBox.GroupStyle>
-                                <GroupStyle>
-                                    <GroupStyle.HeaderTemplate>
-                                        <DataTemplate>
-                                            <TextBlock x:Name="HeaderTextBlock" Text="{Binding Name}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Brush.Foreground}" Margin="3,6"/>
-
-                                            <DataTemplate.Triggers>
-                                                <Trigger Property="Name" Value="{x:Null}">
-                                                    <Setter TargetName="HeaderTextBlock" Property="Visibility" Value="Collapsed"/>
-                                                </Trigger>
-                                            </DataTemplate.Triggers>
-                                        </DataTemplate>
-                                    </GroupStyle.HeaderTemplate>
-                                </GroupStyle>
-                            </c:ExComboBox.GroupStyle>
-
-                            <!--<c:ExComboBox.EmptyItem>
-                                <p:UploadPreset Title="{StaticResource S.SaveAs.Upload.Unavailable.Title}" Description="{StaticResource S.SaveAs.Upload.Unavailable.Description}" ImageId="Vector.Info"/>
-                            </c:ExComboBox.EmptyItem>
-
-                            <c:ExComboBox.NoSelectionItem>
-                                <p:UploadPreset Title="{StaticResource S.SaveAs.Upload.Select.Title}" Description="{StaticResource S.SaveAs.Upload.Select.Description}" ImageId="Vector.Info"/>
-                            </c:ExComboBox.NoSelectionItem>-->
-                        </c:ExComboBox>
-                    </StackPanel>
-
+                    
                     <!--<Grid Margin="5,0" Height="35" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />

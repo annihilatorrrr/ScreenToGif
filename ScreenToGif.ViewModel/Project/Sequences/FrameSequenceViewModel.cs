@@ -51,7 +51,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
             BitsPerChannel = sequence.BitsPerChannel,
             HorizontalDpi = sequence.HorizontalDpi,
             VerticalDpi = sequence.VerticalDpi,
-            Frames = new ObservableCollection<FrameSubSequenceViewModel>(sequence.Frames.Select(s => FrameSubSequenceViewModel.FromModel(s, baseViewModel)).ToList())
+            Frames = new ObservableCollection<FrameSubSequenceViewModel>(sequence.Frames.Select(FrameSubSequenceViewModel.FromModel).ToList())
         };
     }
 
@@ -61,7 +61,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
         {
             Id = 1,
             StartTime = TimeSpan.Zero,
-            EndTime = TimeSpan.FromTicks(project.Frames.LastOrDefault()?.Ticks ?? 0),
+            EndTime = TimeSpan.FromTicks(project.Frames.LastOrDefault()?.TimeStampInTicks ?? 0),
             StreamPosition = 0,
             CachePath = project.FramesCachePath,
             PreviewerViewModel = baseViewModel,
@@ -76,33 +76,27 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
             BitsPerChannel = project.BitsPerChannel,
             HorizontalDpi = project.Dpi,
             VerticalDpi = project.Dpi,
-            Frames = new(project.Frames.Select(s => FrameSubSequenceViewModel.FromModel(project, s, baseViewModel)).ToList())
+            Frames = new(project.Frames.Select((s, i) => FrameSubSequenceViewModel.FromModel(project, s, i == 0)).ToList())
         };
     }
 
     public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath)
     {
-        var ticks = (ulong)timestamp;
-
-        //Get first frame after timestamp. TODO: I should probably get the frames at timestamp + 60fps(16.6ms) and merge at opacity/n
-        var frame = Frames.FirstOrDefault(f => f.TimeStampInTicks >= ticks);
+        //Get first frame after timestamp.
+        var frame = Frames.LastOrDefault(f => f.TimeStampInTicks <= timestamp);
 
         if (frame == null)
             return;
 
         using var readStream = new FileStream(cachePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        //using var deflateStream = new DeflateStream(readStream, CompressionMode.Decompress);
+        readStream.Position = frame.DataStreamPosition;
 
-        readStream.Position = (long) frame.DataStreamPosition;
-
-        //TODO: I need to remove the compression for the stream.
-        //Captured content needs to be flat, so that reading is fine
-
-        var data = readStream.ReadBytes((uint) frame.DataLength);
+        using var deflateStream = new DeflateStream(readStream, CompressionMode.Decompress);
+        var data = deflateStream.ReadBytesUntilFull(frame.DataLength);
 
         Draw(current, canvasWidth, canvasHeight, frame);
 
-        var stride = frame.Width * (( frame.BitsPerChannel * frame.ChannelCount + 7) / 8);
+        var stride = frame.Width * ((frame.BitsPerChannel * frame.ChannelCount + 7) / 8);
 
         //Cut any part of the sequence that overflows outside of the top/left bounds.
         var offsetX = 0 > Left ? Left * -1 : 0;

@@ -53,6 +53,7 @@ public static class Migration
                 goto case "2.37";
 
             case "2.37": //To 3
+            case "2.37.1":
                 Migration2_37_0To3_0_0.Up(properties);
                 goto default;
 

@@ -13,7 +13,7 @@ using ScreenToGif.ViewModel.Presets.Export.Video;
 
 namespace ScreenToGif.ViewModel.Presets.Export;
 
-public abstract class ExportPresetViewModel : BaseViewModel
+public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
 {
     private ExportFormats _type;
     private EncoderTypes _encoder;
@@ -92,7 +92,10 @@ public abstract class ExportPresetViewModel : BaseViewModel
 
     public FluentSymbols Symbol => Encoder switch
     {
-        EncoderTypes.ScreenToGif => FluentSymbols.Add,
+        EncoderTypes.ScreenToGif => FluentSymbols.Window,
+        EncoderTypes.FFmpeg => FluentSymbols.ArrowSync,
+        EncoderTypes.Gifski => FluentSymbols.Timer,
+        EncoderTypes.KGySoft => FluentSymbols.ChevronRight,
         _ => FluentSymbols.Add
     };
 
@@ -111,6 +114,9 @@ public abstract class ExportPresetViewModel : BaseViewModel
         ExportFormats.Bmp => ".bmp",
         ExportFormats.Jpeg => ".jpg",
         ExportFormats.Png => ".png",
+
+        ExportFormats.Stg => ".stg",
+        ExportFormats.Psd => ".psd",
         _ => ""
     };
 
@@ -273,4 +279,6 @@ public abstract class ExportPresetViewModel : BaseViewModel
 
         return null;
     }
+
+    public abstract ExportPreset ToModel();
 }

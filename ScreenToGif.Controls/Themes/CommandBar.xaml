@@ -19,7 +19,7 @@
                     <Border x:Name="MainBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="7" Padding="4">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
-                            <ItemsControl ItemsSource="{TemplateBinding ItemsSource}" VerticalAlignment="Center">
+                            <ItemsControl ItemsSource="{TemplateBinding ItemsSource}" VerticalAlignment="Center" FocusVisualStyle="{TemplateBinding FocusVisualStyle}">
                                 <StackPanel IsItemsHost="True" Orientation="Horizontal"/>
                             </ItemsControl>
 

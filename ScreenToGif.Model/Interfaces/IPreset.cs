@@ -8,6 +8,6 @@ namespace ScreenToGif.Domain.Interfaces
         
         string Description { get; set; }
 
-        Task<ValidatedEventArgs> IsValid();
+        //Task<ValidatedEventArgs> IsValid();
     }
 }

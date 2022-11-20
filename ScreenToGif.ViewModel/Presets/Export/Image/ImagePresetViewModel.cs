@@ -3,7 +3,7 @@ using ScreenToGif.Domain.Models.Preset.Export.Image;
 
 namespace ScreenToGif.ViewModel.Presets.Export.Image;
 
-public class ImagePresetViewModel : ExportPresetViewModel
+public abstract class ImagePresetViewModel : ExportPresetViewModel
 {
     private bool _zipFiles;
 
@@ -32,8 +32,8 @@ public class ImagePresetViewModel : ExportPresetViewModel
             OnPropertyChanged(nameof(ZipFiles));
         }
     }
-    
-    public ImagePresetViewModel()
+
+    protected ImagePresetViewModel()
     {
         OutputFilenameKey = "S.Preset.Filename.Image";
     }

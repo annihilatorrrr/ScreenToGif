@@ -8,7 +8,7 @@ using ScreenToGif.Cloud;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Settings;
-using ScreenToGif.ViewModel.UploadPresets;
+using ScreenToGif.ViewModel.Presets.Upload;
 using ScreenToGif.ViewModel.UploadPresets.Imgur;
 using ScreenToGif.Windows.Other;
 
@@ -49,7 +49,7 @@ public partial class ImgurPanel : UserControl, IPanel
 
     private async void AuthorizeButton_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is not ImgurPreset preset)
+        if (DataContext is not ImgurPresetViewModel preset)
             return;
 
         if (string.IsNullOrWhiteSpace(preset.OAuthToken))
@@ -97,7 +97,7 @@ public partial class ImgurPanel : UserControl, IPanel
         {
             ThisPanel.IsEnabled = false;
 
-            if (DataContext is not ImgurPreset preset)
+            if (DataContext is not ImgurPresetViewModel preset)
                 return;
 
             if (!offline && !await Imgur.IsAuthorized(preset))
@@ -129,7 +129,7 @@ public partial class ImgurPanel : UserControl, IPanel
         
     public async Task<bool> IsValid()
     {
-        if (DataContext is not ImgurPreset preset)
+        if (DataContext is not ImgurPresetViewModel preset)
             return false;
 
         if (string.IsNullOrWhiteSpace(preset.Title))
@@ -138,7 +138,7 @@ public partial class ImgurPanel : UserControl, IPanel
             return false;
         }
 
-        if (UserSettings.All.UploadPresets.OfType<UploadPreset>().Any(a => a.Title != _originalTitle && a.Title == preset.Title.Trim()))
+        if (UserSettings.All.UploadPresets.OfType<UploadPresetViewModel>().Any(a => a.Title != _originalTitle && a.Title == preset.Title.Trim()))
         {
             StatusBand.Warning(LocalizationHelper.Get("S.Options.Upload.Preset.Warning.Repeated"));
             return false;
@@ -153,8 +153,8 @@ public partial class ImgurPanel : UserControl, IPanel
         return true;
     }
 
-    public UploadPreset GetPreset()
+    public UploadPresetViewModel GetPreset()
     {
-        return DataContext as ImgurPreset;
+        return DataContext as ImgurPresetViewModel;
     }
 }

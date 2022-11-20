@@ -2,14 +2,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ScreenToGif.Util;
-using ScreenToGif.ViewModel.UploadPresets;
+using ScreenToGif.ViewModel.Presets.Upload;
 using ScreenToGif.ViewModel.UploadPresets.History;
 
 namespace ScreenToGif.Windows.Other;
 
 public partial class UploadHistory : Window
 {
-    public UploadPreset CurrentPreset { get; set; }
+    public UploadPresetViewModel CurrentPreset { get; set; }
 
 
     public UploadHistory()

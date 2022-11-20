@@ -9,7 +9,7 @@ using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Webp;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage;
 
-public class AnimatedImagePresetViewModel : ExportPresetViewModel
+public abstract class AnimatedImagePresetViewModel : ExportPresetViewModel
 {
     private bool _looped = true;
     private bool _repeatForever = true;
@@ -32,8 +32,8 @@ public class AnimatedImagePresetViewModel : ExportPresetViewModel
         get => _repeatCount;
         set => SetProperty(ref _repeatCount, value);
     }
-    
-    public AnimatedImagePresetViewModel()
+
+    protected AnimatedImagePresetViewModel()
     {
         OutputFilenameKey = "S.Preset.Filename.Animation";
     }

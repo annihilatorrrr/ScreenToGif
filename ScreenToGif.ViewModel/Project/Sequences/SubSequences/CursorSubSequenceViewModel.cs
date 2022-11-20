@@ -90,7 +90,7 @@ public class CursorSubSequenceViewModel : RasterSubSequenceViewModel
     /// The position of the data stream after the headers of this sub sequence.
     /// The size of the headers is 59 bytes.
     /// </summary>
-    public override ulong DataStreamPosition => StreamPosition + 42;// + 59; //TODO: Fix for cached
+    public override long DataStreamPosition => StreamPosition + 42;// + 59; //TODO: Fix for cached
 
     public static CursorSubSequenceViewModel FromModel(CursorSubSequence sequence)
     {

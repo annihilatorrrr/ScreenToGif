@@ -20,7 +20,7 @@ public class Imgur : IUploader
 {
     public async Task<IHistory> UploadFileAsync(IUploadPreset preset, string path, CancellationToken cancellationToken, IProgress<double> progressCallback = null)
     {
-        if (preset is not ImgurPreset imgurPreset)
+        if (preset is not ImgurPresetViewModel imgurPreset)
             throw new Exception("Imgur preset is null.");
 
         var args = new Dictionary<string, string>();
@@ -65,7 +65,7 @@ public class Imgur : IUploader
         return WebHelper.AppendQuery("https://api.imgur.com/oauth2/authorize", args);
     }
 
-    public static async Task<bool> GetTokens(ImgurPreset preset)
+    public static async Task<bool> GetTokens(ImgurPresetViewModel preset)
     {
         var args = new Dictionary<string, string>
         {
@@ -78,7 +78,7 @@ public class Imgur : IUploader
         return await GetTokens(preset, args);
     }
 
-    public static async Task<bool> RefreshToken(ImgurPreset preset)
+    public static async Task<bool> RefreshToken(ImgurPresetViewModel preset)
     {
         var args = new Dictionary<string, string>
         {
@@ -91,12 +91,12 @@ public class Imgur : IUploader
         return await GetTokens(preset, args);
     }
 
-    public static bool IsAuthorizationExpired(ImgurPreset preset)
+    public static bool IsAuthorizationExpired(ImgurPresetViewModel preset)
     {
         return DateTime.UtcNow > preset.ExpiryDate;
     }
 
-    public static async Task<bool> IsAuthorized(ImgurPreset preset)
+    public static async Task<bool> IsAuthorized(ImgurPresetViewModel preset)
     {
         if (string.IsNullOrWhiteSpace(preset.RefreshToken))
             return false;
@@ -107,7 +107,7 @@ public class Imgur : IUploader
         return await RefreshToken(preset);
     }
 
-    public static async Task<List<ImgurAlbum>> GetAlbums(ImgurPreset preset)
+    public static async Task<List<ImgurAlbum>> GetAlbums(ImgurPresetViewModel preset)
     {
         if (!await IsAuthorized(preset))
             return null;
@@ -131,7 +131,7 @@ public class Imgur : IUploader
         return list;
     }
 
-    public static async Task<string> AskForAlbum(ImgurPreset preset)
+    public static async Task<string> AskForAlbum(ImgurPresetViewModel preset)
     {
         var albums = await GetAlbums(preset);
 
@@ -139,7 +139,7 @@ public class Imgur : IUploader
     }
 
 
-    private static async Task<bool> GetTokens(ImgurPreset preset, Dictionary<string, string> args)
+    private static async Task<bool> GetTokens(ImgurPresetViewModel preset, Dictionary<string, string> args)
     {
         var response = await WebHelper.PostMultipart("https://api.imgur.com/oauth2/token", args);
 
@@ -157,7 +157,7 @@ public class Imgur : IUploader
         return true;
     }
 
-    private async Task<History> Upload(ImgurPreset preset, string path, Dictionary<string, string> args, NameValueCollection headers)
+    private async Task<History> Upload(ImgurPresetViewModel preset, string path, Dictionary<string, string> args, NameValueCollection headers)
     {
         await using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
         {

@@ -5,10 +5,11 @@ using System.Runtime.Serialization;
 using System.Windows;
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Util;
+using ScreenToGif.ViewModel.Presets.Upload;
 
 namespace ScreenToGif.ViewModel.UploadPresets.Imgur;
 
-public class ImgurPreset : UploadPreset
+public class ImgurPresetViewModel : UploadPresetViewModel
 {
     private string _oAuthToken = "";
     private string _accessToken = "";
@@ -91,13 +92,12 @@ public class ImgurPreset : UploadPreset
             string.Format(LocalizationHelper.Get("S.Options.Upload.Preset.Info.Valid"), ExpiryDate.Value.ToLocalTime().ToString("g", CultureInfo.CurrentUICulture));
 
 
-    public ImgurPreset() : this(10000000L, TimeSpan.FromMinutes(1))
+    public ImgurPresetViewModel() : this(10000000L, TimeSpan.FromMinutes(1))
     { }
 
-    public ImgurPreset(long? sizeLimit = null, TimeSpan? durationLimit = null, Size? resolutionLimit = null) : base(sizeLimit, durationLimit, resolutionLimit)
+    public ImgurPresetViewModel(long? sizeLimit = null, TimeSpan? durationLimit = null, Size? resolutionLimit = null) : base(sizeLimit, durationLimit, resolutionLimit)
     {
         Type = UploadDestinations.Imgur;
-        ImageId = "Vector.Imgur";
         AllowedTypes = new List<ExportFormats>
         {
             ExportFormats.Apng,

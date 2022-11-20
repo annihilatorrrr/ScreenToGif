@@ -443,6 +443,8 @@ public partial class ScreenRecorder : BaseScreenRecorder
         var options = new Options(Options.RecorderIndex);
         options.ShowDialog();
 
+        //TODO: Should it reposition the capture controls?
+
         DetectCaptureFrequency();
         RegisterCommands();
         AdjustSelectionToScreen();
@@ -1198,7 +1200,10 @@ public partial class ScreenRecorder : BaseScreenRecorder
     private void Window_StateChanged(object sender, EventArgs e)
     {
         if (WindowState == WindowState.Minimized)
+        {
+            _captureRegion.Hide();
             return;
+        }
 
         if (ViewModel.Stage == RecorderStages.Recording && IsRegionIntersected())
         {
@@ -1206,7 +1211,7 @@ public partial class ScreenRecorder : BaseScreenRecorder
             Topmost = true;
         }
 
-        AdjustSelectionToScreen();
+        RepositionCaptureRegion();
         //ForceUpdate();
     }
 

@@ -7,7 +7,7 @@ using ScreenToGif.Cloud;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Settings;
-using ScreenToGif.ViewModel.UploadPresets;
+using ScreenToGif.ViewModel.Presets.Upload;
 using ScreenToGif.ViewModel.UploadPresets.Yandex;
 
 namespace ScreenToGif.UserControls;
@@ -45,7 +45,7 @@ public partial class YandexPanel : UserControl, IPanel
 
     public Task<bool> IsValid()
     {
-        if (DataContext is not YandexPreset preset)
+        if (DataContext is not YandexPresetViewModel preset)
             return Task.FromResult(false);
 
         if (string.IsNullOrWhiteSpace(preset.Title))
@@ -55,7 +55,7 @@ public partial class YandexPanel : UserControl, IPanel
             return Task.FromResult(false);
         }
 
-        if (UserSettings.All.UploadPresets.OfType<UploadPreset>().Any(a => a.Title != _originalTitle && a.Title == preset.Title.Trim()))
+        if (UserSettings.All.UploadPresets.OfType<UploadPresetViewModel>().Any(a => a.Title != _originalTitle && a.Title == preset.Title.Trim()))
         {
             StatusBand.Warning(LocalizationHelper.Get("S.Options.Upload.Preset.Warning.Repeated"));
             NameTextBox.Focus();
@@ -72,8 +72,8 @@ public partial class YandexPanel : UserControl, IPanel
         return Task.FromResult(true);
     }
 
-    public UploadPreset GetPreset()
+    public UploadPresetViewModel GetPreset()
     {
-        return DataContext as YandexPreset;
+        return DataContext as YandexPresetViewModel;
     }
 }

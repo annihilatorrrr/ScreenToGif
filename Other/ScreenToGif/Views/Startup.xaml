@@ -27,6 +27,7 @@
                             </GeometryDrawing>
 
                             <!--TODO: Tilt the drawing-->
+                            <!--TODO: Add little face-->
                             <GeometryDrawing Brush="{DynamicResource Brush.Foreground.Weak}"
                                              Geometry="F1 M 4 3.799999 C 3.44 3.799999 2.966666 3.993334 2.58 4.379999 C 2.193333 4.766666 2 5.24 2 5.799999 L 2 14.799999 C 2 15.36 2.193333 15.833333 2.58 16.219999 C 2.966666 16.606667 3.44 16.799999 4 16.799999 L 7 16.799999 L 7 18.799999 L 5.52 18.799999 C 5.36 18.799999 5.233333 18.846666 5.14 18.939999 C 5.046666 19.033333 5 19.153332 5 19.299999 C 5 19.446667 5.046666 19.566666 5.14 19.66 C 5.233333 19.753332 5.36 19.799999 5.52 19.799999 L 14.52 19.799999 C 14.653333 19.799999 14.766666 19.753332 14.86 19.66 C 14.953333 19.566666 14.999999 19.446667 15 19.299999 C 14.999999 19.153332 14.953333 19.033333 14.86 18.939999 C 14.766666 18.846666 14.653333 18.799999 14.52 18.799999 L 13 18.799999 L 13 16.799999 L 16 16.799999 C 16.559999 16.799999 17.033333 16.606667 17.42 16.219999 C 17.806665 15.833333 18 15.36 18 14.799999 L 18 5.799999 C 18 5.24 17.806665 4.766666 17.42 4.379999 C 17.033333 3.993334 16.559999 3.799999 16 3.799999 Z M 12 16.799999 L 12 18.799999 L 8 18.799999 L 8 16.799999 Z M 3 5.799999 C 3 5.533333 3.1 5.299999 3.3 5.1 C 3.5 4.9 3.733333 4.799999 4 4.799999 L 16 4.799999 C 16.266666 4.799999 16.5 4.9 16.699999 5.1 C 16.9 5.299999 17 5.533333 17 5.799999 L 17 14.799999 C 17 15.066666 16.9 15.299999 16.699999 15.5 C 16.5 15.7 16.266666 15.799999 16 15.799999 L 4 15.799999 C 3.733333 15.799999 3.5 15.7 3.3 15.5 C 3.1 15.299999 3 15.066666 3 14.799999 Z"/>
                         </DrawingGroup>
@@ -99,19 +100,87 @@
                        Visibility="{Binding Source={StaticResource AppViewModel}, Path=UpdateVisibility, UpdateSourceTrigger=PropertyChanged}">
                 <c:ExButton Content="Update Now" Command="{Binding UpdateCommand}" TextWrapping="NoWrap"/>
             </c:InfoBar>
-            
-            <ListBox Grid.Row="1" BorderThickness="0" Background="Transparent" Margin="5" ItemsSource="{Binding RecentProjects, UpdateSourceTrigger=PropertyChanged}">
-                <ListBox.Resources>
-                    <DataTemplate DataType="{x:Type v:AppViewModel}">
-                        <Grid>
-                            <TextBlock Text="Text"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.Resources>
-            </ListBox>
 
-            <TextBlock Grid.Row="1" Text="No recent projects or other files opened" Foreground="{DynamicResource Brush.Foreground.Medium}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,10" FontSize="13"/>
+            <Grid Grid.Row="1" Margin="5,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Recent projects" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" Margin="5"
+                           Visibility="{Binding TitleTextBlockVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,15">
+                    <ItemsControl BorderThickness="0" Background="Transparent" ItemsSource="{Binding RecentProjects, UpdateSourceTrigger=PropertyChanged}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type v:RecentProjectViewModel}">
+                                <Border Margin="2" Height="42" Background="{DynamicResource Brush.InfoBar.Background}" BorderThickness="1" BorderBrush="{DynamicResource Brush.InfoBar.Border}" CornerRadius="3">
+                                    <Grid HorizontalAlignment="Stretch" Margin="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <c:SymbolIcon Grid.Column="0" x:Name="SymbolIcon" Symbol="{Binding Symbol}" Margin="5,0" VerticalAlignment="Center"
+                                                  Foreground="{DynamicResource Brush.InfoBar.Glyph}"/>
+
+                                        <TextBlock Grid.Column="1" x:Name="TitleTextBlock" Text="{Binding Title}" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,0"/>
+
+                                        <TextBlock Grid.Column="2" Text="{Binding CreationDate, StringFormat='{}{0:g}'}" Margin="10,0"
+                                               VerticalAlignment="Center" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                        <c:ExButton Grid.Column="3" Padding="4,0" Style="{DynamicResource Style.Button.Borderless}"
+                                                Command="{Binding ExportProjectCommand}" CommandParameter="{Binding .}"
+                                                ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                                            <c:SymbolIcon Symbol="Save" FontSize="18"/>
+                                        </c:ExButton>
+
+                                        <c:ExButton Grid.Column="4" Padding="4,0" Style="{DynamicResource Style.Button.Borderless}"
+                                                Command="{Binding EditProjectCommand}" CommandParameter="{Binding .}"
+                                                ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                                            <c:SymbolIcon Symbol="Edit" FontSize="18"/>
+                                        </c:ExButton>
+
+                                        <c:ExButton Grid.Column="5" Padding="4,0" Style="{DynamicResource Style.Button.Borderless}"
+                                                Command="{Binding RemoveProjectCommand}" CommandParameter="{Binding .}"
+                                                ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                                            <c:SymbolIcon Symbol="Delete" FontSize="18"/>
+                                        </c:ExButton>
+                                    </Grid>
+                                </Border>
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="Recording">
+                                        <Setter TargetName="TitleTextBlock" Property="Text" Value="Recording"/>
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding Type}" Value="Project">
+                                        <Setter TargetName="TitleTextBlock" Property="Text" Value="Project"/>
+                                        <Setter TargetName="SymbolIcon" Property="Symbol" Value="Document"/>
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding Type}" Value="OldRecording">
+                                        <Setter TargetName="TitleTextBlock" Property="Text" Value="Recording (old)"/>
+                                        <Setter TargetName="SymbolIcon" Property="Foreground" Value="{DynamicResource Brush.InfoBar.Glyph.Warning}"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <TextBlock Grid.Row="1" Text="No projects opened recently" Foreground="{DynamicResource Brush.Foreground.Medium}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,10" FontSize="13"
+                           Visibility="{Binding NoItemsTextBlockVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <c:ProgressRing Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="70" Height="70"
+                                IsIndeterminate="True" IsActive="{Binding IsLoading, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
         </Grid>
     </Grid>
 </c:ExWindow>

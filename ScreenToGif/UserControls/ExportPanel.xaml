@@ -1448,11 +1448,11 @@
                     </n:ExtendedComboBox.GroupStyle>
                     
                     <n:ExtendedComboBox.EmptyItem>
-                        <p:UploadPreset Title="{StaticResource S.SaveAs.Upload.Unavailable.Title}" Description="{StaticResource S.SaveAs.Upload.Unavailable.Description}" ImageId="Vector.Info"/>
+                        <p:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Unavailable.Title}" Description="{StaticResource S.SaveAs.Upload.Unavailable.Description}" ImageId="Vector.Info"/>
                     </n:ExtendedComboBox.EmptyItem>
 
                     <n:ExtendedComboBox.NoSelectionItem>
-                        <p:UploadPreset Title="{StaticResource S.SaveAs.Upload.Select.Title}" Description="{StaticResource S.SaveAs.Upload.Select.Description}" ImageId="Vector.Info"/>
+                        <p:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Select.Title}" Description="{StaticResource S.SaveAs.Upload.Select.Description}" ImageId="Vector.Info"/>
                     </n:ExtendedComboBox.NoSelectionItem>
                 </n:ExtendedComboBox>
 

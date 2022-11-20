@@ -1,19 +1,34 @@
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Preset.Export;
+using ScreenToGif.Domain.Models.Preset.Upload;
 using ScreenToGif.Domain.Models.Project.Cached;
 using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Domain.ViewModels;
 using ScreenToGif.Native.Helpers;
 using ScreenToGif.Util;
+using ScreenToGif.Util.Project;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel.Presets.Export;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Apng;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
+using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Webp;
+using ScreenToGif.ViewModel.Presets.Export.Image;
+using ScreenToGif.ViewModel.Presets.Export.Other;
+using ScreenToGif.ViewModel.Presets.Export.Video.Avi;
+using ScreenToGif.ViewModel.Presets.Export.Video.Mkv;
+using ScreenToGif.ViewModel.Presets.Export.Video.Mov;
+using ScreenToGif.ViewModel.Presets.Export.Video.Mp4;
+using ScreenToGif.ViewModel.Presets.Export.Video.Webm;
+using ScreenToGif.ViewModel.Presets.Upload;
 using ScreenToGif.ViewModel.Project;
 using ScreenToGif.ViewModel.Project.Sequences;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -35,12 +50,21 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     private bool _comesFromRecorder;
     private WriteableBitmap _renderedImage;
     private IntPtr _renderedImageBackBuffer;
-    private long _currentTime;
+    private long _minimumTime;
     private long _startTime;
+    private long _currentTime;
     private long _endTime;
     private ProjectViewModel _project;
     private RecordingProject _projectSource;
+    private bool _isInLayerMode;
+
+    private double _exporterSectionWidth;
     private ExportFormats _exportFormat;
+    private List<ExportPresetViewModel> _exportPresets;
+    private List<ExportPresetViewModel> _filteredExportPresets;
+    private ExportPresetViewModel _selectedExportPreset;
+    private List<UploadPresetViewModel> _uploadPresets;
+    private ICollectionView _filteredUploadPresets;
 
     public bool IsLoading
     {
@@ -106,12 +130,27 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         }
     }
 
+    public long MinimumTime
+    {
+        get => _minimumTime;
+        set
+        {
+            SetProperty(ref _minimumTime, value);
+
+            if (_minimumTime > StartTime)
+                StartTime = _minimumTime;
+        }
+    }
+
     public long StartTime
     {
         get => _startTime;
         set
         {
             SetProperty(ref _startTime, value);
+
+            if (_startTime > CurrentTime)
+                CurrentTime = _startTime;
 
             OnPropertyChanged(nameof(TimeLeft));
             OnPropertyChanged(nameof(TimeLeftAsTimeSpan));
@@ -141,6 +180,9 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         {
             SetProperty(ref _endTime, value);
 
+            if (StartTime > _endTime)
+                StartTime = _endTime;
+
             OnPropertyChanged(nameof(TimeLeft));
             OnPropertyChanged(nameof(TimeLeftAsTimeSpan));
         }
@@ -159,10 +201,8 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         {
             SetProperty(ref _project, value);
 
-            var endTime = _project.Tracks.Max(s => s.Sequences.Max(ss => ss.EndTime.Ticks));
-
-            CurrentTime = CurrentTime > EndTime ? EndTime : CurrentTime;
-            EndTime = endTime;
+            //MinimumTime = _project.Tracks.Where(w => w.Sequences.OfType<FrameSequenceViewModel>().Any()).Min(s => s.Sequences.OfType<FrameSequenceViewModel>().Min(ss => ss.Frames.Min(sss => sss.TimeStampInTicks)));
+            EndTime = _project.Tracks.Max(s => s.Sequences.Max(ss => ss.EndTime.Ticks));
 
             OnPropertyChanged(nameof(Tracks));
             OnPropertyChanged(nameof(HasMouseTrack));
@@ -183,6 +223,8 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
 
     public bool HasKeyboardTrack => Project.Tracks.Any(a => a.Sequences.OfType<CursorSequenceViewModel>().Any());
 
+    //Has stroke track.
+
     public Visibility EditButtonVisibility => ComesFromRecorder ? Visibility.Visible : Visibility.Collapsed;
 
     public Visibility PlayButtonVisibility => IsPlaybackEnabled ? Visibility.Collapsed : Visibility.Visible;
@@ -193,7 +235,20 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
 
     public Visibility LoopedPlaybackOffVisibility => LoopedPlayback ? Visibility.Collapsed : Visibility.Visible;
 
+    //Layers
+    public bool IsInLayerMode
+    {
+        get => _isInLayerMode;
+        set => SetProperty(ref _isInLayerMode, value);
+    }
+
     //Exporter
+
+    public double ExporterSectionWidth
+    {
+        get => _exporterSectionWidth;
+        set => SetProperty(ref _exporterSectionWidth, value);
+    }
 
     public ExportFormats ExportFormat
     {
@@ -205,10 +260,57 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
             OnPropertyChanged(nameof(Extensions));
             //OnPropertyChanged(nameof(OutputVisibility));
             //OnPropertyChanged(nameof(UploadVisibility));
+
+            FilterPresets();
         }
     }
 
-    public List<ExportPresetViewModel> ExportPresets { get; set; }
+    internal List<ExportPresetViewModel> ExportPresets
+    {
+        get => _exportPresets;
+        set => SetProperty(ref _exportPresets, value);
+    }
+
+    public List<ExportPresetViewModel> FilteredExportPresets
+    {
+        get => _filteredExportPresets;
+        set => SetProperty(ref _filteredExportPresets, value);
+    }
+
+    public ExportPresetViewModel SelectedExportPreset
+    {
+        get => _selectedExportPreset;
+        set
+        {
+            SetProperty(ref _selectedExportPreset, value);
+
+            OnPropertyChanged(nameof(Extensions));
+            OnPropertyChanged(nameof(OutputVisibility));
+            OnPropertyChanged(nameof(UploadVisibility));
+
+            UsePresetSettings();
+            LoadUploadPresets();
+        }
+    }
+
+    internal List<UploadPresetViewModel> UploadPresets
+    {
+        get => _uploadPresets;
+        set => SetProperty(ref _uploadPresets, value);
+    }
+
+    public ICollectionView FilteredUploadPresets
+    {
+        get => _filteredUploadPresets;
+        set
+        {
+            SetProperty(ref _filteredUploadPresets, value);
+
+            OnPropertyChanged(nameof(IsUploadComboBoxEnabled));
+        }
+    }
+
+    public bool IsUploadComboBoxEnabled => !FilteredUploadPresets.IsEmpty;
 
     public List<string> Extensions => ExportFormat switch
     {
@@ -228,9 +330,10 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         _ => new List<string>()
     };
 
-    //OutputVisibility
-    //UploadVisibility
+    public Visibility OutputVisibility => SelectedExportPreset?.PickLocation == true ? Visibility.Visible : Visibility.Collapsed;
 
+    public Visibility UploadVisibility => SelectedExportPreset?.UploadFile == true ? Visibility.Visible : Visibility.Collapsed;
+    
     public ExporterViewModel()
     {
         LoadSettings();
@@ -299,6 +402,21 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         InputGestures = { new KeyGesture(Key.K, ModifierKeys.Alt) }
     };
 
+    public RoutedUICommand PresetSettingsCommand { get; set; } = new()
+    {
+        InputGestures = { new KeyGesture(Key.P, ModifierKeys.Alt) }
+    };
+
+    public RoutedUICommand UploadPresetSettingsCommand { get; set; } = new()
+    {
+        InputGestures = { new KeyGesture(Key.U, ModifierKeys.Alt) }
+    };
+
+    public RoutedUICommand FileAutomationSettingsCommand { get; set; } = new()
+    {
+        InputGestures = { new KeyGesture(Key.F, ModifierKeys.Alt) }
+    };
+
     public RoutedUICommand ExportCommand { get; set; } = new()
     {
         InputGestures = { new KeyGesture(Key.S, ModifierKeys.Control) }
@@ -328,18 +446,35 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     //  Get start/end time
     //  Get crop rect
 
-    private void LoadSettings()
+    public void LoadSettings()
     {
         LoopedPlayback = UserSettings.All.ExporterLoopedPlayback;
         PlaybackFramerate = UserSettings.All.ExporterPlaybackFramerate;
 
+        ExporterSectionWidth = UserSettings.All.ExporterSectionWidth;
         ExportPresets = UserSettings.All.ExportPresets.OfType<ExportPreset>().Select(s => ExportPresetViewModel.FromModel(s, this)).ToList();
+        UploadPresets = UserSettings.All.UploadPresets.OfType<UploadPreset>().Select(s => UploadPresetViewModel.FromModel(s, this)).ToList();
+
         ExportFormat = UserSettings.All.SaveType;
     }
 
     public void ImportFromRecording(RecordingProject project)
     {
         IsLoading = true;
+
+        Project = ProjectViewModel.FromModel(project, this);
+        ComesFromRecorder = true;
+        
+        InitializePreview();
+
+        IsLoading = false;
+    }
+
+    public async Task ImportFromRecording(string path)
+    {
+        IsLoading = true;
+
+        var project = await RecordingProjectHelper.ReadFromPath(path);
 
         Project = ProjectViewModel.FromModel(project, this);
         ComesFromRecorder = true;
@@ -404,6 +539,177 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         LoopedPlayback = !LoopedPlayback;
     }
 
+    private void FilterPresets()
+    {
+        var query = ExportPresets.Where(w => w.Type == ExportFormat);
+
+        if (!Environment.Is64BitProcess)
+            query = query.Where(w => w.Encoder != EncoderTypes.Gifski);
+
+        var filtered = query.ToList();
+
+        GenerateDefaultPresets(filtered);
+        NormalizePresets(filtered);
+
+        FilteredExportPresets = filtered.OrderBy(o => o.Encoder).ThenBy(t => t.Title).ToList();
+        SelectedExportPreset = FilteredExportPresets.FirstOrDefault(f => f.IsSelected) ?? FilteredExportPresets.FirstOrDefault();
+    }
+
+    private void GenerateDefaultPresets(ICollection<ExportPresetViewModel> presets)
+    {
+        switch (ExportFormat)
+        {
+            //Animated images.
+            case ExportFormats.Gif:
+            {
+                AddDistinct(presets, EmbeddedGifPresetViewModel.Defaults);
+                AddDistinct(presets, KGySoftGifPresetViewModel.Defaults);
+                AddDistinct(presets, FfmpegGifPresetViewModel.Defaults);
+
+                //Gifski only runs on x64.
+                if (Environment.Is64BitProcess)
+                    AddDistinct(presets, GifskiGifPresetViewModel.Defaults);
+
+                AddDistinct(presets, SystemGifPresetViewModel.Default);
+                break;
+            }
+            case ExportFormats.Apng:
+            {
+                AddDistinct(presets, EmbeddedApngPresetViewModel.Default);
+                AddDistinct(presets, FfmpegApngPresetViewModel.Defaults);
+                break;
+            }
+            case ExportFormats.Webp:
+            {
+                AddDistinct(presets, FfmpegWebpPresetViewModel.Defaults);
+                break;
+            }
+
+            //Videos.
+            case ExportFormats.Avi:
+            {
+                AddDistinct(presets, FfmpegAviPresetViewModel.Default);
+                break;
+            }
+            case ExportFormats.Mkv:
+            {
+                AddDistinct(presets, FfmpegMkvPresetViewModel.Defaults);
+                break;
+            }
+            case ExportFormats.Mov:
+            {
+                AddDistinct(presets, FfmpegMovPresetViewModel.Defaults);
+                break;
+            }
+            case ExportFormats.Mp4:
+            {
+                AddDistinct(presets, FfmpegMp4PresetViewModel.Defaults);
+                break;
+            }
+            case ExportFormats.Webm:
+            {
+                AddDistinct(presets, FfmpegWebmPresetViewModel.Defaults);
+                break;
+            }
+
+            //Images.
+            case ExportFormats.Jpeg:
+            {
+                AddDistinct(presets, JpegPresetViewModel.Default);
+                break;
+            }
+            case ExportFormats.Png:
+            {
+                AddDistinct(presets, PngPresetViewModel.Default);
+                break;
+            }
+            case ExportFormats.Bmp:
+            {
+                AddDistinct(presets, BmpPresetViewModel.Default);
+                break;
+            }
+
+            //Other.
+            case ExportFormats.Stg:
+            {
+                AddDistinct(presets, StgPresetViewModel.Default);
+                break;
+            }
+            case ExportFormats.Psd:
+            {
+                AddDistinct(presets, PsdPresetViewModel.Default);
+                break;
+            }
+        }
+    }
+
+    private static void AddDistinct(ICollection<ExportPresetViewModel> current, IEnumerable<IExportPreset> newList)
+    {
+        foreach (var preset in newList.Where(preset => current.Where(w => w.Type == preset.Type).All(a => a.TitleKey != preset.TitleKey)))
+            current.Add((ExportPresetViewModel)preset);
+    }
+
+    private static void AddDistinct(ICollection<ExportPresetViewModel> current, IExportPreset newPreset)
+    {
+        if (current.Where(w => w.Type == newPreset.Type).All(a => a.TitleKey != newPreset.TitleKey))
+            current.Add((ExportPresetViewModel)newPreset);
+    }
+
+    private void NormalizePresets(List<ExportPresetViewModel> presets)
+    {
+        foreach (var preset in presets.Where(w => w.IsDefault))
+        {
+            preset.Title = LocalizationHelper.Get(preset.TitleKey).Replace("{0}", preset.DefaultExtension);
+            preset.Description = LocalizationHelper.Get(preset.DescriptionKey);
+            preset.OutputFolder ??= Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            preset.OutputFilename = (preset.OutputFilenameKey ?? "").Length <= 0 || !string.IsNullOrWhiteSpace(preset.OutputFilename) ? preset.OutputFilename : LocalizationHelper.Get(preset.OutputFilenameKey);
+        }
+    }
+
+    private void UsePresetSettings()
+    {
+        if (SelectedExportPreset == null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(SelectedExportPreset.Extension))
+            SelectedExportPreset.Extension = SelectedExportPreset.DefaultExtension;
+    }
+
+    private void LoadUploadPresets()
+    {
+        if (SelectedExportPreset == null)
+            return;
+
+        var type = (SelectedExportPreset.Extension ?? SelectedExportPreset.DefaultExtension) == ".zip" ? ExportFormats.Zip : SelectedExportPreset.Type;
+        var list = UploadPresets.Where(w => w.AllowedTypes.Count == 0 || w.AllowedTypes.Contains(type)).ToList();
+
+        //No need to adding grouping when there's no item to be displayed.
+        //if (list.Count == 0)
+        //{
+        //    FilteredUploadPresets = list;
+        //    return;
+        //}
+
+        //Groups by authentication mode.
+        //var lcv = new ListCollectionView(list.OrderBy(o => o.IsAnonymous).ThenBy(t => t.Title).ToList());
+        //lcv.GroupDescriptions?.Add(new PropertyGroupDescription("Mode"));
+
+        var aa = CollectionViewSource.GetDefaultView(list.OrderBy(o => o.IsAnonymous).ThenBy(t => t.Title).ToList());
+        aa.GroupDescriptions.Add(new PropertyGroupDescription("Mode"));
+
+        FilteredUploadPresets = aa;
+        
+        //var previous = preset.UploadService;
+
+        //UploadPresetComboBox.IsEnabled = true;
+        //UploadPresetComboBox.ItemsSource = lcv;
+
+        //if (uploadPreset != null && list.Contains(uploadPreset))
+        //    preset.UploadService = uploadPreset.Title;
+        //else
+        //    preset.UploadService = previous;
+    }
+
     public void EndPreview()
     {
         _renderWorker.CancelAsync();
@@ -420,6 +726,10 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         UserSettings.All.ExporterLoopedPlayback = LoopedPlayback;
         UserSettings.All.ExporterPlaybackFramerate = PlaybackFramerate;
 
+        UserSettings.All.ExporterSectionWidth = ExporterSectionWidth;
+        UserSettings.All.ExportPresets = new ArrayList(ExportPresets.Select(s => s.ToModel()).ToArray());
+        //UserSettings.All.UploadPresets = UploadPresets.Select(s => UploadPresetViewModel.ToModel(s)).ToList();
+
         UserSettings.All.SaveType = ExportFormat;
     }
 
@@ -432,7 +742,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     
     private void RenderWorker_DoWork(object sender, DoWorkEventArgs e)
     {
-        while (!_playbackWorker.CancellationPending)
+        while (!_renderWorker.CancellationPending)
         {
             _event.WaitOne();
 

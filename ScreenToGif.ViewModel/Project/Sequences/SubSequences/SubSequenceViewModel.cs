@@ -6,8 +6,8 @@ namespace ScreenToGif.ViewModel.Project.Sequences.SubSequences;
 public abstract class SubSequenceViewModel : BindableBase
 {
     private SubSequenceTypes _type;
-    private ulong _timeStampInTicks;
-    private ulong _streamPosition;
+    private long _timeStampInTicks;
+    private long _streamPosition;
 
     public SubSequenceTypes Type
     {
@@ -18,7 +18,7 @@ public abstract class SubSequenceViewModel : BindableBase
     /// <summary>
     /// Ticks since the start of the sequence.
     /// </summary>
-    public ulong TimeStampInTicks
+    public long TimeStampInTicks
     {
         get => _timeStampInTicks;
         set => SetProperty(ref _timeStampInTicks, value);
@@ -27,7 +27,7 @@ public abstract class SubSequenceViewModel : BindableBase
     /// <summary>
     /// Position of this sub-sequence in the stream.
     /// </summary>
-    public ulong StreamPosition
+    public long StreamPosition
     {
         get => _streamPosition;
         set => SetProperty(ref _streamPosition, value);

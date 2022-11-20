@@ -4,6 +4,7 @@ using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Native.External;
 using ScreenToGif.Native.Structs;
 using ScreenToGif.Util.Settings;
+using System.IO.Compression;
 using System.Windows;
 
 namespace ScreenToGif.Util.Capture;
@@ -21,7 +22,7 @@ public class GdiCapture : ScreenCapture
     private BitmapInfoHeader _bitmapHeader;
     private CopyPixelOperations _pixelOperations;
     private int _cursorStep;
-    private ulong _byteLength;
+    private long _byteLength;
 
     #endregion
 
@@ -62,7 +63,7 @@ public class GdiCapture : ScreenCapture
         };
 
         //This was working with 32 bits: 3L * Width * Height;
-        _byteLength = (ulong)((StartWidth * _bitmapHeader.BitCount + 31) / 32 * 4 * StartHeight);
+        _byteLength = (StartWidth * _bitmapHeader.BitCount + 31) / 32 * 4 * StartHeight;
 
         //Preemptively Capture the first cursor shape.
         //CaptureCursor();
@@ -78,7 +79,7 @@ public class GdiCapture : ScreenCapture
             //Set frame details.
             FrameCount++;
 
-            frame.Ticks = Stopwatch.GetElapsedTicks();
+            frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
             frame.Pixels = new byte[_byteLength];
 
             if (Gdi32.GetDIBits(_windowDeviceContext, _compatibleBitmap, 0, (uint)StartHeight, frame.Pixels, ref _bitmapHeader, DibColorModes.RgbColors) == 0)
@@ -107,7 +108,7 @@ public class GdiCapture : ScreenCapture
             //Set frame details.
             FrameCount++;
 
-            frame.Ticks = Stopwatch.GetElapsedTicks();
+            frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
             frame.Pixels = new byte[_byteLength];
 
             if (Gdi32.GetDIBits(_windowDeviceContext, _compatibleBitmap, 0, (uint)StartHeight, frame.Pixels, ref _bitmapHeader, DibColorModes.RgbColors) == 0)
@@ -139,31 +140,34 @@ public class GdiCapture : ScreenCapture
             return;
         }
 
-        //info.StreamPosition = (ulong)CompressStream.BaseStream.Position;
-        info.StreamPosition = (ulong)CompressStream.Position;
+        info.StreamPosition = StreamPosition;
 
         //Sub-sequence.
-        CompressStream.WriteByte((byte)SubSequenceTypes.Frame); //1 byte.
-        CompressStream.WriteUInt64((ulong)info.Ticks); //8 bytes.
+        FramesBinaryWriter.Write((byte)SubSequenceTypes.Frame); //1 byte.
+        FramesBinaryWriter.Write(info.TimeStampInTicks); //8 bytes.
 
         //Rect sub-sequence.
-        CompressStream.WriteInt32(0); //4 bytes, left.
-        CompressStream.WriteInt32(0); //4 bytes, top.
-        CompressStream.WriteUInt16((ushort)Width); //2 bytes.
-        CompressStream.WriteUInt16((ushort)Height); //2 bytes.
-        CompressStream.WriteBytes(BitConverter.GetBytes(0)); //4 bytes.
+        FramesBinaryWriter.Write(0); //4 bytes, left.
+        FramesBinaryWriter.Write(0); //4 bytes, top.
+        FramesBinaryWriter.Write((ushort)Width); //2 bytes, width.
+        FramesBinaryWriter.Write((ushort)Height); //2 bytes, height.
+        FramesBinaryWriter.Write(BitConverter.GetBytes(0F)); //4 bytes, angle.
 
         //Raster sub-sequence. 
-        CompressStream.WriteUInt16((ushort)Width); //2 bytes.
-        CompressStream.WriteUInt16((ushort)Height); //2 bytes.
-        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
-        CompressStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4 bytes.
-        CompressStream.WriteByte(Project.ChannelCount); //1 byte.
-        CompressStream.WriteByte(Project.BitsPerChannel); //1 byte.
-        CompressStream.WriteInt64(info.Pixels.LongLength); //8 bytes.
-        CompressStream.WriteBytes(info.Pixels);
+        FramesBinaryWriter.Write((ushort)Width); //2 bytes, original width.
+        FramesBinaryWriter.Write((ushort)Height); //2 bytes, original height.
+        FramesBinaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4+4 bytes, dpi.
+        FramesBinaryWriter.Write(Project.ChannelCount); //1 byte.
+        FramesBinaryWriter.Write(Project.BitsPerChannel); //1 byte.
+        FramesBinaryWriter.Write(info.Pixels.LongLength); //8 bytes.
+        
+        using var compressStream = new DeflateStream(FramesFileStream, UserSettings.All.CaptureCompression, true);
+        {
+            compressStream.Write(info.Pixels);
+            compressStream.Flush();
+        }
 
-        info.DataLength = (ulong) info.Pixels.LongLength;
+        info.DataLength = info.Pixels.LongLength;
         info.Pixels = null;
 
         Project.Frames.Add(info);
