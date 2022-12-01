@@ -3,7 +3,6 @@ using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Domain.Models.Project.Recording.Events;
 using ScreenToGif.Util.Settings;
 using System.IO;
-using System.IO.Compression;
 using System.Text;
 using System.Windows.Input;
 
@@ -31,24 +30,59 @@ public static class RecordingProjectHelper
         return project;
     }
 
-    public static void SaveProperties(this RecordingProject project)
+    public static void WritePropertiesToDisk(this RecordingProject project)
     {
         using var fileStream = new FileStream(project.PropertiesCachePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var binaryWriter = new ExBinaryWriter(fileStream);
 
-        fileStream.WriteBytes(Encoding.ASCII.GetBytes("stgR")); //Signature, 4 bytes.
-        fileStream.WriteUInt16(1); //File version, 2 bytes.
-        fileStream.WriteUInt16((ushort) project.Width); //Width, 2 bytes.
-        fileStream.WriteUInt16((ushort) project.Height); //Height, 2 bytes.
-        fileStream.WriteBytes(BitConverter.GetBytes(Convert.ToSingle(project.Dpi))); //DPI, 4 bytes.
-        fileStream.WriteByte(project.ChannelCount); //Number of channels, 1 byte.
-        fileStream.WriteByte(project.BitsPerChannel); //Bits per channels, 1 byte.
-        fileStream.WritePascalString("ScreenToGif"); //App name, 1 byte + X bytes (255 max).
-        fileStream.WritePascalString(UserSettings.All.VersionText); //App version, 1 byte + X bytes (255 max).
-        fileStream.WriteByte((byte) project.CreatedBy); //Recording source, 1 byte.
-        fileStream.WriteInt64(project.CreationDate.Ticks); //Creation date, 8 bytes.
+        binaryWriter.Write(Encoding.ASCII.GetBytes("stgR")); //Signature, 4 bytes.
+        binaryWriter.Write((ushort)1); //File version, 2 bytes.
+        binaryWriter.Write((ushort) project.Width); //Width, 2 bytes.
+        binaryWriter.Write((ushort) project.Height); //Height, 2 bytes.
+        binaryWriter.Write(BitConverter.GetBytes(Convert.ToSingle(project.Dpi))); //DPI, 4 bytes.
+        binaryWriter.Write(project.ChannelCount); //Number of channels, 1 byte.
+        binaryWriter.Write(project.BitsPerChannel); //Bits per channels, 1 byte.
+        binaryWriter.WritePascalString("ScreenToGif"); //App name, 1 byte + X bytes (255 max).
+        binaryWriter.WritePascalString(UserSettings.All.VersionText); //App version, 1 byte + X bytes (255 max).
+        binaryWriter.Write((byte) project.CreatedBy); //Recording source, 1 byte.
+        binaryWriter.Write(project.CreationDate.Ticks); //Creation date, 8 bytes.
     }
 
-    public static async Task<RecordingProject> ReadFromPath(string path)
+    public static void WriteEmptyFrameSequenceHeader(this RecordingProject project)
+    {
+        using var fileStream = new FileStream(project.FramesCachePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var binaryWriter = new ExBinaryWriter(fileStream);
+
+        //Sequence details.
+        binaryWriter.Write((ushort)1); //2 bytes, ID.
+        binaryWriter.Write((byte)SequenceTypes.Frame); //1 bytes.
+        binaryWriter.Write(0); //8 bytes, start time in ticks.
+        binaryWriter.Write(0); //8 bytes, end time in ticks (unknown for now).
+        binaryWriter.Write(BitConverter.GetBytes(1F)); //4 bytes, opacity.
+        binaryWriter.Write(0); //4 bytes, no background.
+
+        //Sequence effects.
+        binaryWriter.Write((byte)0); //Effect count, 1 bytes.
+
+        //Rect sequence.
+        binaryWriter.Write(0); //4 bytes, left/X.
+        binaryWriter.Write(0); //4 bytes, top/Y.
+        binaryWriter.Write((ushort)project.Width); //2 bytes.
+        binaryWriter.Write((ushort)project.Height); //2 bytes.
+        binaryWriter.Write(BitConverter.GetBytes(0F)); //4 bytes, angle.
+        binaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(project.Dpi))); //4+4 bytes.
+
+        //Raster sequence. Should it be type of raster?
+        binaryWriter.Write((byte)RasterSequenceSources.Screen); //1 byte.
+        binaryWriter.Write((ushort)project.Width); //2 bytes.
+        binaryWriter.Write((ushort)project.Height); //2 bytes.
+        binaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(project.Dpi))); //4+4 bytes.
+        binaryWriter.Write(project.ChannelCount); //1 byte.
+        binaryWriter.Write(project.BitsPerChannel); //1 byte.
+        binaryWriter.Write((uint)0); //4 byte, frame count (unknown for now).
+    }
+
+    public static RecordingProject ReadFromPath(string path)
     {
         var propertiesPath = Path.Combine(path, "Properties.cache");
         var framesPath = Path.Combine(path, "Frames.cache");
@@ -59,9 +93,9 @@ public static class RecordingProjectHelper
         //TODO: Use BinaryReader instead.
 
         //Properties.
-        await using var readStream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var readStream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-        var sign = Encoding.ASCII.GetString(await readStream.ReadBytesAsync(4)); //Signature, 4 bytes.
+        var sign = Encoding.ASCII.GetString(readStream.ReadBytes(4)); //Signature, 4 bytes.
 
         if (sign != "stgR") //Signature, 4 bytes.
             throw new Exception($"Unsupported file format. Signature: '{sign}'.");
@@ -75,6 +109,7 @@ public static class RecordingProjectHelper
         {
             PropertiesCachePath = propertiesPath,
             FramesCachePath = framesPath,
+            //StrokesCachePath = strokesPath,
             MouseEventsCachePath = cursorEventsPath,
             KeyboardEventsCachePath = keyEventsPath
         };
@@ -94,8 +129,10 @@ public static class RecordingProjectHelper
         //Frames.
         if (File.Exists(framesPath))
         {
-            await using var readFramesStream = new FileStream(framesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            readFramesStream.Position += 71;
+            using var readFramesStream = new FileStream(framesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var binaryReader = new BinaryReader(readFramesStream);
+
+            readFramesStream.Position += 63;
 
             while (readFramesStream.Position < readFramesStream.Length)
             {
@@ -106,22 +143,27 @@ public static class RecordingProjectHelper
 
                 readFramesStream.Position += 1;
                 
-                frame.TimeStampInTicks = readFramesStream.ReadInt64();
+                frame.TimeStampInTicks = binaryReader.ReadInt64();
+                frame.ExpectedDelay = binaryReader.ReadInt32();
 
                 readFramesStream.Position += 30;
 
-                frame.DataLength = readFramesStream.ReadInt64();
+                frame.DataLength = binaryReader.ReadInt64();
+                var compressedLength = binaryReader.ReadInt64();
+                var currentPosition = readFramesStream.Position;
 
-                await using var compressStream = new DeflateStream(readFramesStream, CompressionMode.Decompress, true);
-                    compressStream.ReadBytesUntilFull(frame.DataLength);
+                //using (var compressStream = new DeflateStream(readFramesStream, CompressionMode.Decompress, true))
+                //    compressStream.ReadBytesUntilFull(frame.DataLength);
                 
+                readFramesStream.Position = currentPosition + compressedLength;
+
                 project.Frames.Add(frame);
             }
         }
 
         if (File.Exists(strokesPath))
         {
-            await using var readFramesStream = new FileStream(strokesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var readFramesStream = new FileStream(strokesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
             //TODO: Read strokes.
             //How are they going to get stored?
@@ -129,11 +171,9 @@ public static class RecordingProjectHelper
 
         if (File.Exists(cursorEventsPath))
         {
-            await using var readFramesStream = new FileStream(cursorEventsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var readFramesStream = new FileStream(cursorEventsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            var type = readFramesStream.ReadByte();
-
-            if (type == 0)
+            if (readFramesStream.ReadByte() == 0)
             {
                 //Cursor
                 var cursor = new CursorEvent();
@@ -170,17 +210,20 @@ public static class RecordingProjectHelper
 
         if (File.Exists(keyEventsPath))
         {
-            await using var readFramesStream = new FileStream(keyEventsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var readFramesStream = new FileStream(keyEventsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             readFramesStream.Position += 1; //Type.
 
-            var key = new KeyEvent();
-            key.TimeStampInTicks = readFramesStream.ReadInt64();
-            key.Key = (Key)readFramesStream.ReadInt32();
-            key.Modifiers = (ModifierKeys)readFramesStream.ReadByte();
-            key.IsUppercase = readFramesStream.ReadByte() == 1;
-            key.WasInjected = readFramesStream.ReadByte() == 1;
+            if (readFramesStream.Length > 0)
+            {
+                var key = new KeyEvent();
+                key.TimeStampInTicks = readFramesStream.ReadInt64();
+                key.Key = (Key)readFramesStream.ReadInt32();
+                key.Modifiers = (ModifierKeys)readFramesStream.ReadByte();
+                key.IsUppercase = readFramesStream.ReadByte() == 1;
+                key.WasInjected = readFramesStream.ReadByte() == 1;
 
-            project.KeyboardEvents.Add(key);
+                project.KeyboardEvents.Add(key);
+            }
         }
 
         return project;

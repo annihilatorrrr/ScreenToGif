@@ -6,15 +6,20 @@ using ScreenToGif.Domain.Models.Preset.Export.Image;
 using ScreenToGif.Domain.Models.Preset.Export.Other;
 using ScreenToGif.Domain.Models.Preset.Export.Video;
 using ScreenToGif.Domain.ViewModels;
+using ScreenToGif.Util;
 using ScreenToGif.ViewModel.Presets.Export.AnimatedImage;
 using ScreenToGif.ViewModel.Presets.Export.Image;
 using ScreenToGif.ViewModel.Presets.Export.Other;
 using ScreenToGif.ViewModel.Presets.Export.Video;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace ScreenToGif.ViewModel.Presets.Export;
 
 public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
 {
+    private readonly DispatcherTimer _searchTimer = new(DispatcherPriority.Background);
+    
     private ExportFormats _type;
     private EncoderTypes _encoder;
     private string _title;
@@ -40,6 +45,7 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
     private string _outputFilenameKey;
     private string _extension;
     private IPreviewerViewModel _previewerViewModel;
+    private bool _fileAlreadyExists;
 
     public ExportFormats Type
     {
@@ -144,7 +150,13 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
     public bool IsDefault
     {
         get => _isDefault;
-        set => SetProperty(ref _isDefault, value);
+        set
+        {
+            SetProperty(ref _isDefault, value);
+
+            OnPropertyChanged(nameof(CanBeEdited));
+            OnPropertyChanged(nameof(ReadOnlyWarningVisibility));
+        }
     }
 
     /// <summary>
@@ -165,7 +177,12 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
     public bool PickLocation
     {
         get => _pickLocation;
-        set => SetProperty(ref _pickLocation, value);
+        set
+        {
+            SetProperty(ref _pickLocation, value);
+
+            OnPropertyChanged(nameof(PickLocationVisibility));
+        }
     }
 
     public OverwriteModes OverwriteMode
@@ -180,10 +197,17 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
         set => SetProperty(ref _exportAsProjectToo, value);
     }
 
+    public Visibility PickLocationVisibility => PickLocation ? Visibility.Visible : Visibility.Collapsed;
+
     public bool UploadFile
     {
         get => _uploadFile;
-        set => SetProperty(ref _uploadFile, value);
+        set
+        {
+            SetProperty(ref _uploadFile, value);
+
+            OnPropertyChanged(nameof(UploadFileVisibility));
+        }
     }
 
     public string UploadService
@@ -192,10 +216,17 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
         set => SetProperty(ref _uploadService, value);
     }
 
+    public Visibility UploadFileVisibility => UploadFile ? Visibility.Visible : Visibility.Collapsed;
+
     public bool SaveToClipboard
     {
         get => _saveToClipboard;
-        set => SetProperty(ref _saveToClipboard, value);
+        set
+        {
+            SetProperty(ref _saveToClipboard, value);
+
+            OnPropertyChanged(nameof(SaveToClipboardVisibility));
+        }
     }
 
     public CopyModes CopyType
@@ -204,10 +235,17 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
         set => SetProperty(ref _copyType, value);
     }
 
+    public Visibility SaveToClipboardVisibility => SaveToClipboard ? Visibility.Visible : Visibility.Collapsed;
+
     public bool ExecuteCustomCommands
     {
         get => _executeCustomCommands;
-        set => SetProperty(ref _executeCustomCommands, value);
+        set
+        {
+            SetProperty(ref _executeCustomCommands, value);
+
+            OnPropertyChanged(nameof(CustomCommandsVisibility));
+        }
     }
 
     public string CustomCommands
@@ -215,17 +253,29 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
         get => _customCommands;
         set => SetProperty(ref _customCommands, value);
     }
-    
+
+    public Visibility CustomCommandsVisibility => ExecuteCustomCommands ? Visibility.Visible : Visibility.Collapsed;
+
     public string OutputFolder
     {
         get => _outputFolder;
-        set => SetProperty(ref _outputFolder, value);
+        set
+        {
+            SetProperty(ref _outputFolder, value);
+
+            OnPropertyChanged(nameof(ResolvedOutputPath));
+        }
     }
 
     public string OutputFilename
     {
         get => _outputFilename;
-        set => SetProperty(ref _outputFilename, value);
+        set
+        {
+            SetProperty(ref _outputFilename, value);
+
+            OnPropertyChanged(nameof(ResolvedOutputPath));
+        }
     }
 
     public string OutputFilenameKey
@@ -241,9 +291,25 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
         {
             SetProperty(ref _extension, value);
 
+            OnPropertyChanged(nameof(ResolvedOutputPath));
             OnPropertyChanged(nameof(CanExportMultipleFiles));
         }
     }
+
+    public string ResolvedOutputPath => Path.Combine(OutputFolder, PathHelper.ReplaceRegexInName(OutputFilename) + Extension);
+
+    public bool FileAlreadyExists
+    {
+        get => _fileAlreadyExists;
+        set
+        {
+            SetProperty(ref _fileAlreadyExists, value);
+
+            OnPropertyChanged(nameof(FileAlreadyExistsVisibility));
+        }
+    }
+
+    public Visibility FileAlreadyExistsVisibility => FileAlreadyExists ? Visibility.Visible : Visibility.Collapsed;
 
     public IPreviewerViewModel PreviewerViewModel
     {
@@ -256,6 +322,16 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
     public bool RequiresFfmpeg => Encoder == EncoderTypes.FFmpeg;
 
     public bool RequiresGifski => Encoder == EncoderTypes.Gifski;
+
+    public bool CanBeEdited => !IsDefault;
+
+    public Visibility ReadOnlyWarningVisibility => IsDefault ? Visibility.Visible : Visibility.Collapsed;
+
+    protected ExportPresetViewModel()
+    {
+        _searchTimer.Interval = TimeSpan.FromMilliseconds(500);
+        _searchTimer.Tick += SearchTimer_Tick;
+    }
 
     public static ExportPresetViewModel FromModel(ExportPreset preset, IPreviewerViewModel exporterViewModel)
     {
@@ -281,4 +357,44 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
     }
 
     public abstract ExportPreset ToModel();
+
+    public abstract ExportPresetViewModel Reset();
+
+    public ExportPresetViewModel ShallowCopy()
+    {
+        return (ExportPresetViewModel)MemberwiseClone();
+    }
+
+    private void ResetFileVerification()
+    {
+        _searchTimer?.Stop();
+
+        //If no file will be saved, there's no need to verify.
+        if (!PickLocation || CanExportMultipleFiles)
+        {
+            FileAlreadyExists = false;
+            return;
+        }
+
+        _searchTimer?.Start();
+    }
+
+    private void SearchTimer_Tick(object sender, EventArgs e)
+    {
+       _searchTimer.Stop();
+
+        try
+        {
+            //Check if there's a file with the same path.
+            var exists = File.Exists(Path.Combine(OutputFolder, PathHelper.ReplaceRegexInName(OutputFilename) + Extension));
+
+            FileAlreadyExists = exists;
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Log(ex, "Check if exists");
+
+            FileAlreadyExists = false;
+        }
+    }
 }

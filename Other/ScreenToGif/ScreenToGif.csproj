@@ -40,11 +40,17 @@
     <Resource Include="Resources\Logo.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Dialogs\AddPreset.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Dialogs\Dialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Dialogs\AddPreset.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="Dialogs\Dialog.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

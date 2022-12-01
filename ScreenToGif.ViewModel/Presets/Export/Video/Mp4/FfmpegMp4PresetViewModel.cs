@@ -81,4 +81,9 @@ public class FfmpegMp4PresetViewModel : Mp4PresetViewModel, IFfmpegPreset
             Parameters = "-vsync passthrough \n-hwaccel auto \n{I} \n-c:v libx265 \n-preset fast \n-pix_fmt yuv420p \n-vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" \n-crf 28 \n-f mp4 \n{O}"
         },
     };
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+    }
 }

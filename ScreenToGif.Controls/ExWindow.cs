@@ -90,14 +90,14 @@ public class ExWindow : Window
     {
         SupportsBackdrop = OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000);
         WillRenderCustomCaptionButtons = !SupportsBackdrop || ShowCustomCaptionButtons;
-        
+
         var chrome = new WindowChrome
         {
             CaptionHeight = 32,
             ResizeBorderThickness = SystemParameters.WindowResizeBorderThickness,
             UseAeroCaptionButtons = !WillRenderCustomCaptionButtons,
             GlassFrameThickness = SupportsBackdrop ? new Thickness(-1) : new Thickness(0),
-            NonClientFrameEdges = !WillRenderCustomCaptionButtons ? NonClientFrameEdges.Right | NonClientFrameEdges.Left : NonClientFrameEdges.None
+            NonClientFrameEdges = !WillRenderCustomCaptionButtons || ResizeMode == ResizeMode.NoResize ? NonClientFrameEdges.Right | NonClientFrameEdges.Left : NonClientFrameEdges.None
         };
 
         WindowChrome.SetWindowChrome(this, chrome);
@@ -130,7 +130,7 @@ public class ExWindow : Window
 
         this.SetResizeMode();
     }
-    
+
     private IntPtr Window_Hook(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
     {
         switch ((WindowsMessages)msg)

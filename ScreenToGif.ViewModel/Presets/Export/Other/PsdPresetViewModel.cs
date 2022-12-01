@@ -110,4 +110,9 @@ public class PsdPresetViewModel : ExportPresetViewModel
             MaximizeCompatibility = MaximizeCompatibility,
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Default;
+    }
 }

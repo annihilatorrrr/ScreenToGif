@@ -341,7 +341,7 @@ public partial class ScreenRecorder : BaseScreenRecorder
             Dispatcher.Invoke(() =>
             {
                 Title = "ScreenToGif - " + LocalizationHelper.Get("S.Recorder.PreStarting");
-                DisplayTimer.SetElapsed(-_preStartCount);
+                MainDisplayTimer.SetElapsed(-_preStartCount);
                 Splash.SetTime(-_preStartCount);
             });
 
@@ -622,7 +622,7 @@ public partial class ScreenRecorder : BaseScreenRecorder
                         ViewModel.Stage = RecorderStages.PreStarting;
 
                         Title = "ScreenToGif - " + LocalizationHelper.Get("S.Recorder.PreStarting");
-                        DisplayTimer.SetElapsed(-UserSettings.All.PreStartValue);
+                        MainDisplayTimer.SetElapsed(-UserSettings.All.PreStartValue);
 
                         _preStartCount = UserSettings.All.PreStartValue - 1;
                         _preStartTimer.Start();
@@ -759,7 +759,7 @@ public partial class ScreenRecorder : BaseScreenRecorder
             while (ViewModel.FrameCount == 0);
 
             //Displays that a frame was manually captured.
-            DisplayTimer.ManuallyCapturedCount++;
+            MainDisplayTimer.ManuallyCapturedCount++;
             CommandManager.InvalidateRequerySuggested();
         }
         catch (GraphicsConfigurationException g)
@@ -957,21 +957,21 @@ public partial class ScreenRecorder : BaseScreenRecorder
 
     public override void StartCapture()
     {
-        DisplayTimer.Start();
+        MainDisplayTimer.Start();
 
         base.StartCapture();
     }
 
     public override void PauseCapture()
     {
-        DisplayTimer.Pause();
+        MainDisplayTimer.Pause();
 
         base.PauseCapture();
     }
 
     public override async Task StopCapture()
     {
-        DisplayTimer.Stop();
+        MainDisplayTimer.Stop();
 
         await base.StopCapture();
     }

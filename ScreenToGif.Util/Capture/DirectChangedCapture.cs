@@ -111,7 +111,7 @@ public class DirectChangedCapture : DirectCapture
             FrameCount++;
 
             frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
-            //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
+            frame.ExpectedDelay = Stopwatch.GetExpectedDelay();
             frame.Pixels = new byte[stream.Length];
 
             //BGRA32 is 4 bytes.
@@ -281,7 +281,7 @@ public class DirectChangedCapture : DirectCapture
             FrameCount++;
 
             frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
-            //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
+            frame.ExpectedDelay = Stopwatch.GetExpectedDelay();
             frame.Pixels = new byte[stream.Length];
 
             //BGRA32 is 4 bytes.

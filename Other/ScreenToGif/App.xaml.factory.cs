@@ -330,13 +330,13 @@ public partial class App
 
     internal static bool CanExitApplication(object parameter)
     {
-        return Current?.Windows.OfType<BaseRecorder>().All(a => a.ViewModel.Stage != RecorderStages.Recording) ?? false;
+        return Current?.Windows.OfType<BaseRecorder>().All(a => a.ViewModel.Stage != RecorderStages.Recording) ?? true;
     }
 
     internal static void ExitApplication(object parameter)
     {
-        //if (UserSettings.All.NotifyWhileClosingApp && !Dialog.Ask(LocalizationHelper.Get("S.Exiting.Title"), LocalizationHelper.Get("S.Exiting.Instruction"), LocalizationHelper.Get("S.Exiting.Message")))
-        //    return;
+        if (UserSettings.All.NotifyWhileClosingApp && !Dialog.Ask("S.Exiting.Instruction", "S.Exiting.Message", "S.Imperative.Exit", "S.Imperative.KeepOpen"))
+            return;
 
         if (UserSettings.All.DeleteCacheWhenClosing)
             StorageHelper.PurgeCache();
@@ -871,7 +871,8 @@ public partial class App
                     ShowExporter(window, window.Project);
                 else
                     await ShowEditor(window.Project);
-                
+
+                caller?.Close();
                 return;
             }
 
@@ -914,22 +915,41 @@ public partial class App
         editor.Activate();
     }
     
-    internal static void ShowExporter(Window caller, RecordingProject project = null, string path = null)
+    internal static void ShowExporter(Window caller, RecordingProject project)
     {
         var exporter = new Exporter();
         exporter.Closed += (_, _) => ExporterCallback(exporter, caller, project);
         exporter.Show();
-
-        if (project != null)
-            exporter.LoadRecordingProject(project);
-        else
-            exporter.LoadRecordingProject(path);
+        exporter.LoadRecordingProject(project);
 
         Current.MainWindow = exporter;
         exporter.Activate();
     }
-    
-    private static async void ExporterCallback(Exporter exporter, Window caller, RecordingProject project = null, string path = null)
+
+    internal static void ShowExporter(Window caller, RecentProjectViewModel recent)
+    {
+        var exporter = new Exporter();
+        exporter.Closed += (_, _) => ExporterCallback(exporter, caller, exporter.Project);
+        exporter.Show();
+
+        switch (recent.Type)
+        {
+            case RecentProjectTypes.Recording:
+                exporter.LoadRecordingProjectPath(recent.Path);
+                break;
+            case RecentProjectTypes.Project:
+                exporter.LoadCachedProjectPath(recent.Path);
+                break;
+            default:
+                exporter.LoadLegacyProjectPath(recent.Path);
+                break;
+        }
+
+        Current.MainWindow = exporter;
+        exporter.Activate();
+    }
+
+    private static async void ExporterCallback(Exporter exporter, Window caller, RecordingProject project = null)
     {
         //When called by any recorder:
         //  Open new window of the same type.
@@ -937,7 +957,7 @@ public partial class App
         //When called by editor/startup (recent projects):
         //  Display again the editor, since it should be still be opened.
 
-        if (caller != null && caller.IsLoaded)
+        if (caller is { IsLoaded: true })
         {
             caller.Show();
             return;
@@ -945,7 +965,7 @@ public partial class App
 
         if (exporter.OpenInEditor)
         {
-            await ShowEditor(project, path);
+            await ShowEditor(project);
             return;
         }
 

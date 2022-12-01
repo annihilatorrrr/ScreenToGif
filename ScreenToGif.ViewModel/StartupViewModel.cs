@@ -36,9 +36,9 @@ public class StartupViewModel : BaseViewModel, IDisposable
         }
     }
 
-    public Visibility NoItemsTextBlockVisibility => !IsLoading && RecentProjects.Count == 0 ? Visibility.Visible : Visibility.Collapsed;  
+    public Visibility NoItemsTextBlockVisibility => !IsLoading && RecentProjects.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
-    public Visibility TitleTextBlockVisibility => RecentProjects.Count > 0 ? Visibility.Visible : Visibility.Collapsed;  
+    public Visibility TitleTextBlockVisibility => RecentProjects.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
     public RoutedUICommand ScreenRecorderCommand { get; set; } = new()
     {
@@ -95,15 +95,16 @@ public class StartupViewModel : BaseViewModel, IDisposable
 
         await Task.Factory.StartNew(() =>
         {
+            RecentProjects.Clear();
+            var found = new List<RecentProjectViewModel>();
+
             try
             {
                 var path = Path.Combine(UserSettings.All.TemporaryFolderResolved, "ScreenToGif");
                 var recordingsPath = Path.Combine(path, "Recordings");
                 var projectsPath = Path.Combine(path, "Projects");
                 var recordingsOldPath = Path.Combine(path, "Recording");
-
-                RecentProjects.Clear();
-
+                
                 if (Directory.Exists(recordingsPath))
                 {
                     foreach (var file in Directory.GetDirectories(recordingsPath))
@@ -111,7 +112,7 @@ public class StartupViewModel : BaseViewModel, IDisposable
                         var parsed = RecentProjectViewModel.FromPath(file, ExportProjectCommand, EditProjectCommand, RemoveProjectCommand);
 
                         if (parsed != null)
-                            RecentProjects.Add(parsed);
+                            found.Add(parsed);
                     }
                 }
 
@@ -122,7 +123,7 @@ public class StartupViewModel : BaseViewModel, IDisposable
                         var parsed = RecentProjectViewModel.FromPath(file, ExportProjectCommand, EditProjectCommand, RemoveProjectCommand);
 
                         if (parsed != null)
-                            RecentProjects.Add(parsed);
+                            found.Add(parsed);
                     }
                 }
 
@@ -133,20 +134,20 @@ public class StartupViewModel : BaseViewModel, IDisposable
                         var parsed = RecentProjectViewModel.FromPath(file, ExportProjectCommand, EditProjectCommand, RemoveProjectCommand);
 
                         if (parsed != null)
-                            RecentProjects.Add(parsed);
+                            found.Add(parsed);
                     }
                 }
             }
             catch (Exception ex)
             {
                 LogWriter.Log(ex, "Loading list of recent projects");
-
-                RecentProjects = new ObservableCollection<RecentProjectViewModel>();
             }
             finally
             {
+                RecentProjects = new ObservableCollection<RecentProjectViewModel>(found.OrderByDescending(o => o.CreationDate));
+
                 IsLoading = false;
-                
+
                 OnPropertyChanged(nameof(TitleTextBlockVisibility));
             }
         }, _tokenSource.Token);

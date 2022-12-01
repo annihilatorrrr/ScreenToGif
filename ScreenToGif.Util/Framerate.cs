@@ -47,31 +47,9 @@ public class CaptureStopwatch
         _stopwatch = new Stopwatch();
 
         _interval = interval;
+        _intervalInTicks = TimeSpan.FromMilliseconds(interval).Ticks;
         _fixedRate = useFixed;
         _totalFixed = 0;
-    }
-
-    /// <summary>
-    /// Gets the diff between the last call.
-    /// </summary>
-    /// <returns>The amount of seconds.</returns>
-    [Obsolete] //TODO: Remove later.
-    public int GetMilliseconds()
-    {
-        if (_fixedRate)
-            return _interval;
-        
-        if (_started)
-        {
-            _started = false;
-            _stopwatch.Start();
-            return _interval;
-        }
-
-        var mili = (int)_stopwatch.ElapsedMilliseconds;
-        _stopwatch.Restart();
-
-        return mili;
     }
 
     /// <summary>
@@ -96,6 +74,11 @@ public class CaptureStopwatch
 
         return 0;
     }
+
+    /// <summary>
+    /// Gets the expected delay between frame exhibition/capture.
+    /// </summary>
+    public int GetExpectedDelay() => _interval;
 
     /// <summary>
     /// Stops/pauses the stopwatch.

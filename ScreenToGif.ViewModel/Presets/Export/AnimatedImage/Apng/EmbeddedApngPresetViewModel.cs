@@ -105,4 +105,9 @@ public class EmbeddedApngPresetViewModel : ApngPresetViewModel
             PaintTransparent = PaintTransparent
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Default;
+    }
 }

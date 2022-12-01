@@ -88,4 +88,9 @@ public class SystemGifPresetViewModel : GifPresetViewModel
             UseGlobalColorTable = UseGlobalColorTable,
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Default;
+    }
 }

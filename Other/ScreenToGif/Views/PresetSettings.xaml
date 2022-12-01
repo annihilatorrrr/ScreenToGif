@@ -1,10 +1,16 @@
 <c:ExWindow x:Class="ScreenToGif.Views.PresetSettings"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
-        xmlns:vm="clr-namespace:ScreenToGif.ViewModel.Presets.Export;assembly=ScreenToGif.ViewModel"
-        Title="Preset Settings" Icon="../Resources/Logo.ico" Height="760" Width="1100" MinHeight="600" MinWidth="1000"
-        ShowMaximizeButton="False" ExtendIntoTitleBar="False" Closing="Window_Closing">
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:c="clr-namespace:ScreenToGif.Controls;assembly=ScreenToGif.Controls"
+            xmlns:vm="clr-namespace:ScreenToGif.ViewModel.Presets.Export;assembly=ScreenToGif.ViewModel"
+            xmlns:u="clr-namespace:ScreenToGif.ViewModel.Presets.Upload;assembly=ScreenToGif.ViewModel"
+            xmlns:e="clr-namespace:ScreenToGif.Domain.Enums;assembly=ScreenToGif.Domain"
+            xmlns:apng="clr-namespace:ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Apng;assembly=ScreenToGif.ViewModel"
+            xmlns:animatedImage="clr-namespace:ScreenToGif.ViewModel.Presets.Export.AnimatedImage;assembly=ScreenToGif.ViewModel"
+            xmlns:image="clr-namespace:ScreenToGif.ViewModel.Presets.Export.Image;assembly=ScreenToGif.ViewModel"
+            xmlns:video="clr-namespace:ScreenToGif.ViewModel.Presets.Export.Video;assembly=ScreenToGif.ViewModel"
+            Title="Preset Settings" Icon="../Resources/Logo.ico" Height="760" Width="1150" MinHeight="600" MinWidth="1150"
+            WindowStartupLocation="CenterOwner" ExtendIntoTitleBar="False" Closing="Window_Closing">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -12,46 +18,59 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{Binding PresetSettingsSectionWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=200}" MinWidth="250" MaxWidth="600"/>
+            <ColumnDefinition Width="{Binding PresetSectionWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="250" MaxWidth="500"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition MinWidth="600"/>
         </Grid.ColumnDefinitions>
 
-        <ListView Grid.Row="1" Grid.Column="0" Margin="10"
-                  HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                  ItemsSource="{Binding Presets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedItem="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  IsEnabled="{Binding IsListEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-            <ListView.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:ExportPresetViewModel}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="1"/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-                        <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+            <TextBlock Grid.Row="0" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" Margin="15,5,5,0">
+                <Run Text="Presets"/>
+                <Run Text="•"/>
+                <Run Text="{Binding ExportFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </TextBlock>
 
-                        <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
-                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Title}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+            <ListView Grid.Row="1" x:Name="PresetsListView" Margin="10" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                      ItemsSource="{Binding Presets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      IsEnabled="{Binding IsListEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectionChanged="PresetsListView_SelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:ExportPresetViewModel}">
+                        <Grid ToolTip="{Binding Description}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}"
-                                   VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                            <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+
+                            <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Title}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}"
+                                       VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
 
         <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="2" ResizeBehavior="PreviousAndNext" Background="Transparent" IsTabStop="False" FocusVisualStyle="{x:Null}"/>
 
         <!--Settings-->
         <Border Grid.Row="1" Grid.Column="2" Background="{DynamicResource Brush.Dialog.Background.Alt}" BorderThickness="1" BorderBrush="{DynamicResource Brush.Separator.Background}" CornerRadius="10,0,0,0">
-            <Grid>
+            <Grid Margin="0,0,10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
@@ -77,14 +96,6 @@
                     <c:ExButton Padding="4" Style="{StaticResource Style.Button.Borderless}" Command="{Binding ResetPresetCommand}"
                                 ToolTip="Reset to the default settings" ToolTipService.Placement="Top">
                         <StackPanel Orientation="Horizontal">
-                            <c:SymbolIcon Symbol="ImageCopy"/>
-                            <TextBlock Text="Duplicate" VerticalAlignment="Center" Margin="8,0" FontSize="14"/>
-                        </StackPanel>
-                    </c:ExButton>
-
-                    <c:ExButton Padding="4" Style="{StaticResource Style.Button.Borderless}" Command="{Binding ResetPresetCommand}"
-                                ToolTip="Reset to the default settings" ToolTipService.Placement="Top">
-                        <StackPanel Orientation="Horizontal">
                             <c:SymbolIcon Symbol="ArrowSync"/>
                             <TextBlock Text="Reset" VerticalAlignment="Center" Margin="8,0" FontSize="14"/>
                         </StackPanel>
@@ -99,20 +110,651 @@
                     </c:ExButton>
                 </StackPanel>
 
-                <ScrollViewer Grid.Row="1">
-                    <StackPanel>
-                        <Expander MaxWidth="400">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="800" Margin="20">
+                        <!--Identification-->
+                        <Expander>
                             <Expander.Header>
-                                <Grid>
+                                <Grid Margin="6" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
 
+                                    <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Symbol="Document" FontSize="24" VerticalAlignment="Center" Margin="5,5,10,5"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Identification" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Title, description and more" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
                                 </Grid>
                             </Expander.Header>
 
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
 
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Title" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                <c:ExTextBox Grid.Row="0" Grid.Column="1" MaxLength="50" Margin="10,10,60,10" VerticalAlignment="Center"
+                                             Text="{Binding SelectedPreset.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             IsEnabled="{Binding SelectedPreset.CanBeEdited, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Description" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                <c:ExTextBox Grid.Row="2" Grid.Column="1" MaxLength="100" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap"
+                                             Text="{Binding SelectedPreset.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             IsEnabled="{Binding SelectedPreset.CanBeEdited, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Encoder" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                <c:ExComboBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" IsEnabled="False"
+                                              ItemsSource="{Binding AvailableEncoders, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                              SelectedItem="{Binding SelectedPreset.Encoder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Auto save output selection" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="The output path and upload destination will be remembered" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                    IsChecked="{Binding SelectedPreset.HasAutoSave, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Separator Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                           Visibility="{Binding SelectedPreset.ReadOnlyWarningVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <c:InfoBar Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Title="Read-only" Description="{DynamicResource S.Preset.Warning.Readonly}" Margin="60,5"
+                                           Type="Info" IsClosable="False" Visibility="{Binding SelectedPreset.ReadOnlyWarningVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
                         </Expander>
 
-                        <!--Generic Preset settings-->
-                        <!--Per preset settings-->
+                        <!--Export Options-->
+                        <Expander Margin="0,2,0,0">
+                            <Expander.Header>
+                                <Grid Margin="6" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Symbol="ArrowExportRight" FontSize="24" VerticalAlignment="Center" Margin="5,5,10,5"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Export Options" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Output destination, upload and post export behavior" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                                </Grid>
+                            </Expander.Header>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Export to a folder" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Export the animation to a folder of your choice" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                    IsChecked="{Binding SelectedPreset.PickLocation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Upload to a service" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Upload the animation to an online service of your choice" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                    IsChecked="{Binding SelectedPreset.UploadFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Copy to clipboard" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Copy the path or link to the animation after the export" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                    IsChecked="{Binding SelectedPreset.SaveToClipboard, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Execute commands" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Execute commands after the export" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                    IsChecked="{Binding SelectedPreset.ExecuteCustomCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+                            </Grid>
+                        </Expander>
+
+                        <!--Output-->
+                        <Expander Margin="0,2,0,0" Visibility="{Binding SelectedPreset.PickLocationVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <Expander.Header>
+                                <Grid Margin="6" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Symbol="FolderArrowRight" FontSize="24" VerticalAlignment="Center" Margin="5,5,10,5"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Output" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Default output folder and filename" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                                </Grid>
+                            </Expander.Header>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Folder" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                <Grid Grid.Row="0" Grid.Column="1" Margin="0,0,60,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <c:ExTextBox Grid.Column="0" VerticalAlignment="Center" Margin="10,10,2,10" TextWrapping="Wrap"
+                                                 Text="{Binding SelectedPreset.OutputFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                    <c:ExButton Grid.Column="1" Padding="10,6" Margin="2,10,0,10" VerticalAlignment="Stretch" Command="{Binding SelectFolderCommand}"
+                                                ToolTip="{DynamicResource S.SaveAs.File.Choose}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                                        <c:SymbolIcon Symbol="FolderOpen" FontSize="15"/>
+                                    </c:ExButton>
+                                </Grid>
+                                
+                                <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Filename" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                <Grid Grid.Row="2" Grid.Column="1" Margin="0,0,60,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <c:ExTextBox Grid.Column="0" VerticalAlignment="Center" Margin="10,10,2,10" TextWrapping="Wrap"
+                                                 Text="{Binding SelectedPreset.OutputFilename, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                    <c:ExComboBox Grid.Column="1" Margin="2,10,0,10" VerticalAlignment="Stretch" ToolTip="{DynamicResource S.SaveAs.File.Format}"
+                                                  ItemsSource="{Binding Extensions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedItem="{Binding SelectedPreset.Extension, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Overwrite" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                <c:ExComboBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Height="50" Margin="10,10,60,10" SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedPreset.OverwriteMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <c:ExComboBox.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type c:ExComboBoxItem}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="1"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+
+                                                <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+
+                                                <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Header}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </c:ExComboBox.ItemTemplate>
+
+                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.SaveOptions.OverwriteMode.Warn}" Description="{DynamicResource S.SaveAs.SaveOptions.OverwriteMode.Warn.Info}" Symbol="DocumentError" Value="{x:Static e:OverwriteModes.Warn}"/>
+                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.SaveOptions.OverwriteMode.Prompt}" Description="{DynamicResource S.SaveAs.SaveOptions.OverwriteMode.Prompt.Info}" Symbol="DocumentQuestionMark" Value="{x:Static e:OverwriteModes.Prompt}"/>
+                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.SaveOptions.OverwriteMode.Allow}" Description="{DynamicResource S.SaveAs.SaveOptions.OverwriteMode.Allow.Info}" Symbol="DocumentCheckmark" Value="{x:Static e:OverwriteModes.Allow}"/>
+                                </c:ExComboBox>
+
+                                <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Export as project" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Export as project too, to the same location" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                    IsChecked="{Binding SelectedPreset.ExportAsProjectToo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+                            </Grid>
+                        </Expander>
+
+                        <!--Upload-->
+                        <Expander Margin="0,2,0,0" Visibility="{Binding SelectedPreset.UploadFileVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <Expander.Header>
+                                <Grid Margin="6" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Symbol="ArrowUpload" FontSize="24" VerticalAlignment="Center" Margin="5,5,10,5"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Upload" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Default upload service" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                                </Grid>
+                            </Expander.Header>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Text="Preset" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+
+                                <c:ExComboBox Grid.Column="1" Margin="10,10,60,10" Height="50" SelectedValuePath="Title" IsEnabled="{Binding IsUploadComboBoxEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                              ItemsSource="{Binding FilteredUploadPresets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                              SelectedValue="{Binding SelectedPreset.UploadPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{DynamicResource S.SaveAs.Upload.Info}">
+                                    <c:ExComboBox.GroupStyle>
+                                        <GroupStyle>
+                                            <GroupStyle.HeaderTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock x:Name="HeaderTextBlock" Text="{Binding Name}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource Brush.Foreground}" Margin="3,6"/>
+
+                                                    <DataTemplate.Triggers>
+                                                        <Trigger Property="Name" Value="{x:Null}">
+                                                            <Setter TargetName="HeaderTextBlock" Property="Visibility" Value="Collapsed"/>
+                                                        </Trigger>
+                                                    </DataTemplate.Triggers>
+                                                </DataTemplate>
+                                            </GroupStyle.HeaderTemplate>
+                                        </GroupStyle>
+                                    </c:ExComboBox.GroupStyle>
+
+                                    <c:ExComboBox.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type u:UploadPresetViewModel}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="1"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+
+                                                <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+
+                                                <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Title}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </c:ExComboBox.ItemTemplate>
+
+                                    <c:ExComboBox.EmptyItem>
+                                        <u:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Unavailable.Title}" Description="{StaticResource S.SaveAs.Upload.Unavailable.Description}"/>
+                                    </c:ExComboBox.EmptyItem>
+
+                                    <c:ExComboBox.NoSelectionItem>
+                                        <u:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Select.Title}" Description="{StaticResource S.SaveAs.Upload.Select.Description}"/>
+                                    </c:ExComboBox.NoSelectionItem>
+                                </c:ExComboBox>
+                            </Grid>
+                        </Expander>
+
+                        <!--Clipboard-->
+                        <Expander Margin="0,2,0,0" Visibility="{Binding SelectedPreset.SaveToClipboardVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <Expander.Header>
+                                <Grid Margin="6" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Symbol="ClipboardTextLeft" FontSize="24" VerticalAlignment="Center" Margin="5,5,10,5"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Clipboard" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Copy the path or link after export" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                                </Grid>
+                            </Expander.Header>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Text="Copy behavior" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                <c:ExComboBox Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" Height="50" SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedPreset.CopyType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <c:ExComboBox.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type c:ExComboBoxItem}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="1"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+
+                                                <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+
+                                                <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Header}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </c:ExComboBox.ItemTemplate>
+
+                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.SaveOptions.CopyToClipboard.File}" Description="{DynamicResource S.SaveAs.SaveOptions.CopyToClipboard.File.Info}" Symbol="ClipboardImage" Value="{x:Static e:CopyModes.File}"/>
+                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.SaveOptions.CopyToClipboard.FolderPath}" Description="{DynamicResource S.SaveAs.SaveOptions.CopyToClipboard.FolderPath.Info}" Symbol="ClipboardNote" Value="{x:Static e:CopyModes.FolderPath}"/>
+                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.SaveOptions.CopyToClipboard.FilePath}" Description="{DynamicResource S.SaveAs.SaveOptions.CopyToClipboard.FilePath.Info}" Symbol="ClipboardNote" Value="{x:Static e:CopyModes.FilePath}"/>
+                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.SaveOptions.CopyToClipboard.Link}" Description="{DynamicResource S.SaveAs.SaveOptions.CopyToClipboard.Link.Info}" Symbol="ClipboardLink" Value="{x:Static e:CopyModes.Link}"/>
+                                </c:ExComboBox>
+                            </Grid>
+                        </Expander>
+
+                        <!--Custom Commands-->
+                        <Expander Margin="0,2,0,0" Visibility="{Binding SelectedPreset.CustomCommandsVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <Expander.Header>
+                                <Grid Margin="6" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Symbol="Diagram" FontSize="24" VerticalAlignment="Center" Margin="5,5,10,5"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Custom Commands" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Commands to be executed after the export" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                                </Grid>
+                            </Expander.Header>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Text="Commands" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                <c:ExTextBox Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" AcceptsReturn="True" TextWrapping="WrapWithOverflow"
+                                             Text="{Binding SelectedPreset.CustomCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="{DynamicResource S.SaveAs.SaveOptions.ExecuteCommands.Info}"/>
+                            </Grid>
+                        </Expander>
+
+                        <!--Per-preset Settings-->
+                        <Expander Margin="0,2,0,0">
+                            <Expander.Header>
+                                <Grid Margin="6" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Symbol="CubeArrowCurveDown" FontSize="24" VerticalAlignment="Center" Margin="5,5,10,5"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Encoder Options" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Options specific to the selected encoder and file format" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                                </Grid>
+                            </Expander.Header>
+
+                            <StackPanel>
+                                <ContentPresenter Content="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ContentPresenter.Resources>
+                                        <DataTemplate DataType="{x:Type animatedImage:AnimatedImagePresetViewModel}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--Looped-->
+                                                <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Looped}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="On playback, after reaching the end, the animation starts over" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                IsChecked="{Binding Looped, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Repeats Forever-->
+                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center" IsEnabled="{Binding Looped, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.RepeatForever}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Animation repeats without stopping" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                IsChecked="{Binding RepeatForever, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Repeat Count-->
+                                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Repeat Count" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                           IsEnabled="{Binding Looped, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <c:IntegerStepper Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" Margin="10,10,2,10"
+                                                                  StepValue="1" Minimum="1" Maximum="100" Value="{Binding RepeatCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  IsEnabled="{Binding Looped, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type image:ImagePresetViewModel}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!--Zip Files-->
+                                                <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.ImageOptions.Zip}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.ImageOptions.Zip.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                IsChecked="{Binding ZipFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type video:VideoPresetViewModel}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Mode" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <!--Mode: Normal/Advanced-->
+
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Parameters" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <!--Parameters: string-->
+
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
+
+
+                            </StackPanel>
+                        </Expander>
                     </StackPanel>
                 </ScrollViewer>
 

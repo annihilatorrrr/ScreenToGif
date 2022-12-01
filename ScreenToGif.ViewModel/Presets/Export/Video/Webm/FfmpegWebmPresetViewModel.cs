@@ -62,4 +62,9 @@ public class FfmpegWebmPresetViewModel : WebmPresetViewModel, IFfmpegPreset
             Parameters = "-vsync passthrough \n-hwaccel auto \n{I} \n-c:v libvpx \n-tile-columns 6 -frame-parallel 1 \n-auto-alt-ref 1 -lag-in-frames 25 \n-preset fast \n-pix_fmt yuv420p \n-vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" \n-crf 30 \n-b:v 0 \n-f webm \n{O}"
         }
     };
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+    }
 }

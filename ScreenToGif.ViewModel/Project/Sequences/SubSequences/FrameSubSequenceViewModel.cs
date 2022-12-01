@@ -1,4 +1,3 @@
-using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Project.Cached.Sequences.SubSequences;
 using ScreenToGif.Domain.Models.Project.Recording;
 
@@ -10,13 +9,14 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
     /// The position of the data stream after the headers of this sub sequence.
     /// The size of the headers is 55 bytes.
     /// </summary>
-    public override long DataStreamPosition => StreamPosition + 47; //55;
+    public override long DataStreamPosition => StreamPosition + 51; //55;
 
     public static FrameSubSequenceViewModel FromModel(FrameSubSequence sequence)
     {
         return new FrameSubSequenceViewModel
         {
             TimeStampInTicks = sequence.TimeStampInTicks,
+            ExpectedDelay = sequence.ExpectedDelay,
             StreamPosition = sequence.StreamPosition,
             Left = sequence.Left,
             Top = sequence.Top,
@@ -29,7 +29,7 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
             VerticalDpi = sequence.VerticalDpi,
             ChannelCount = sequence.ChannelCount,
             BitsPerChannel = sequence.BitsPerChannel,
-            DataLength = sequence.DataLength
+            DataLength = sequence.DataLength,
         };
     }
 
@@ -38,6 +38,7 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
         return new FrameSubSequenceViewModel
         {
             TimeStampInTicks = adjustTiming ? 0 : frame.TimeStampInTicks,
+            ExpectedDelay = frame.ExpectedDelay,
             StreamPosition = frame.StreamPosition,
             Left = 0,
             Top = 0,
@@ -50,7 +51,7 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
             VerticalDpi = project.Dpi,
             ChannelCount = project.ChannelCount,
             BitsPerChannel = project.BitsPerChannel,
-            DataLength = frame.DataLength
+            DataLength = frame.DataLength,
         };
     }
 }

@@ -14,8 +14,9 @@
         <Setter Property="Background" Value="{DynamicResource Brush.TextBox.Background}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.TextBox.Border}"/>
         <Setter Property="SelectionBrush" Value="{DynamicResource Brush.Accent}"/>
-        <Setter Property="Padding" Value="2"/>
-        <Setter Property="MinHeight" Value="23"/>
+        <Setter Property="Padding" Value="2,3"/>
+        <Setter Property="Height" Value="NaN"/>
+        <Setter Property="MinHeight" Value="30"/>
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="AllowDrop" Value="True"/>
@@ -28,7 +29,7 @@
                     <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" 
                             VerticalAlignment="{TemplateBinding VerticalAlignment}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" SnapsToDevicePixels="True" CornerRadius="3"
                             Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" MinWidth="{TemplateBinding MinWidth}" MinHeight="{TemplateBinding MinHeight}">
-                        <Grid x:Name="InnerGrid">
+                        <Grid x:Name="InnerGrid" Margin="{TemplateBinding Padding}">
                             <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalScrollBarVisibility="Hidden" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
 
@@ -92,7 +93,7 @@
                             </MultiTrigger.Conditions>
 
                             <Setter Property="BorderThickness" Value="1,1,1,2"/>
-                            <Setter Property="Padding" Value="2,2,2,1"/>
+                            <Setter Property="Padding" Value="2,3,2,2"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource Brush.TextBox.Border.Focused}"/>
                             <Setter Property="Background" Value="{DynamicResource Brush.TextBox.Background.Focused}"/>
                             <!--<Setter Property="Fill" TargetName="InnerPath" Value="{DynamicResource Brush.TextBox.Border.Focused}"/>-->

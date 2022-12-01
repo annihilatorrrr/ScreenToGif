@@ -137,4 +137,9 @@ public class GifskiGifPresetViewModel : GifPresetViewModel
             Quality = Quality
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+    }
 }

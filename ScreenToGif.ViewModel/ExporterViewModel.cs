@@ -9,6 +9,7 @@ using ScreenToGif.Native.Helpers;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Project;
 using ScreenToGif.Util.Settings;
+using ScreenToGif.ViewModel.ExportPresets;
 using ScreenToGif.ViewModel.Presets.Export;
 using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Apng;
 using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
@@ -42,12 +43,12 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     private readonly BackgroundWorker _renderWorker = new() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
     private readonly BackgroundWorker _playbackWorker = new() { WorkerSupportsCancellation = true };
 
-    private bool _isLoading;
+    private bool _isLoading = true;
     private bool _hasImprecisePlayback;
     private bool _isPlaybackEnabled;
     private bool _loopedPlayback;
     private int _playbackFramerate;
-    private bool _comesFromRecorder;
+    private bool _showEditButton;
     private WriteableBitmap _renderedImage;
     private IntPtr _renderedImageBackBuffer;
     private long _minimumTime;
@@ -58,7 +59,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     private RecordingProject _projectSource;
     private bool _isInLayerMode;
 
-    private double _exporterSectionWidth;
+    private GridLength _exporterSectionWidth = new(UserSettings.All.ExporterSectionWidth, GridUnitType.Pixel);
     private ExportFormats _exportFormat;
     private List<ExportPresetViewModel> _exportPresets;
     private List<ExportPresetViewModel> _filteredExportPresets;
@@ -108,12 +109,12 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         set => SetProperty(ref _playbackFramerate, value);
     }
 
-    public bool ComesFromRecorder
+    public bool ShowEditButton
     {
-        get => _comesFromRecorder;
+        get => _showEditButton;
         set
         {
-            SetProperty(ref _comesFromRecorder, value);
+            SetProperty(ref _showEditButton, value);
 
             OnPropertyChanged(nameof(EditButtonVisibility));
         }
@@ -202,7 +203,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
             SetProperty(ref _project, value);
 
             //MinimumTime = _project.Tracks.Where(w => w.Sequences.OfType<FrameSequenceViewModel>().Any()).Min(s => s.Sequences.OfType<FrameSequenceViewModel>().Min(ss => ss.Frames.Min(sss => sss.TimeStampInTicks)));
-            EndTime = _project.Tracks.Max(s => s.Sequences.Max(ss => ss.EndTime.Ticks));
+            EndTime = _project.Tracks.Any() ? _project.Tracks.Max(s => s.Sequences.Max(ss => ss.EndTime.Ticks)) : 0;
 
             OnPropertyChanged(nameof(Tracks));
             OnPropertyChanged(nameof(HasMouseTrack));
@@ -225,7 +226,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
 
     //Has stroke track.
 
-    public Visibility EditButtonVisibility => ComesFromRecorder ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility EditButtonVisibility => ShowEditButton ? Visibility.Visible : Visibility.Collapsed;
 
     public Visibility PlayButtonVisibility => IsPlaybackEnabled ? Visibility.Collapsed : Visibility.Visible;
 
@@ -244,10 +245,16 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
 
     //Exporter
 
-    public double ExporterSectionWidth
+    public GridLength ExporterSectionWidth
     {
         get => _exporterSectionWidth;
-        set => SetProperty(ref _exporterSectionWidth, value);
+        set
+        {
+            SetProperty(ref _exporterSectionWidth, value);
+
+            if (value.IsAbsolute)
+                UserSettings.All.ExporterSectionWidth = value.Value;
+        }
     }
 
     public ExportFormats ExportFormat
@@ -274,7 +281,12 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     public List<ExportPresetViewModel> FilteredExportPresets
     {
         get => _filteredExportPresets;
-        set => SetProperty(ref _filteredExportPresets, value);
+        set
+        {
+            SetProperty(ref _filteredExportPresets, value);
+
+            PersistCurrentPresets();
+        }
     }
 
     public ExportPresetViewModel SelectedExportPreset
@@ -285,8 +297,6 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
             SetProperty(ref _selectedExportPreset, value);
 
             OnPropertyChanged(nameof(Extensions));
-            OnPropertyChanged(nameof(OutputVisibility));
-            OnPropertyChanged(nameof(UploadVisibility));
 
             UsePresetSettings();
             LoadUploadPresets();
@@ -330,10 +340,6 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         _ => new List<string>()
     };
 
-    public Visibility OutputVisibility => SelectedExportPreset?.PickLocation == true ? Visibility.Visible : Visibility.Collapsed;
-
-    public Visibility UploadVisibility => SelectedExportPreset?.UploadFile == true ? Visibility.Visible : Visibility.Collapsed;
-    
     public ExporterViewModel()
     {
         LoadSettings();
@@ -344,7 +350,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
 
         _playbackWorker.DoWork += PlaybackWorder_DoWork;
     }
-    
+
     #region Commands
 
     public RoutedUICommand PlayPauseCommand { get; set; } = new()
@@ -417,6 +423,26 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         InputGestures = { new KeyGesture(Key.F, ModifierKeys.Alt) }
     };
 
+    public RoutedUICommand SelectFolderCommand { get; set; } = new()
+    {
+        InputGestures = { new KeyGesture(Key.O, ModifierKeys.Alt) }
+    };
+
+    public RoutedUICommand IncreaseFileNumberCommand { get; set; } = new()
+    {
+        InputGestures = { new KeyGesture(Key.OemPlus, ModifierKeys.Alt) }
+    };
+
+    public RoutedUICommand DecreaseFileNumberCommand { get; set; } = new()
+    {
+        InputGestures = { new KeyGesture(Key.OemPlus, ModifierKeys.Alt) }
+    };
+
+    public RoutedUICommand OpenExistingFileCommand { get; set; } = new()
+    {
+        InputGestures = { new KeyGesture(Key.O, ModifierKeys.Alt | ModifierKeys.Shift) }
+    };
+
     public RoutedUICommand ExportCommand { get; set; } = new()
     {
         InputGestures = { new KeyGesture(Key.S, ModifierKeys.Control) }
@@ -451,7 +477,6 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         LoopedPlayback = UserSettings.All.ExporterLoopedPlayback;
         PlaybackFramerate = UserSettings.All.ExporterPlaybackFramerate;
 
-        ExporterSectionWidth = UserSettings.All.ExporterSectionWidth;
         ExportPresets = UserSettings.All.ExportPresets.OfType<ExportPreset>().Select(s => ExportPresetViewModel.FromModel(s, this)).ToList();
         UploadPresets = UserSettings.All.UploadPresets.OfType<UploadPreset>().Select(s => UploadPresetViewModel.FromModel(s, this)).ToList();
 
@@ -463,8 +488,8 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         IsLoading = true;
 
         Project = ProjectViewModel.FromModel(project, this);
-        ComesFromRecorder = true;
-        
+        ShowEditButton = true;
+
         InitializePreview();
 
         IsLoading = false;
@@ -474,10 +499,38 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     {
         IsLoading = true;
 
-        var project = await RecordingProjectHelper.ReadFromPath(path);
+        var project = await Task.Factory.StartNew(() => RecordingProjectHelper.ReadFromPath(path));
 
         Project = ProjectViewModel.FromModel(project, this);
-        ComesFromRecorder = true;
+        ShowEditButton = true;
+
+        InitializePreview();
+
+        IsLoading = false;
+    }
+
+    public async Task ImportFromLegacyProject(string path, bool deleteOld = true)
+    {
+        IsLoading = true;
+
+        var project = await Task.Factory.StartNew(() => LegacyProjectHelper.ReadFromPath(path, deleteOld));
+
+        Project = ProjectViewModel.FromModel(project, this);
+        ShowEditButton = true;
+
+        InitializePreview();
+
+        IsLoading = false;
+    }
+
+    public async Task ImportFromEditor(string path)
+    {
+        IsLoading = true;
+
+        var project = await Task.Factory.StartNew(() => RecordingProjectHelper.ReadFromPath(path));
+
+        Project = ProjectViewModel.FromModel(project, this);
+        ShowEditButton = true;
 
         InitializePreview();
 
@@ -675,6 +728,15 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
             SelectedExportPreset.Extension = SelectedExportPreset.DefaultExtension;
     }
 
+    private void PersistCurrentPresets()
+    {
+        var list = ExportPresets?.Where(w => w.Type != ExportFormat).ToList() ?? new List<ExportPresetViewModel>();
+
+        list.AddRange(FilteredExportPresets);
+
+        ExportPresets = list.ToList();
+    }
+
     private void LoadUploadPresets()
     {
         if (SelectedExportPreset == null)
@@ -698,7 +760,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         aa.GroupDescriptions.Add(new PropertyGroupDescription("Mode"));
 
         FilteredUploadPresets = aa;
-        
+
         //var previous = preset.UploadService;
 
         //UploadPresetComboBox.IsEnabled = true;
@@ -726,11 +788,70 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         UserSettings.All.ExporterLoopedPlayback = LoopedPlayback;
         UserSettings.All.ExporterPlaybackFramerate = PlaybackFramerate;
 
-        UserSettings.All.ExporterSectionWidth = ExporterSectionWidth;
         UserSettings.All.ExportPresets = new ArrayList(ExportPresets.Select(s => s.ToModel()).ToArray());
         //UserSettings.All.UploadPresets = UploadPresets.Select(s => UploadPresetViewModel.ToModel(s)).ToList();
 
         UserSettings.All.SaveType = ExportFormat;
+    }
+
+    public void ChangeFileNumber(int change)
+    {
+        //If there's no filename declared, show the default one.
+        if (string.IsNullOrWhiteSpace(SelectedExportPreset.OutputFilename))
+        {
+            SelectedExportPreset.OutputFilename = LocalizationHelper.Get(SelectedExportPreset.OutputFilenameKey);
+            return;
+        }
+
+        var index = SelectedExportPreset.OutputFilename.Length;
+        int start = -1, end = -1;
+
+        //Detects the last number in a string.
+        foreach (var c in SelectedExportPreset.OutputFilename.Reverse())
+        {
+            if (char.IsNumber(c))
+            {
+                if (end == -1)
+                    end = index;
+
+                start = index - 1;
+            }
+            else if (start == index)
+                break;
+
+            index--;
+        }
+
+        //If there's no number.
+        if (end == -1)
+        {
+            SelectedExportPreset.OutputFilename += $" ({change})";
+            return;
+        }
+
+        //If it's a negative number, include the signal.
+        if (start > 0 && SelectedExportPreset.OutputFilename.Substring(start - 1, 1).Equals("-"))
+            start--;
+
+        //Cut, convert, merge.
+        if (int.TryParse(SelectedExportPreset.OutputFilename.Substring(start, end - start), out var number))
+        {
+            var offset = start + number.ToString().Length;
+
+            SelectedExportPreset.OutputFilename = SelectedExportPreset.OutputFilename.Substring(0, start) + (number + change) + SelectedExportPreset.OutputFilename.Substring(offset, SelectedExportPreset.OutputFilename.Length - end);
+        }
+    }
+
+    public void OpenOutputFile()
+    {
+        try
+        {
+            ProcessHelper.StartWithShell(SelectedExportPreset.ResolvedOutputPath);
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Log(ex, "Open file that already exists using the hyperlink");
+        }
     }
 
     public void Dispose()
@@ -739,7 +860,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         _renderWorker?.Dispose();
         _playbackWorker?.Dispose();
     }
-    
+
     private void RenderWorker_DoWork(object sender, DoWorkEventArgs e)
     {
         while (!_renderWorker.CancellationPending)

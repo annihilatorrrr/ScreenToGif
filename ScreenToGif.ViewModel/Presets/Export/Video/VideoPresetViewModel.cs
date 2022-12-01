@@ -269,4 +269,9 @@ public class VideoPresetViewModel : ExportPresetViewModel
             Vsync = Vsync,
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return null;
+    }
 }

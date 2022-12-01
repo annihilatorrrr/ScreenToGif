@@ -330,7 +330,7 @@ public class DirectCapture : ScreenCapture
             FrameCount++;
 
             frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
-            //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
+            frame.ExpectedDelay = Stopwatch.GetExpectedDelay();
             frame.Pixels = new byte[stream.Length];
 
             //BGRA32 is 4 bytes.
@@ -538,7 +538,7 @@ public class DirectCapture : ScreenCapture
             FrameCount++;
 
             frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
-            //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
+            frame.ExpectedDelay = Stopwatch.GetExpectedDelay();
             frame.Pixels = new byte[stream.Length];
 
             //BGRA32 is 4 bytes.
@@ -655,7 +655,7 @@ public class DirectCapture : ScreenCapture
             FrameCount++;
 
             frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
-            //frame.Delay = Stopwatch.GetMilliseconds(); //Resets the stopwatch. Messes up the editor.
+            frame.ExpectedDelay = Stopwatch.GetExpectedDelay();
             frame.Pixels = new byte[stream.Length];
 
             //BGRA32 is 4 bytes.
@@ -943,6 +943,7 @@ public class DirectCapture : ScreenCapture
         //Sub-sequence.
         FramesBinaryWriter.Write((byte)SubSequenceTypes.Frame); //1 byte.
         FramesBinaryWriter.Write(info.TimeStampInTicks); //8 bytes.
+        FramesBinaryWriter.Write(info.ExpectedDelay); //4 bytes, expected delay.
 
         //Rect sub-sequence.
         FramesBinaryWriter.Write(0); //4 bytes, left.

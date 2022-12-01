@@ -9,8 +9,8 @@
              xmlns:c="clr-namespace:ScreenToGif.Util.Converters;assembly=ScreenToGif.Util"
              xmlns:e="clr-namespace:ScreenToGif.Domain.Enums;assembly=ScreenToGif.Domain"
              xmlns:t="clr-namespace:ScreenToGif.Util.Settings;assembly=ScreenToGif.Util"
-             xmlns:p="clr-namespace:ScreenToGif.ViewModel.UploadPresets;assembly=ScreenToGif.ViewModel"
              xmlns:uc="clr-namespace:ScreenToGif.UserControls"
+             xmlns:upload="clr-namespace:ScreenToGif.ViewModel.Presets.Upload;assembly=ScreenToGif.ViewModel"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="300" Focusable="False" IsTabStop="False"
              x:Name="ThisPanel" Loaded="Panel_Loaded" Unloaded="ExportPanel_Unloaded">
     
@@ -1448,11 +1448,11 @@
                     </n:ExtendedComboBox.GroupStyle>
                     
                     <n:ExtendedComboBox.EmptyItem>
-                        <p:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Unavailable.Title}" Description="{StaticResource S.SaveAs.Upload.Unavailable.Description}" ImageId="Vector.Info"/>
+                        <upload:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Unavailable.Title}" Description="{StaticResource S.SaveAs.Upload.Unavailable.Description}" ImageId="Vector.Info"/>
                     </n:ExtendedComboBox.EmptyItem>
 
                     <n:ExtendedComboBox.NoSelectionItem>
-                        <p:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Select.Title}" Description="{StaticResource S.SaveAs.Upload.Select.Description}" ImageId="Vector.Info"/>
+                        <upload:UploadPresetViewModel Title="{StaticResource S.SaveAs.Upload.Select.Title}" Description="{StaticResource S.SaveAs.Upload.Select.Description}" ImageId="Vector.Info"/>
                     </n:ExtendedComboBox.NoSelectionItem>
                 </n:ExtendedComboBox>
 

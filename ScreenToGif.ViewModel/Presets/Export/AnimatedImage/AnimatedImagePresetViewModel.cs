@@ -18,7 +18,13 @@ public abstract class AnimatedImagePresetViewModel : ExportPresetViewModel
     public bool Looped
     {
         get => _looped;
-        set => SetProperty(ref _looped, value);
+        set
+        {
+            SetProperty(ref _looped, value);
+
+            if (!Looped)
+                RepeatForever = false;
+        }
     }
 
     public bool RepeatForever

@@ -11,7 +11,13 @@ public class RecordingFrame
     /// Ticks since the start of the recording.
     /// </summary>
     public long TimeStampInTicks { get; set; }
-    
+
+    /// <summary>
+    /// The expected frame delay in miliseconds.
+    /// When this is the last frame, it's used as the maximum rendering time.
+    /// </summary>
+    public int ExpectedDelay { get; set; }
+
     /// <summary>
     /// The capture content.
     /// </summary>

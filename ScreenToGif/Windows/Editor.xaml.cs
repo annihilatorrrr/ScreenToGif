@@ -2862,7 +2862,7 @@ namespace ScreenToGif.Windows
         #endregion
 
         #endregion
-
+        
         #region Transitions Tab
 
         private void Transition_CanExecute(object sender, CanExecuteRoutedEventArgs e)

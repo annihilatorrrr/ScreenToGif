@@ -178,11 +178,31 @@
     <SolidColorBrush x:Key="Brush.Fill.Accent.Secondary" Color="#005FB8"/>
     <SolidColorBrush x:Key="Brush.Fill.Accent.Tertiary" Color="#CC005FB8"/>
     <SolidColorBrush x:Key="Brush.Fill.Accent.Disabled" Color="#37000000"/>
+
     <SolidColorBrush x:Key="Brush.Fill.Control.Strong.Default" Color="#72000000"/>
     <SolidColorBrush x:Key="Brush.Fill.Control.Solid.Default" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Stroke.Control.Default" Color="#0F000000"/>
+
+    <SolidColorBrush x:Key="Brush.Fill.Card.Default" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Fill.Card.Secondary" Color="#80F6F6F6"/>
+    <SolidColorBrush x:Key="Brush.Stroke.Card.Default" Color="#0F000000"/>
+
+    <SolidColorBrush x:Key="Brush.Fill.Text.Primary" Color="#E4000000"/>
+    <SolidColorBrush x:Key="Brush.Fill.Text.Secondary" Color="#9B000000"/>
+    <SolidColorBrush x:Key="Brush.Fill.Text.Disabled" Color="#5C000000"/>
+
+    <SolidColorBrush x:Key="Brush.Fill.TextOnAccent.Primary" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Fill.TextOnAccent.Disabled" Color="#FFFFFF"/>
+
+    <SolidColorBrush x:Key="Brush.Fill.ControlAlt.Secondary" Color="#06000000"/>
+    <SolidColorBrush x:Key="Brush.Fill.ControlAlt.Tertiary" Color="#0F000000"/>
+    <SolidColorBrush x:Key="Brush.Fill.ControlAlt.Quarternary" Color="#18000000"/>
+
+    <SolidColorBrush x:Key="Brush.Stroke.ControlStrong.Default" Color="#72000000"/>
+    <SolidColorBrush x:Key="Brush.Stroke.ControlStrong.Disabled" Color="#37000000"/>
+
     <LinearGradientBrush x:Key="Brush.Elevation.Circle.Border" StartPoint="0.5,0" EndPoint="0.5,1">
         <GradientStop Color="#0F000000" Offset="0.0"/>
         <GradientStop Color="#29000000" Offset="0.95"/>
     </LinearGradientBrush>
-    <SolidColorBrush x:Key="Brush.Stroke.Control.Default" Color="#0F000000"/>
 </ResourceDictionary>

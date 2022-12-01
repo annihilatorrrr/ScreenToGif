@@ -183,4 +183,9 @@ public class FfmpegGifPresetViewModel : GifPresetViewModel, IFfmpegPreset
             Vsync = Vsync,
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+    }
 }

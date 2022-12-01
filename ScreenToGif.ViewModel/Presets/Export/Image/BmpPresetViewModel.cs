@@ -81,4 +81,9 @@ public class BmpPresetViewModel : ImagePresetViewModel
             Extension = Extension,
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Default;
+    }
 }

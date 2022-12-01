@@ -38,4 +38,9 @@ public class FfmpegAviPresetViewModel : AviPresetViewModel, IFfmpegPreset
         PixelFormat = VideoPixelFormats.Yuv420p,
         Parameters = "-vsync passthrough \n-hwaccel auto \n{I} \n-c:v mpeg4 -vtag xvid \n-pix_fmt yuv420p \n-vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" \n-b:v 5M \n-pass 2 \n-f avi \n{O}"
     };
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Default;
+    }
 }

@@ -66,6 +66,8 @@
     <s:String x:Key="S.Imperative.Discard">Discard</s:String>
     <s:String x:Key="S.Imperative.Keep">Keep</s:String>
     <s:String x:Key="S.Imperative.SeeMore">See more</s:String>
+    <s:String x:Key="S.Imperative.Exit">Exit</s:String>
+    <s:String x:Key="S.Imperative.KeepOpen">Keep Open</s:String>
 
     <!--Warnings-->
     <s:String x:Key="S.Crash">Oh no, the app crashed :(</s:String>
@@ -1563,10 +1565,10 @@
     <s:String x:Key="S.SaveAs.Presets.Reset">Reset the settings of this export preset to its defaults.</s:String>
     
     <!--Editor • Save as > Presets > Dialogs-->
-    <s:String x:Key="S.SaveAs.Presets.Ask.Delete.Title">Deleting the Preset</s:String>
+    <!--<s:String x:Key="S.SaveAs.Presets.Ask.Delete.Title">Deleting the Preset</s:String>-->
     <s:String x:Key="S.SaveAs.Presets.Ask.Delete.Instruction">Are you sure that you want to delete the preset?</s:String>
     <s:String x:Key="S.SaveAs.Presets.Ask.Delete.Message">This action cannot be undone.&#10;&#10;Would you like to delete the selected preset?</s:String>
-    <s:String x:Key="S.SaveAs.Presets.Ask.Reset.Title">Reseting the Preset</s:String>
+    <!--<s:String x:Key="S.SaveAs.Presets.Ask.Reset.Title">Reseting the Preset</s:String>-->
     <s:String x:Key="S.SaveAs.Presets.Ask.Reset.Instruction">Are you sure that you want to reset the preset?</s:String>
     <s:String x:Key="S.SaveAs.Presets.Ask.Reset.Message">This action cannot be undone.&#10;&#10;Would you like to reset the selected preset to its default settings?</s:String>
     
@@ -1623,9 +1625,9 @@
     <s:String x:Key="S.SaveAs.GifOptions.Gifski.Faster">Use an even faster encoding process.</s:String>
     <s:String x:Key="S.SaveAs.GifOptions.Gifski.Faster.Info">May reduce the quality of the gif.</s:String>
     <s:String x:Key="S.SaveAs.GifOptions.Loop">Loop:</s:String>
-    <s:String x:Key="S.SaveAs.GifOptions.Looped">Looped gif.</s:String>
-    <s:String x:Key="S.SaveAs.GifOptions.RepeatForever">Repeat forever.</s:String>
-    <s:String x:Key="S.SaveAs.GifOptions.RepeatCount">Repeat count.</s:String>
+    <s:String x:Key="S.SaveAs.GifOptions.Looped">Loop gif</s:String>
+    <s:String x:Key="S.SaveAs.GifOptions.RepeatForever">Repeat forever</s:String>
+    <s:String x:Key="S.SaveAs.GifOptions.RepeatCount">Repeat count</s:String>
     <s:String x:Key="S.SaveAs.GifOptions.Transparency.Enable">Enable transparency.</s:String>
     <s:String x:Key="S.SaveAs.GifOptions.Transparency.Enable.Info">Enables the full transparency mode, which makes the background of the gif to be fully transparent.&#10;The chroma key replacement process will be ignored if this option is enabled.</s:String>
     <s:String x:Key="S.SaveAs.GifOptions.Transparency.Pick">Select which color to display as transparent.</s:String>
@@ -1843,11 +1845,11 @@
     <s:String x:Key="S.SaveAs.SaveOptions.PickFolder">Save the file to a folder of your choice.</s:String>
     <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode">Overwrite?</s:String>
     <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Warn">Warn</s:String>
-    <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Warn.Info">Only warns that another file exists with the same name.</s:String>
+    <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Warn.Info">Only warns that another file exists with the same name</s:String>
     <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Prompt">Prompt</s:String>
-    <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Prompt.Info">Asks if the user wants to overwrite the file.</s:String>
+    <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Prompt.Info">Asks if the user wants to overwrite the file</s:String>
     <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Allow">Allow</s:String>
-    <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Allow.Info">Simply overwrites the file.</s:String>
+    <s:String x:Key="S.SaveAs.SaveOptions.OverwriteMode.Allow.Info">Simply overwrites the file</s:String>
     <s:String x:Key="S.SaveAs.SaveOptions.ProjectToo">Save as project too (same folder, same filename).</s:String>
     <s:String x:Key="S.SaveAs.SaveOptions.UploadFile">Upload the file.</s:String>
     <s:String x:Key="S.SaveAs.SaveOptions.CopyToClipboard">Copy to the clipboard.</s:String>

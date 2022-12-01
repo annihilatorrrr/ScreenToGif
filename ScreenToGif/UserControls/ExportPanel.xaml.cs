@@ -9,7 +9,6 @@ using ScreenToGif.Util.Extensions;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel;
 using ScreenToGif.ViewModel.ExportPresets;
-using ScreenToGif.ViewModel.ExportPresets.Video.Codecs;
 using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Apng;
 using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 using ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Webp;

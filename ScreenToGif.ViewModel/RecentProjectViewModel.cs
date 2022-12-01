@@ -1,7 +1,9 @@
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.ViewModels;
 using ScreenToGif.Util;
+using ScreenToGif.Util.JsonConverters;
 using System.Text;
+using System.Text.Json;
 using System.Windows.Input;
 
 namespace ScreenToGif.ViewModel;
@@ -109,14 +111,19 @@ public class RecentProjectViewModel : BaseViewModel
 
             if (File.Exists(oldProjectPath))
             {
-                //TODO: Improve parsing, without having to read the entire file.
-                //Parse JSON, or maybe just read the text.
-                var date = File.ReadAllText(oldProjectPath).FindTextBetween("\\/", "\\/");
+                using var fileStream = new FileStream(oldProjectPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var json = JsonDocument.Parse(fileStream);
+                
+                var deserializeOptions = new JsonSerializerOptions();
+                deserializeOptions.Converters.Add(new UnixEpochDateTimeOffsetConverter());
+                deserializeOptions.Converters.Add(new UnixEpochDateTimeConverter());
+
+                var date = json.RootElement.GetProperty("CreationDate").Deserialize<DateTime>(deserializeOptions);
 
                 return new RecentProjectViewModel
                 {
                     Type = RecentProjectTypes.OldRecording,
-                    CreationDate = date?.ConvertJsonStringToDateTime() ?? DateTime.MinValue,
+                    CreationDate = date,
                     Version = "2",
                     Path = path,
                     ExportProjectCommand = exportCommand,

@@ -318,4 +318,9 @@ public class KGySoftGifPresetViewModel : GifPresetViewModel
             DeltaTolerance = DeltaTolerance,
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+    }
 }

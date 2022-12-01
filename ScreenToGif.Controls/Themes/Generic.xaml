@@ -18,6 +18,7 @@
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Stepper.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/TextBox.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Timeline.xaml"/>
+        <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/ToggleSwitch.xaml"/>
         <ResourceDictionary Source="/ScreenToGif.Controls;component/Themes/Window.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 

@@ -80,6 +80,7 @@ public class GdiCapture : ScreenCapture
             FrameCount++;
 
             frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
+            frame.ExpectedDelay = Stopwatch.GetExpectedDelay();
             frame.Pixels = new byte[_byteLength];
 
             if (Gdi32.GetDIBits(_windowDeviceContext, _compatibleBitmap, 0, (uint)StartHeight, frame.Pixels, ref _bitmapHeader, DibColorModes.RgbColors) == 0)
@@ -109,6 +110,7 @@ public class GdiCapture : ScreenCapture
             FrameCount++;
 
             frame.TimeStampInTicks = Stopwatch.GetElapsedTicks();
+            frame.ExpectedDelay = Stopwatch.GetExpectedDelay();
             frame.Pixels = new byte[_byteLength];
 
             if (Gdi32.GetDIBits(_windowDeviceContext, _compatibleBitmap, 0, (uint)StartHeight, frame.Pixels, ref _bitmapHeader, DibColorModes.RgbColors) == 0)
@@ -145,6 +147,7 @@ public class GdiCapture : ScreenCapture
         //Sub-sequence.
         FramesBinaryWriter.Write((byte)SubSequenceTypes.Frame); //1 byte.
         FramesBinaryWriter.Write(info.TimeStampInTicks); //8 bytes.
+        FramesBinaryWriter.Write(info.ExpectedDelay); //4 bytes, expected delay.
 
         //Rect sub-sequence.
         FramesBinaryWriter.Write(0); //4 bytes, left.
@@ -159,15 +162,27 @@ public class GdiCapture : ScreenCapture
         FramesBinaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4+4 bytes, dpi.
         FramesBinaryWriter.Write(Project.ChannelCount); //1 byte.
         FramesBinaryWriter.Write(Project.BitsPerChannel); //1 byte.
-        FramesBinaryWriter.Write(info.Pixels.LongLength); //8 bytes.
-        
-        using var compressStream = new DeflateStream(FramesFileStream, UserSettings.All.CaptureCompression, true);
+
+        FramesBinaryWriter.Write(info.Pixels.LongLength); //8 bytes, uncompressed length.
+
+        var start = FramesFileStream.Position;
+        FramesBinaryWriter.Write(0L); //8 bytes.
+
+        using (var compressStream = new DeflateStream(FramesFileStream, UserSettings.All.CaptureCompression, true))
         {
             compressStream.Write(info.Pixels);
             compressStream.Flush();
         }
 
+        var end = FramesFileStream.Position;
+        var compressedLength = end - start - 8;
+
+        FramesFileStream.Position = start;
+        FramesBinaryWriter.Write(compressedLength); //8 bytes, compressed length.
+        FramesFileStream.Position = end;
+
         info.DataLength = info.Pixels.LongLength;
+        //info.CompressedDataLength = compressedLength;
         info.Pixels = null;
 
         Project.Frames.Add(info);

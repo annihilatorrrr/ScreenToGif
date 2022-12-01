@@ -47,10 +47,6 @@
                         <Trigger Property="KeyGesture" Value="{x:Null}">
                             <Setter TargetName="KeyGestureTextBlock" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
-
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{StaticResource Brush.Button.Foreground.Accent.Disabled}"/>
-                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

@@ -94,4 +94,9 @@ public class StgPresetViewModel : ExportPresetViewModel
             CompressionLevel = CompressionLevel,
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Default;
+    }
 }

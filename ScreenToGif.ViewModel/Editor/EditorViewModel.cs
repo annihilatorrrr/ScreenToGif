@@ -262,7 +262,7 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
         //  Pass token.
         //TODO: The conversion is not that difficult anymore.
 
-        var cached = await RecordingProjectHelper.ReadFromPath(path);
+        var cached = await Task.Factory.StartNew(() => RecordingProjectHelper.ReadFromPath(path));
         Project = ProjectViewModel.FromModel(cached, this);
 
         InitializePreview();

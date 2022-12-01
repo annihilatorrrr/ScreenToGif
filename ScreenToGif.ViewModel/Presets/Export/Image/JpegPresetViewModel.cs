@@ -81,4 +81,9 @@ public class JpegPresetViewModel : ImagePresetViewModel
             Extension = Extension,
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Default;
+    }
 }

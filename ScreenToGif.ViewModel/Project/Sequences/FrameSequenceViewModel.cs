@@ -57,11 +57,13 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
 
     public static FrameSequenceViewModel FromModel(RecordingProject project, IPreviewerViewModel baseViewModel)
     {
+        var last = project.Frames.LastOrDefault();
+
         return new FrameSequenceViewModel
         {
             Id = 1,
             StartTime = TimeSpan.Zero,
-            EndTime = TimeSpan.FromTicks(project.Frames.LastOrDefault()?.TimeStampInTicks ?? 0),
+            EndTime = TimeSpan.FromTicks(last?.TimeStampInTicks ?? 0) + TimeSpan.FromMilliseconds(last?.ExpectedDelay ?? 0),
             StreamPosition = 0,
             CachePath = project.FramesCachePath,
             PreviewerViewModel = baseViewModel,
@@ -82,14 +84,14 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
 
     public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath)
     {
-        //Get first frame after timestamp.
+        //Get last frame that appears after current timestamp. TODO: Avoid going past sequence limit.
         var frame = Frames.LastOrDefault(f => f.TimeStampInTicks <= timestamp);
 
         if (frame == null)
             return;
 
         using var readStream = new FileStream(cachePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        readStream.Position = frame.DataStreamPosition;
+        readStream.Position = frame.DataStreamPosition + 8;
 
         using var deflateStream = new DeflateStream(readStream, CompressionMode.Decompress);
         var data = deflateStream.ReadBytesUntilFull(frame.DataLength);

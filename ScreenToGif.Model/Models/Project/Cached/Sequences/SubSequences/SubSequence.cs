@@ -11,6 +11,8 @@ public abstract class SubSequence
     /// </summary>
     public long TimeStampInTicks { get; set; }
 
+    public int ExpectedDelay { get; set; }
+    
     /// <summary>
     /// Position of this sub-sequence in the stream.
     /// </summary>

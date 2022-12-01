@@ -43,13 +43,7 @@ public partial class Startup : ExWindow
         SystemEvents.DisplaySettingsChanged += System_DisplaySettingsChanged;
     }
 
-    private void Startup_Initialized(object sender, System.EventArgs e)
-    {
-        if (!UpdatePositioning())
-            WindowStartupLocation = WindowStartupLocation.CenterScreen;
-    }
-
-    private void Startup_Loaded(object sender, RoutedEventArgs e)
+    private void Startup_Initialized(object sender, EventArgs e)
     {
         if (!UpdatePositioning())
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -67,9 +61,7 @@ public partial class Startup : ExWindow
 
     private void ExportProjects_Executed(object sender, ExecutedRoutedEventArgs e)
     {
-        var parameter = e.Parameter as RecentProjectViewModel;
-
-        App.ShowExporter(null, null, parameter?.Path);
+        App.ShowExporter(null, e.Parameter as RecentProjectViewModel);
     }
 
     private async void EditProjects_Executed(object sender, ExecutedRoutedEventArgs e)

@@ -218,4 +218,9 @@ public class EmbeddedGifPresetViewModel : GifPresetViewModel
             ChromaKey = ChromaKey
         };
     }
+
+    public override ExportPresetViewModel Reset()
+    {
+        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+    }
 }

@@ -170,7 +170,7 @@ public enum WindowsMessages
     QueryDragIcon = 0x0037,
     QueryEndSession = 0x0011,
     QueryNewPalette = 0x030F,
-    queryOpen = 0x0013,
+    QueryOpen = 0x0013,
     QueueSync = 0x0023,
     Quit = 0x0012,
     RButtonDoubleClick = 0x0206,

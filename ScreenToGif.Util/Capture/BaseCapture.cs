@@ -113,7 +113,7 @@ public abstract class BaseCapture : ICapture
         Project.Width = width;
         Project.Height = height;
         Project.Dpi = 96 * scale;
-        Project.SaveProperties();
+        Project.WritePropertiesToDisk();
 
         ConfigureConsumer();
 

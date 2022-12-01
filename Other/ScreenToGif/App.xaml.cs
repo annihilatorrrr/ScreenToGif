@@ -329,6 +329,7 @@ public partial class App : Application
         ViewModel.OptionsCommand = new RelayCommand(OpenOptions);
         ViewModel.FeedbackCommand = new RelayCommand(OpenFeedback);
         ViewModel.TroubleshootCommand = new RelayCommand(OpenTroubleshooter);
+        ViewModel.ExitCommand = new RelayCommand(CanExitApplication, ExitApplication);
 
         ViewModel.TrayLeftClickCommand = new RelayCommand(TrayLeftClick);
         ViewModel.TrayLeftDoubleClickCommand = new RelayCommand(TrayLeftDoubleClick);
@@ -338,8 +339,6 @@ public partial class App : Application
         ViewModel.CheckCacheSpaceCommand = new RelayCommand(ClearCache);
         ViewModel.CheckForUpdatesCommand = new RelayCommand(CheckForUpdates);
         ViewModel.SendFeedbackCommand = new RelayCommand(ClearCache);
-
-        ViewModel.ExitCommand = new RelayCommand(CanExitApplication, ExitApplication);
     }
 
     internal void RegisterShortcuts()

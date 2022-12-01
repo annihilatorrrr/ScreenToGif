@@ -165,46 +165,46 @@
             <Grid.Resources>
                 <x:Array x:Key="ExportItemArray" Type="{x:Type c:ExporterComboBoxItem}">
                     <!--Animated Image-->
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Apng}" Content="{DynamicResource S.SaveAs.Apng.Info}" Symbol="ImageCopy"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Apng}" Description="{DynamicResource S.SaveAs.Apng.Info}" Symbol="ImageCopy"
                                             GroupName="{DynamicResource S.SaveAs.Type.Animated}" FileType="{x:Static e:ExportFormats.Apng}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Gif}" Content="{DynamicResource S.SaveAs.Gif.Info}" Symbol="Gif"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Gif}" Description="{DynamicResource S.SaveAs.Gif.Info}" Symbol="Gif"
                                             GroupName="{DynamicResource S.SaveAs.Type.Animated}" FileType="{x:Static e:ExportFormats.Gif}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Webp}" Content="{DynamicResource S.SaveAs.Webp.Info}" Symbol="ImageCopy"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Webp}" Description="{DynamicResource S.SaveAs.Webp.Info}" Symbol="ImageCopy"
                                             GroupName="{DynamicResource S.SaveAs.Type.Animated}" FileType="{x:Static e:ExportFormats.Webp}"/>
 
                     <!--Video-->
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Avi}" Content="{DynamicResource S.SaveAs.Avi.Info}" Symbol="VideoClip"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Avi}" Description="{DynamicResource S.SaveAs.Avi.Info}" Symbol="VideoClip"
                                             GroupName="{DynamicResource S.SaveAs.Type.Video}" FileType="{x:Static e:ExportFormats.Avi}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Mkv}" Content="{DynamicResource S.SaveAs.Mkv.Info}" Symbol="VideoClip"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Mkv}" Description="{DynamicResource S.SaveAs.Mkv.Info}" Symbol="VideoClip"
                                             GroupName="{DynamicResource S.SaveAs.Type.Video}" FileType="{x:Static e:ExportFormats.Mkv}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Mov}" Content="{DynamicResource S.SaveAs.Mov.Info}" Symbol="VideoClip"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Mov}" Description="{DynamicResource S.SaveAs.Mov.Info}" Symbol="VideoClip"
                                             GroupName="{DynamicResource S.SaveAs.Type.Video}" FileType="{x:Static e:ExportFormats.Mov}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Mp4}" Content="{DynamicResource S.SaveAs.Mp4.Info}" Symbol="VideoClip"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Mp4}" Description="{DynamicResource S.SaveAs.Mp4.Info}" Symbol="VideoClip"
                                             GroupName="{DynamicResource S.SaveAs.Type.Video}" FileType="{x:Static e:ExportFormats.Mp4}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Webm}" Content="{DynamicResource S.SaveAs.Webm.Info}" Symbol="VideoClip"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Webm}" Description="{DynamicResource S.SaveAs.Webm.Info}" Symbol="VideoClip"
                                             GroupName="{DynamicResource S.SaveAs.Type.Video}" FileType="{x:Static e:ExportFormats.Webm}"/>
 
                     <!--Frames-->
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Bmp}" Content="{DynamicResource S.SaveAs.Bmp.Info}" Symbol="ImageMultiple"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Bmp}" Description="{DynamicResource S.SaveAs.Bmp.Info}" Symbol="ImageMultiple"
                                             GroupName="{DynamicResource S.SaveAs.Type.Frames}" FileType="{x:Static e:ExportFormats.Bmp}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Jpeg}" Content="{DynamicResource S.SaveAs.Jpeg.Info}" Symbol="ImageMultiple"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Jpeg}" Description="{DynamicResource S.SaveAs.Jpeg.Info}" Symbol="ImageMultiple"
                                             GroupName="{DynamicResource S.SaveAs.Type.Frames}" FileType="{x:Static e:ExportFormats.Jpeg}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Png}" Content="{DynamicResource S.SaveAs.Png.Info}" Symbol="ImageMultiple"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Png}" Description="{DynamicResource S.SaveAs.Png.Info}" Symbol="ImageMultiple"
                                             GroupName="{DynamicResource S.SaveAs.Type.Frames}" FileType="{x:Static e:ExportFormats.Png}"/>
 
                     <!--Other-->
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Project}" Content="{DynamicResource S.SaveAs.Project.Info}" Symbol="Box"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Project}" Description="{DynamicResource S.SaveAs.Project.Info}" Symbol="Box"
                                             GroupName="{DynamicResource S.SaveAs.Type.Other}" FileType="{x:Static e:ExportFormats.Stg}"/>
 
-                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Psd}" Content="{DynamicResource S.SaveAs.Psd.Info}" Symbol="BoxMultiple"
+                    <c:ExporterComboBoxItem Header="{DynamicResource S.SaveAs.Psd}" Description="{DynamicResource S.SaveAs.Psd.Info}" Symbol="BoxMultiple"
                                             GroupName="{DynamicResource S.SaveAs.Type.Other}" FileType="{x:Static e:ExportFormats.Psd}"/>
                 </x:Array>
 
@@ -254,7 +254,7 @@
                                     <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
                                     <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Header}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
 
-                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Content}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                                 </Grid>
                             </DataTemplate>
                         </c:ExComboBox.ItemTemplate>
@@ -301,13 +301,8 @@
                         </c:ExComboBox.ItemTemplate>
                     </c:ExComboBox>
 
-                    <!--Type Options-->
-                    <!--Export Options-->
-                    <!--Upload Options-->
-                    <!--This will all be located in a separated window, controlled by the presets.-->
-
                     <!--Upload-->
-                    <StackPanel Visibility="{Binding UploadVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Visibility="{Binding SelectedExportPreset.UploadFileVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
@@ -375,7 +370,7 @@
                     </StackPanel>
 
                     <!--File-->
-                    <StackPanel Visibility="{Binding OutputVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Visibility="{Binding SelectedExportPreset.PickLocationVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
@@ -401,7 +396,7 @@
                                          Margin="0,4,2,4" VerticalContentAlignment="Center" TextWrapping="Wrap" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5"
                                          ToolTip="{DynamicResource S.SaveAs.File.Location}"/>
 
-                            <c:ExButton Grid.Column="1" Padding="10,6" Margin="2,4,4,4" VerticalAlignment="Center" Command="{Binding SelectFolderCommand}"
+                            <c:ExButton Grid.Column="1" x:Name="ChooseLocationButton" Padding="10,6" Margin="2,4,4,4" VerticalAlignment="Center" Command="{Binding SelectFolderCommand}"
                                         ToolTip="{DynamicResource S.SaveAs.File.Choose}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
                                 <c:SymbolIcon Symbol="FolderOpen" FontSize="15"/>
                             </c:ExButton>
@@ -437,45 +432,11 @@
                         <!--TODO: Display special element if filename is automated-->
 
                         <!--File already exists-->
-                        <c:InfoBar Type="Warning" Title="File already exists" IsClosable="False" Margin="10,5,5,0" Visibility="Collapsed">
+                        <c:InfoBar Type="Warning" Title="File already exists" IsClosable="False" Margin="10,5,5,0"
+                                   Visibility="{Binding SelectedExportPreset.FileExistsVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue={x:Static Visibility.Collapsed}}">
                             <c:HyperlinkButton Content="Open File" Command="{Binding OpenExistingFileCommand}"/>
                         </c:InfoBar>
                     </StackPanel>
-                    
-                    <!--<Grid Margin="5,0" Height="35" Visibility="Collapsed">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="40"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource Brush.StatusBand.Error}" CornerRadius="3" Margin="5,0"
-                            Visibility="{Binding ElementName=UploadPresetComboBox, Path=SelectedItem.HasLimit, Converter={StaticResource Bool2Visibility}, FallbackValue={x:Static Visibility.Collapsed}}" 
-                            ToolTip="{DynamicResource S.SaveAs.Upload.Limit}">
-                            <TextBlock Text="{Binding ElementName=UploadPresetComboBox, Path=SelectedItem.Limit}" Foreground="{DynamicResource Element.Foreground.Medium}" Margin="3,0" Padding="0" VerticalAlignment="Center"/>
-                        </Border>
-
-                        <c:ExButton Grid.Column="1" ToolTip="{DynamicResource S.SaveAs.Upload.Add}" ToolTipService.Placement="Bottom">
-                            <c:SymbolIcon Symbol="Add" FontSize="16"/>
-                        </c:ExButton>
-
-                        <c:ExButton Grid.Column="2" x:Name="EditUploadPresetButton" ToolTip="{DynamicResource S.SaveAs.Upload.Edit}" ToolTipService.Placement="Bottom"
-                                    IsEnabled="{Binding ElementName=UploadPresetComboBox, Path=SelectedItem, Converter={StaticResource ContentToVisibility}}">
-                            <c:SymbolIcon Symbol="Edit" FontSize="16"/>
-                        </c:ExButton>
-
-                        <c:ExButton Grid.Column="3" x:Name="HistoryUploadPresetButton" ToolTip="{DynamicResource S.SaveAs.Upload.History}" ToolTipService.Placement="Bottom"
-                                    IsEnabled="{Binding ElementName=UploadPresetComboBox, Path=SelectedItem, Converter={StaticResource ContentToVisibility}}">
-                            <c:SymbolIcon Symbol="ShiftsActivity" FontSize="16"/>
-                        </c:ExButton>
-
-                        <c:ExButton Grid.Column="4" x:Name="RemoveUploadPresetButton" ToolTip="{DynamicResource S.SaveAs.Presets.Remove}" ToolTipService.Placement="Bottom"
-                                    IsEnabled="{Binding ElementName=UploadPresetComboBox, Path=SelectedItem, Converter={StaticResource ContentToVisibility}}">
-                            <c:SymbolIcon Symbol="Delete" FontSize="16"/>
-                        </c:ExButton>
-                    </Grid>-->
                 </StackPanel>
             </ScrollViewer>
 

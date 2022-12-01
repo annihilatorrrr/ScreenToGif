@@ -123,14 +123,14 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
 
     public override void RenderAt(IntPtr current, int canvasWidth, int canvasHeight, long timestamp, double quality, string cachePath)
     {
-        //Get last cursor that appears after current timestamp.
+        //Get last cursor that appears after current timestamp.  TODO: Avoid going past sequence limit.
         var cursor = CursorEvents.LastOrDefault(f => f.TimeStampInTicks <= timestamp);
 
         if (cursor == null)
             return;
 
         using var readStream = new FileStream(cachePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        readStream.Position = (long)cursor.DataStreamPosition;
+        readStream.Position = cursor.DataStreamPosition;
 
         var data = readStream.ReadBytes((uint)cursor.DataLength);
 

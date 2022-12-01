@@ -110,7 +110,7 @@
             <TextBlock Grid.Column="1" Text="{DynamicResource S.Recorder.ClickOrPress}" VerticalAlignment="Center" TextAlignment="Center" Margin="5" 
                        Foreground="{DynamicResource Brush.Foreground.Medium}" Visibility="{Binding InteractionInfoTextVisibility, Mode=OneWay, FallbackValue={x:Static Visibility.Collapsed}}"/>
 
-            <c:DisplayTimer Grid.Column="2" x:Name="DisplayTimer" Margin="5" CornerRadius="3" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True"
+            <c:DisplayTimer Grid.Column="2" x:Name="MainDisplayTimer" Margin="5" CornerRadius="3" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True"
                             CapturedCount="{Binding FrameCount, Mode=OneWay}" IsImpreciseCapture="{Binding HasImpreciseCapture, Mode=OneWay}"/>
         </Grid>
 
@@ -167,8 +167,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <c:IntegerStepper Grid.Column="0" x:Name="FrequencyIntegerStepper" Margin="0,3" MinWidth="45" IsEnabled="{Binding CanSwitchFrequency, Mode=OneWay}"
-                                      StepValue="1" Minimum="1" Maximum="60" Value="{Binding Framerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <c:IntegerStepper Grid.Column="0" x:Name="FrequencyIntegerStepper" Margin="0,5,0,2" MinWidth="45" IsEnabled="{Binding CanSwitchFrequency, Mode=OneWay}"
+                                      MinHeight="23" StepValue="1" Minimum="1" Maximum="60" Value="{Binding Framerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <TextBlock Grid.Column="1" x:Name="FrequencyTextBlock" Text="{DynamicResource S.Recorder.Fps.Short}" FontSize="12" Margin="3,0,0,0" VerticalAlignment="Center" 
                                Padding="0" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
@@ -206,14 +206,14 @@
 
                     <c:IntegerBox Grid.Column="0" x:Name="WidthIntegerBox" Padding="4,0" Margin="3,5,1,2" Minimum="40" Maximum="10000" HorizontalContentAlignment="Center" MinWidth="35"
                                   Value="{Binding PixelWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanSelectRegion, Mode=OneWay}"
-                                  ToolTip="Width, in pixels" ToolTipService.Placement="Bottom" ToolTipService.HorizontalOffset="-5"
+                                  MinHeight="23" ToolTip="Width, in pixels" ToolTipService.Placement="Bottom" ToolTipService.HorizontalOffset="-5"
                                   PropagateWheelEvent="True" ValueChanged="Size_ValueChanged" MouseWheel="SizeIntegerBox_MouseWheel"/>
 
                     <TextBlock Grid.Column="1" Text="×" FontSize="16" FontFamily="Segoe Script" Margin="1" VerticalAlignment="Center" Padding="0" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
 
                     <c:IntegerBox Grid.Column="2" Padding="4,0" Margin="1,5,3,2" Minimum="40" Maximum="10000" HorizontalContentAlignment="Center" MinWidth="35"
                                   Value="{Binding PixelHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanSelectRegion, Mode=OneWay}"
-                                  ToolTip="Height, in pixels" ToolTipService.Placement="Bottom" ToolTipService.HorizontalOffset="-5"
+                                  MinHeight="23" ToolTip="Height, in pixels" ToolTipService.Placement="Bottom" ToolTipService.HorizontalOffset="-5"
                                   PropagateWheelEvent="True" ValueChanged="Size_ValueChanged" MouseWheel="SizeIntegerBox_MouseWheel"/>
                 </Grid>
 

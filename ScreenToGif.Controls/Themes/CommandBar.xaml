@@ -30,7 +30,7 @@
 
                                 <!--For some reason, the ContextMenu Placement Bottom or Top doesn't work-->
                                 <ToggleButton.ContextMenu>
-                                    <ContextMenu ItemsSource="{TemplateBinding SecondaryCommands}" Placement="MousePoint"
+                                    <ContextMenu ItemsSource="{TemplateBinding SecondaryCommandsSource}" Placement="MousePoint"
                                                  IsOpen="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </ToggleButton.ContextMenu>
                             </ToggleButton>
@@ -48,7 +48,7 @@
                     </Border>
 
                     <ControlTemplate.Triggers>
-                        <Trigger Property="SecondaryCommands" Value="{x:Null}">
+                        <Trigger Property="HasSecondaryCommands" Value="False">
                             <Setter TargetName="MoreToggleButton" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
 

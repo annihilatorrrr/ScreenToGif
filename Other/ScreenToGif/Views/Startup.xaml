@@ -7,7 +7,7 @@
             Title="{DynamicResource S.StartUp.Title}" Height="380" Width="700"
             MinHeight="380" MinWidth="700" MaxHeight="600" MaxWidth="900" UseLayoutRounding="True"
             ShowCustomCaptionButtons="True" WindowStyle="None" ShowMaximizeButton="False" ShowMinimizeButton="False"
-            Initialized="Startup_Initialized" Loaded="Startup_Loaded" Closing="Startup_Closing">
+            Initialized="Startup_Initialized" Closing="Startup_Closing">
 
     <Grid>
         <Grid.ColumnDefinitions>

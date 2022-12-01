@@ -1,11 +1,16 @@
+using Microsoft.Win32;
 using ScreenToGif.Controls;
+using ScreenToGif.Dialogs;
+using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Models.Project.Cached;
 using ScreenToGif.Domain.Models.Project.Recording;
+using ScreenToGif.Util;
 using ScreenToGif.Util.Native;
 using ScreenToGif.Util.Settings;
-using ScreenToGif.Util;
 using ScreenToGif.ViewModel;
+using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -32,6 +37,8 @@ public partial class Exporter : ExWindow
 
     public bool OpenInEditor { get; set; }
 
+    public RecordingProject Project => _viewModel.ProjectSource;
+
     public Exporter()
     {
         InitializeComponent();
@@ -50,7 +57,7 @@ public partial class Exporter : ExWindow
             new CommandBinding(_viewModel.LayersCommand, Layers_Executed, (_, args) => args.CanExecute = true),
             new CommandBinding(_viewModel.CropCommand, Crop_Executed, (_, args) => args.CanExecute = true),
             new CommandBinding(_viewModel.TrimCommand, Trim_Executed, (_, args) => args.CanExecute = true),
-            new CommandBinding(_viewModel.EditCommand, Edit_Executed, (_, args) => args.CanExecute = _viewModel.ComesFromRecorder),
+            new CommandBinding(_viewModel.EditCommand, Edit_Executed, (_, args) => args.CanExecute = _viewModel.ShowEditButton),
 
             new CommandBinding(_viewModel.SettingsCommand, Settings_Executed, (_, args) => args.CanExecute = true),
             new CommandBinding(_viewModel.MouseSettingsCommand, SkipForward_Executed, (_, args) => args.CanExecute = _viewModel.HasMouseTrack),
@@ -59,6 +66,11 @@ public partial class Exporter : ExWindow
             new CommandBinding(_viewModel.PresetSettingsCommand, PresetSettings_Executed, (_, args) => args.CanExecute = true),
             new CommandBinding(_viewModel.UploadPresetSettingsCommand, UploadPresetSettings_Executed, (_, args) => args.CanExecute = _viewModel.SelectedExportPreset?.UploadFile == true),
             new CommandBinding(_viewModel.FileAutomationSettingsCommand, FileAutomationSettings_Executed, (_, args) => args.CanExecute = _viewModel.SelectedExportPreset?.PickLocation == true),
+
+            new CommandBinding(_viewModel.SelectFolderCommand, SelectFolder_Executed, (_, args) => args.CanExecute = _viewModel.SelectedExportPreset?.PickLocation == true),
+            new CommandBinding(_viewModel.IncreaseFileNumberCommand, IncreaseFolder_Executed, (_, args) => args.CanExecute = _viewModel.SelectedExportPreset?.PickLocation == true),
+            new CommandBinding(_viewModel.DecreaseFileNumberCommand, DecreaseFolder_Executed, (_, args) => args.CanExecute = _viewModel.SelectedExportPreset?.PickLocation == true),
+            new CommandBinding(_viewModel.OpenExistingFileCommand, OpenExistingFileCommand_Executed, (_, args) => args.CanExecute = _viewModel.SelectedExportPreset?.PickLocation == true),
             
             new CommandBinding(_viewModel.ExportCommand, Export_Executed, (_, args) => args.CanExecute = true),
             new CommandBinding(_viewModel.CancelCommand, Cancel_Executed, (_, args) => args.CanExecute = true),
@@ -132,26 +144,206 @@ public partial class Exporter : ExWindow
     {
         _viewModel.PersistSettings();
 
-        var settings = new PresetSettings(_viewModel.SelectedExportPreset);
+        var settings = new PresetSettings(_viewModel.FilteredExportPresets, _viewModel.SelectedExportPreset)
+        {
+            Owner = this
+        };
 
         if (settings.ShowDialog() == true)
-            _viewModel.LoadSettings();
+        {
+            _viewModel.FilteredExportPresets = settings.Presets;
+            _viewModel.PersistSettings();
+        }
     }
 
     private void UploadPresetSettings_Executed(object sender, ExecutedRoutedEventArgs e)
     {
         _viewModel.PersistSettings();
 
-        var settings = new PresetSettings(_viewModel.SelectedExportPreset);
+        var settings = new PresetSettings(_viewModel.FilteredExportPresets, _viewModel.SelectedExportPreset);
 
         if (settings.ShowDialog() == true)
-            _viewModel.LoadSettings();
+        {
+            _viewModel.FilteredExportPresets = settings.Presets;
+            _viewModel.PersistSettings();
+        }
     }
 
     private void FileAutomationSettings_Executed(object sender, ExecutedRoutedEventArgs e)
     {
         //Open window, passing preset.
         //On return, decide how to show data
+    }
+
+    private void SelectFolder_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        try
+        {
+            var output = _viewModel.SelectedExportPreset.OutputFolder ?? "";
+
+            if (output.ToCharArray().Any(x => Path.GetInvalidPathChars().Contains(x)))
+                output = "";
+
+            //It's only a relative path if not null/empty and there's no root folder declared.
+            var isRelative = !string.IsNullOrWhiteSpace(output) && !Path.IsPathRooted(output);
+            var notAlt = !string.IsNullOrWhiteSpace(output) && _viewModel.SelectedExportPreset.OutputFolder.Contains(Path.DirectorySeparatorChar);
+
+            var initial = Directory.Exists(output) ? output : Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == 0)
+            {
+                #region Select folder
+
+                var fs = new FolderSelector
+                {
+                    Description = LocalizationHelper.Get("S.SaveAs.File.SelectFolder"),
+                    DefaultFolder = isRelative ? Path.GetFullPath(initial) : initial,
+                    SelectedPath = isRelative ? Path.GetFullPath(initial) : initial
+                };
+
+                if (!fs.ShowDialog())
+                    return;
+
+                _viewModel.SelectedExportPreset.OutputFolder = fs.SelectedPath;
+                ChooseLocationButton.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+
+                #endregion
+            }
+            else
+            {
+                #region Save folder and file
+
+                var sfd = new SaveFileDialog
+                {
+                    FileName = _viewModel.SelectedExportPreset.OutputFilename,
+                    InitialDirectory = isRelative ? Path.GetFullPath(initial) : initial
+                };
+
+                #region Extensions
+
+                switch (_viewModel.SelectedExportPreset.Type)
+                {
+                    //Animated image.
+                    case ExportFormats.Apng:
+                        sfd.Filter = string.Format("{0}|*.png|{0}|*.apng", LocalizationHelper.Get("S.Editor.File.Apng"));
+                        sfd.DefaultExt = _viewModel.SelectedExportPreset.Extension ?? ".png";
+                        break;
+                    case ExportFormats.Gif:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Gif")} (.gif)|*.gif";
+                        sfd.DefaultExt = ".gif";
+                        break;
+                    case ExportFormats.Webp:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Webp")} (.webp)|*.webp";
+                        sfd.DefaultExt = ".webp";
+                        break;
+
+                    //Video.
+                    case ExportFormats.Avi:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Avi")} (.avi)|*.avi";
+                        sfd.DefaultExt = ".avi";
+                        break;
+                    case ExportFormats.Mkv:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Mkv")} (.mkv)|*.mkv";
+                        sfd.DefaultExt = ".mkv";
+                        break;
+                    case ExportFormats.Mov:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Mov")} (.mov)|*.mov";
+                        sfd.DefaultExt = ".mov";
+                        break;
+                    case ExportFormats.Mp4:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Mp4")} (.mp4)|*.mp4";
+                        sfd.DefaultExt = ".mp4";
+                        break;
+                    case ExportFormats.Webm:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Webm")} (.webm)|*.webm";
+                        sfd.DefaultExt = ".webm";
+                        break;
+
+                    //Images.
+                    case ExportFormats.Bmp:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Image.Bmp")} (.bmp)|*.bmp|{LocalizationHelper.Get("S.Editor.File.Project.Image.Zip")} (.zip)|*.zip";
+                        sfd.DefaultExt = _viewModel.SelectedExportPreset.Extension ?? _viewModel.SelectedExportPreset.DefaultExtension ?? ".bmp";
+                        break;
+                    case ExportFormats.Jpeg:
+                        sfd.Filter = string.Format("{0}|*.jpg|{0}|*.jpeg|{1} (.zip)|*.zip", LocalizationHelper.Get("S.Editor.File.Image.Jpeg"), LocalizationHelper.Get("S.Editor.File.Project.Image.Zip"));
+                        sfd.DefaultExt = _viewModel.SelectedExportPreset.Extension ?? _viewModel.SelectedExportPreset.DefaultExtension ?? ".jpg";
+                        break;
+                    case ExportFormats.Png:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Image.Png")} (.png)|*.png|{LocalizationHelper.Get("S.Editor.File.Project.Image.Zip")} (.zip)|*.zip";
+                        sfd.DefaultExt = _viewModel.SelectedExportPreset.Extension ?? _viewModel.SelectedExportPreset.DefaultExtension ?? ".png";
+                        break;
+
+                    //Other.
+                    case ExportFormats.Stg:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Project")} (.stg)|*.stg|{LocalizationHelper.Get("S.Editor.File.Project.Zip")} (.zip)|*.zip";
+                        sfd.DefaultExt = _viewModel.SelectedExportPreset.Extension ?? ".stg";
+                        break;
+                    case ExportFormats.Psd:
+                        sfd.Filter = $"{LocalizationHelper.Get("S.Editor.File.Psd")} (.psd)|*.psd";
+                        sfd.DefaultExt = ".psd";
+                        break;
+                }
+
+                #endregion
+
+                var result = sfd.ShowDialog();
+
+                if (!result.HasValue || !result.Value)
+                    return;
+
+                //TODO: process output before setting to property?
+
+                _viewModel.SelectedExportPreset.OutputFolder = Path.GetDirectoryName(sfd.FileName);
+                _viewModel.SelectedExportPreset.OutputFilename = Path.GetFileNameWithoutExtension(sfd.FileName);
+                _viewModel.SelectedExportPreset.OverwriteMode = File.Exists(sfd.FileName) ? OverwriteModes.Prompt : OverwriteModes.Warn;
+                _viewModel.SelectedExportPreset.Extension = Path.GetExtension(sfd.FileName);
+
+                //RaiseSaveEvent();
+                //_viewModel.Export();
+
+                #endregion
+            }
+
+            //Converts to a relative path again.
+            if (isRelative && !string.IsNullOrWhiteSpace(_viewModel.SelectedExportPreset.OutputFolder))
+            {
+                var selected = new Uri(_viewModel.SelectedExportPreset.OutputFolder);
+                var baseFolder = new Uri(AppDomain.CurrentDomain.BaseDirectory);
+                var relativeFolder = selected.AbsolutePath.TrimEnd(Path.DirectorySeparatorChar).TrimEnd(Path.AltDirectorySeparatorChar) == baseFolder.AbsolutePath.TrimEnd(Path.DirectorySeparatorChar).TrimEnd(Path.AltDirectorySeparatorChar) ?
+                    "." : Uri.UnescapeDataString(baseFolder.MakeRelativeUri(selected).ToString());
+
+                //This app even returns you the correct slashes/backslashes.
+                _viewModel.SelectedExportPreset.OutputFolder = notAlt ? relativeFolder.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar) : relativeFolder.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            }
+        }
+        catch (ArgumentException sx)
+        {
+            LogWriter.Log(sx, "Error while trying to choose the output path and filename.", _viewModel.SelectedExportPreset.OutputFolder + _viewModel.SelectedExportPreset.OutputFilename);
+
+            _viewModel.SelectedExportPreset.OutputFolder = "";
+            _viewModel.SelectedExportPreset.OutputFilename = "";
+            throw;
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Log(ex, "Error while trying to choose the output path and filename.", _viewModel.SelectedExportPreset.OutputFolder + _viewModel.SelectedExportPreset.OutputFilename);
+            throw;
+        }
+    }
+
+    private void IncreaseFolder_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        _viewModel.ChangeFileNumber(1);
+    }
+
+    private void DecreaseFolder_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        _viewModel.ChangeFileNumber(-1);
+    }
+
+    private void OpenExistingFileCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        _viewModel.OpenOutputFile();
     }
 
     private void Export_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -175,6 +367,7 @@ public partial class Exporter : ExWindow
 
         Close();
     }
+
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
@@ -206,15 +399,31 @@ public partial class Exporter : ExWindow
         UserSettings.All.ExporterWindowState = WindowState;
         UserSettings.Save();
     }
-    
+
+
     public void LoadRecordingProject(RecordingProject project)
     {
         _viewModel.ImportFromRecording(project);
     }
 
-    public async void LoadRecordingProject(string path)
+    public async void LoadRecordingProjectPath(string path)
     {
         await _viewModel.ImportFromRecording(path);
+    }
+
+    public async void LoadLegacyProjectPath(string path)
+    {
+        //TODO: Localize.
+        var delete = Dialog.AskStatic("Delete old project?",
+            "The selected project will be converted to the new format.\r\nDo you want to delete the old one afterwards?",
+            "Delete", "Keep");
+
+        await _viewModel.ImportFromLegacyProject(path, delete);
+    }
+
+    public async void LoadCachedProjectPath(string path)
+    {
+        await _viewModel.ImportFromEditor(path);
     }
 
     public void LoadCachedProject(CachedProject project)

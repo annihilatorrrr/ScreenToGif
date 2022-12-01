@@ -7,6 +7,7 @@ public abstract class SubSequenceViewModel : BindableBase
 {
     private SubSequenceTypes _type;
     private long _timeStampInTicks;
+    private int _expectedDelay;
     private long _streamPosition;
 
     public SubSequenceTypes Type
@@ -22,6 +23,12 @@ public abstract class SubSequenceViewModel : BindableBase
     {
         get => _timeStampInTicks;
         set => SetProperty(ref _timeStampInTicks, value);
+    }
+    
+    public int ExpectedDelay
+    {
+        get => _expectedDelay;
+        set => SetProperty(ref _expectedDelay, value);
     }
 
     /// <summary>
