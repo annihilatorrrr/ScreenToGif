@@ -2,18 +2,26 @@ using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Gif;
+using ScreenToGif.Util;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 
 public class GifskiGifPresetViewModel : GifPresetViewModel
 {
     private bool _fast;
+    private bool _extraEffort;
     private int _quality = 10;
 
     public bool Fast
     {
         get => _fast;
         set => SetProperty(ref _fast, value);
+    }
+
+    public bool ExtraEffort
+    {
+        get => _extraEffort;
+        set => SetProperty(ref _extraEffort, value);
     }
 
     public int Quality
@@ -97,7 +105,6 @@ public class GifskiGifPresetViewModel : GifPresetViewModel
             Looped = preset.Looped,
             RepeatForever = preset.RepeatForever,
             RepeatCount = preset.RepeatCount,
-            UseGlobalColorTable = preset.UseGlobalColorTable,
             Fast = preset.Fast,
             Quality = preset.Quality
         };
@@ -132,14 +139,41 @@ public class GifskiGifPresetViewModel : GifPresetViewModel
             Looped = Looped,
             RepeatForever = RepeatForever,
             RepeatCount = RepeatCount,
-            UseGlobalColorTable = UseGlobalColorTable,
             Fast = Fast,
+            ExtraEffort = ExtraEffort,
             Quality = Quality
         };
     }
 
-    public override ExportPresetViewModel Reset()
+    public override void Reset()
     {
-        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+        var preset = Defaults.First(f => f.TitleKey == TitleKey);
+
+        Title = LocalizationHelper.Get(preset.TitleKey).Replace("{0}", preset.DefaultExtension);
+        Description = LocalizationHelper.Get(preset.DescriptionKey);
+        IsSelected = preset.IsSelected;
+        IsSelectedForEncoder = preset.IsSelectedForEncoder;
+        IsDefault = preset.IsDefault;
+        HasAutoSave = preset.HasAutoSave;
+        CreationDate = preset.CreationDate;
+        PickLocation = preset.PickLocation;
+        OverwriteMode = preset.OverwriteMode;
+        ExportAsProjectToo = preset.ExportAsProjectToo;
+        UploadFile = preset.UploadFile;
+        UploadService = preset.UploadService;
+        SaveToClipboard = preset.SaveToClipboard;
+        CopyType = preset.CopyType;
+        ExecuteCustomCommands = preset.ExecuteCustomCommands;
+        CustomCommands = preset.CustomCommands;
+        OutputFolder = preset.OutputFolder;
+        OutputFilename = preset.OutputFilename;
+        OutputFilenameKey = preset.OutputFilenameKey;
+        Extension = preset.Extension;
+        Looped = preset.Looped;
+        RepeatForever = preset.RepeatForever;
+        RepeatCount = preset.RepeatCount;
+        Fast = preset.Fast;
+        ExtraEffort = preset.ExtraEffort;
+        Quality = preset.Quality;
     }
 }

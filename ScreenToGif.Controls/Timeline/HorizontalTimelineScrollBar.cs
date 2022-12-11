@@ -101,6 +101,11 @@ public class HorizontalTimelineScrollBar : RangeBase
     static HorizontalTimelineScrollBar()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(HorizontalTimelineScrollBar), new FrameworkPropertyMetadata(typeof(HorizontalTimelineScrollBar)));
+
+        //TODO: If I open the editor a second time, this throws an exception, saying that it's already registered.
+        ValueProperty.OverrideMetadata(typeof(HorizontalTimelineScrollBar), new FrameworkPropertyMetadata(Value_PropertyChanged));
+        MaximumProperty.OverrideMetadata(typeof(HorizontalTimelineScrollBar), new FrameworkPropertyMetadata(Value_PropertyChanged));
+        MinimumProperty.OverrideMetadata(typeof(HorizontalTimelineScrollBar), new FrameworkPropertyMetadata(Value_PropertyChanged));
     }
 
     public HorizontalTimelineScrollBar()
@@ -138,11 +143,6 @@ public class HorizontalTimelineScrollBar : RangeBase
             };
         }
 
-        //TODO: If I open the editor a second time, this throws an exception, saying that it's already registered.
-        ValueProperty.OverrideMetadata(typeof(HorizontalTimelineScrollBar), new FrameworkPropertyMetadata(Value_PropertyChanged));
-        MaximumProperty.OverrideMetadata(typeof(HorizontalTimelineScrollBar), new FrameworkPropertyMetadata(Value_PropertyChanged));
-        MinimumProperty.OverrideMetadata(typeof(HorizontalTimelineScrollBar), new FrameworkPropertyMetadata(Value_PropertyChanged));
-        
         EventManager.RegisterClassHandler(typeof(HorizontalTimelineScrollBar), Thumb.DragDeltaEvent, new DragDeltaEventHandler(OnThumbDragDelta));
     }
 

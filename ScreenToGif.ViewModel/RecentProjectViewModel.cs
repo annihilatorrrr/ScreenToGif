@@ -60,8 +60,8 @@ public class RecentProjectViewModel : BaseViewModel
 
     public FluentSymbols Symbol => Type switch
     {
-        RecentProjectTypes.Recording => FluentSymbols.Record,
         RecentProjectTypes.Project => FluentSymbols.DocumentFilled,
+        RecentProjectTypes.Recording or RecentProjectTypes.OldRecording => FluentSymbols.Record,
         _ => FluentSymbols.WarningFilled,
     };
 
@@ -81,17 +81,31 @@ public class RecentProjectViewModel : BaseViewModel
             if (File.Exists(propertiesPath))
             {
                 using var readStream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var type = Encoding.ASCII.GetString(readStream.ReadBytes(4));
-                var version = readStream.ReadUInt16();
+                var type = Encoding.ASCII.GetString(readStream.ReadBytes(4)); //4 bytes.
+                var version = readStream.ReadUInt16(); //2 bytes
 
                 if (type == "stgR")
+                {
                     readStream.Position += 10;
+                    readStream.ReadPascalString();
+                    readStream.ReadPascalString();
+                    readStream.Position += 1;
+                }
                 else
-                    readStream.Position += 14;
+                {
+                    readStream.Position += 12;
 
-                readStream.ReadPascalString();
-                readStream.ReadPascalString();
-                readStream.Position += 1;
+                    var backgroundSize = readStream.ReadUInt32();
+                    readStream.Position += backgroundSize;
+                    readStream.Position += 2;
+
+                    var appNameSize = readStream.ReadByte();
+                    readStream.Position += appNameSize;
+
+                    var appVersionSize = readStream.ReadByte();
+                    readStream.Position += appVersionSize;
+                    readStream.Position += 1;
+                }
 
                 var dateInTicks = readStream.ReadInt64();
                 var date = new DateTime(dateInTicks);

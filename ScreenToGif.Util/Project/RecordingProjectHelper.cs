@@ -17,6 +17,7 @@ public static class RecordingProjectHelper
 
         var project = new RecordingProject
         {
+            RootCachePath = path,
             PropertiesCachePath = Path.Combine(path, "Properties.cache"),
             FramesCachePath = Path.Combine(path, "Frames.cache"),
             MouseEventsCachePath = Path.Combine(path, "MouseEvents.cache"),
@@ -70,13 +71,13 @@ public static class RecordingProjectHelper
         binaryWriter.Write((ushort)project.Width); //2 bytes.
         binaryWriter.Write((ushort)project.Height); //2 bytes.
         binaryWriter.Write(BitConverter.GetBytes(0F)); //4 bytes, angle.
-        binaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(project.Dpi))); //4+4 bytes.
 
         //Raster sequence. Should it be type of raster?
         binaryWriter.Write((byte)RasterSequenceSources.Screen); //1 byte.
         binaryWriter.Write((ushort)project.Width); //2 bytes.
         binaryWriter.Write((ushort)project.Height); //2 bytes.
-        binaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(project.Dpi))); //4+4 bytes.
+        binaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(project.Dpi))); //4 bytes.
+        binaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(project.Dpi))); //4 bytes.
         binaryWriter.Write(project.ChannelCount); //1 byte.
         binaryWriter.Write(project.BitsPerChannel); //1 byte.
         binaryWriter.Write((uint)0); //4 byte, frame count (unknown for now).
@@ -90,23 +91,23 @@ public static class RecordingProjectHelper
         var cursorEventsPath = Path.Combine(path, "MouseEvents.cache");
         var keyEventsPath = Path.Combine(path, "KeyboardEvents.cache");
 
-        //TODO: Use BinaryReader instead.
-
         //Properties.
         using var readStream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var bynaryReader = new BinaryReader(readStream);
 
-        var sign = Encoding.ASCII.GetString(readStream.ReadBytes(4)); //Signature, 4 bytes.
+        var sign = Encoding.ASCII.GetString(bynaryReader.ReadBytes(4)); //Signature, 4 bytes.
 
         if (sign != "stgR") //Signature, 4 bytes.
             throw new Exception($"Unsupported file format. Signature: '{sign}'.");
 
-        var version = readStream.ReadUInt16(); //File version, 2 bytes.
+        var version = bynaryReader.ReadUInt16(); //File version, 2 bytes.
 
         if (version != 1)
             throw new Exception($"Unsupported file version. Version: '{version}'.");
 
         var project = new RecordingProject
         {
+            RootCachePath = path,
             PropertiesCachePath = propertiesPath,
             FramesCachePath = framesPath,
             //StrokesCachePath = strokesPath,
@@ -114,17 +115,17 @@ public static class RecordingProjectHelper
             KeyboardEventsCachePath = keyEventsPath
         };
 
-        project.Width = readStream.ReadUInt16(); //Width, 2 bytes.
-        project.Height = readStream.ReadUInt16(); //Height, 2 bytes.
-        project.Dpi = Convert.ToDouble(readStream.ReadSingle()); //DPI, 4 bytes.
-        project.ChannelCount = (byte)readStream.ReadByte(); //Number of channels, 1 byte.
-        project.BitsPerChannel = (byte)readStream.ReadByte(); //Bits per channels, 1 byte.
+        project.Width = bynaryReader.ReadUInt16(); //Width, 2 bytes.
+        project.Height = bynaryReader.ReadUInt16(); //Height, 2 bytes.
+        project.Dpi = Convert.ToDouble(bynaryReader.ReadSingle()); //DPI, 4 bytes.
+        project.ChannelCount = bynaryReader.ReadByte(); //Number of channels, 1 byte.
+        project.BitsPerChannel = bynaryReader.ReadByte(); //Bits per channels, 1 byte.
         
         readStream.ReadPascalString(); //App name, 1 byte + X bytes (255 max).
         readStream.ReadPascalString(); //App version, 1 byte + X bytes (255 max).
 
-        project.CreatedBy = (ProjectSources)readStream.ReadByte(); //Recording source, 1 byte.
-        project.CreationDate = new DateTime(readStream.ReadInt64()); //Creation date, 8 bytes.
+        project.CreatedBy = (ProjectSources)bynaryReader.ReadByte(); //Recording source, 1 byte.
+        project.CreationDate = new DateTime(bynaryReader.ReadInt64()); //Creation date, 8 bytes.
 
         //Frames.
         if (File.Exists(framesPath))
@@ -149,13 +150,13 @@ public static class RecordingProjectHelper
                 readFramesStream.Position += 30;
 
                 frame.DataLength = binaryReader.ReadInt64();
-                var compressedLength = binaryReader.ReadInt64();
+                frame.CompressedDataLength = binaryReader.ReadInt64();
                 var currentPosition = readFramesStream.Position;
 
                 //using (var compressStream = new DeflateStream(readFramesStream, CompressionMode.Decompress, true))
                 //    compressStream.ReadBytesUntilFull(frame.DataLength);
                 
-                readFramesStream.Position = currentPosition + compressedLength;
+                readFramesStream.Position = currentPosition + frame.CompressedDataLength;
 
                 project.Frames.Add(frame);
             }
@@ -173,56 +174,68 @@ public static class RecordingProjectHelper
         {
             using var readFramesStream = new FileStream(cursorEventsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            if (readFramesStream.ReadByte() == 0)
+            //TODO: Read is wrong
+
+            while (readFramesStream.Position < readFramesStream.Length)
             {
-                //Cursor
-                var cursor = new CursorEvent();
-                cursor.TimeStampInTicks = readFramesStream.ReadInt64();
-                cursor.Left = readFramesStream.ReadInt32();
-                cursor.Top = readFramesStream.ReadInt32();
-                cursor.LeftButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
-                cursor.RightButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
-                cursor.MiddleButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
-                cursor.FirstExtraButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
-                cursor.SecondExtraButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
-                cursor.MouseDelta = readFramesStream.ReadInt16();
+                if (readFramesStream.ReadByte() == 0) //Event Type
+                {
+                    //Cursor
+                    var cursor = new CursorEvent();
+                    cursor.StreamPosition = readFramesStream.Position - 1;
+                    cursor.TimeStampInTicks = readFramesStream.ReadInt64();
+                    cursor.Left = readFramesStream.ReadInt32();
+                    cursor.Top = readFramesStream.ReadInt32();
+                    cursor.LeftButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                    cursor.RightButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                    cursor.MiddleButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                    cursor.FirstExtraButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                    cursor.SecondExtraButton = readFramesStream.ReadByte() == 1 ? MouseButtonState.Pressed : MouseButtonState.Released;
+                    cursor.MouseDelta = readFramesStream.ReadInt16();
 
-                project.MouseEvents.Add(cursor);
-            }
-            else
-            {
-                //Cursor data.
-                var cursorData = new CursorDataEvent();
-                cursorData.TimeStampInTicks = readFramesStream.ReadInt64();
-                cursorData.CursorType = readFramesStream.ReadByte();
-                cursorData.Left = readFramesStream.ReadInt32();
-                cursorData.Top = readFramesStream.ReadInt32();
+                    project.MouseEvents.Add(cursor);
+                }
+                else
+                {
+                    //Cursor data.
+                    var cursorData = new CursorDataEvent();
+                    cursorData.StreamPosition = readFramesStream.Position - 1;
+                    cursorData.TimeStampInTicks = readFramesStream.ReadInt64();
+                    cursorData.CursorType = readFramesStream.ReadByte();
+                    cursorData.Left = readFramesStream.ReadInt32();
+                    cursorData.Top = readFramesStream.ReadInt32();
 
-                cursorData.Width = readFramesStream.ReadInt32();
-                cursorData.Height = readFramesStream.ReadInt32();
-                cursorData.XHotspot = readFramesStream.ReadInt32();
-                cursorData.YHotspot = readFramesStream.ReadInt32();
-                cursorData.PixelsLength = readFramesStream.ReadInt64();
+                    cursorData.Width = readFramesStream.ReadInt32();
+                    cursorData.Height = readFramesStream.ReadInt32();
+                    cursorData.XHotspot = readFramesStream.ReadInt32();
+                    cursorData.YHotspot = readFramesStream.ReadInt32();
+                    cursorData.PixelsLength = readFramesStream.ReadInt64();
+                    readFramesStream.Position += cursorData.PixelsLength;
 
-                project.MouseEvents.Add(cursorData);
+                    project.MouseEvents.Add(cursorData);
+                }
             }
         }
 
         if (File.Exists(keyEventsPath))
         {
             using var readFramesStream = new FileStream(keyEventsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            readFramesStream.Position += 1; //Type.
 
             if (readFramesStream.Length > 0)
             {
-                var key = new KeyEvent();
-                key.TimeStampInTicks = readFramesStream.ReadInt64();
-                key.Key = (Key)readFramesStream.ReadInt32();
-                key.Modifiers = (ModifierKeys)readFramesStream.ReadByte();
-                key.IsUppercase = readFramesStream.ReadByte() == 1;
-                key.WasInjected = readFramesStream.ReadByte() == 1;
+                while (readFramesStream.Position < readFramesStream.Length)
+                {
+                    var key = new KeyEvent();
+                    key.StreamPosition = readFramesStream.Position;
+                    readFramesStream.Position += 1; //Type.
+                    key.TimeStampInTicks = readFramesStream.ReadInt64();
+                    key.Key = (Key)readFramesStream.ReadInt32();
+                    key.Modifiers = (ModifierKeys)readFramesStream.ReadByte();
+                    key.IsUppercase = readFramesStream.ReadByte() == 1;
+                    key.WasInjected = readFramesStream.ReadByte() == 1;
 
-                project.KeyboardEvents.Add(key);
+                    project.KeyboardEvents.Add(key);
+                }
             }
         }
 
@@ -237,6 +250,7 @@ public static class RecordingProjectHelper
             File.Delete(project.FramesCachePath);
             File.Delete(project.MouseEventsCachePath);
             File.Delete(project.KeyboardEventsCachePath);
+            File.Delete(project.RootCachePath);
 
             project.Frames.Clear();
             project.MouseEvents.Clear();

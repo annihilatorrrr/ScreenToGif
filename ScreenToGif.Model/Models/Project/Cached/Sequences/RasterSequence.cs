@@ -20,6 +20,10 @@ public abstract class RasterSequence : RectSequence
     /// </summary>
     public ushort OriginalHeight { get; set; }
 
+    public double HorizontalDpi { get; set; }
+
+    public double VerticalDpi { get; set; }
+
     /// <summary>
     /// The number of channels of the images.
     /// 4 is RGBA
@@ -31,8 +35,4 @@ public abstract class RasterSequence : RectSequence
     /// The bits per channel in the images.
     /// </summary>
     public byte BitsPerChannel { get; set; } = 8;
-
-    public double HorizontalDpi { get; set; }
-
-    public double VerticalDpi { get; set; }
 }

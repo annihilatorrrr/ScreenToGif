@@ -6,7 +6,6 @@ using ScreenToGif.Util;
 using ScreenToGif.Util.Project;
 using ScreenToGif.Util.Settings;
 using ScreenToGif.ViewModel.Project;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -27,6 +26,8 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
     private ProjectViewModel _project;
     private WriteableBitmap _renderedImage;
     private IntPtr _renderedImageBackBuffer;
+    private int _renderedImageStride;
+    private int _renderedImagePixelHeight;
     private long _currentTime;
     private long _startTime;
     private long _endTime;
@@ -46,9 +47,6 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
     private readonly GridLength _minTimelineHeight = new(100, GridUnitType.Pixel);
 
     private ExportViewModel _export;
-
-    //Erase it later.
-    private ObservableCollection<FrameViewModel> _frames = new();
 
     #endregion
 
@@ -117,6 +115,8 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
             SetProperty(ref _renderedImage, value);
 
             _renderedImageBackBuffer = value.BackBuffer;
+            _renderedImageStride = value.BackBufferStride;
+            _renderedImagePixelHeight = value.PixelHeight;
         }
     }
 
@@ -230,45 +230,67 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
 
     #endregion
 
-    #region Methods
-
-    public async Task ImportFromRecording(RecordingProject project)
+    public EditorViewModel()
     {
-        IsLoading = true;
+        _renderWorker.DoWork += RenderWorker_DoWork;
+        _renderWorker.ProgressChanged += RenderWorker_ProgressChanged;
+        _renderWorker.RunWorkerAsync();
 
-        //Show progress.
-        //  Create list of progresses.
-        //  Pass the created progress reporter.
-        //Cancelable.
-        //  Pass token.
-        //TODO: The conversion is not that difficult anymore.
-
-        var cached = await project.ConvertFromRecordingProject();
-        Project = ProjectViewModel.FromModel(cached, this);
-
-        InitializePreview();
-
-        IsLoading = false;
+        _playbackWorker.DoWork += PlaybackWorder_DoWork;
     }
+
+    #region Methods
 
     public async Task ImportFromRecording(string path)
     {
         IsLoading = true;
 
-        //Show progress.
-        //  Create list of progresses.
-        //  Pass the created progress reporter.
-        //Cancelable.
-        //  Pass token.
-        //TODO: The conversion is not that difficult anymore.
-
-        var cached = await Task.Factory.StartNew(() => RecordingProjectHelper.ReadFromPath(path));
+        var recording = await Task.Factory.StartNew(() => RecordingProjectHelper.ReadFromPath(path));
+        var cached = await recording.ConvertToCachedProject();
         Project = ProjectViewModel.FromModel(cached, this);
 
         InitializePreview();
 
         IsLoading = false;
     }
+
+    public async Task ImportFromCached(string path)
+    {
+        IsLoading = true;
+
+        var cached = await Task.Factory.StartNew(() => CachedProjectHelper.ReadFromPath(path));
+        Project = ProjectViewModel.FromModel(cached, this);
+
+        InitializePreview();
+
+        IsLoading = false;
+    }
+
+    public async Task ImportFromLegacyProject(string path, bool deleteOld = true)
+    {
+        IsLoading = true;
+
+        var legacy = await Task.Factory.StartNew(() => LegacyProjectHelper.ReadFromPath(path, deleteOld));
+        var cached = await legacy.ConvertToCachedProject();
+        Project = ProjectViewModel.FromModel(cached, this);
+
+        InitializePreview();
+
+        IsLoading = false;
+    }
+
+    public async Task ImportFromRecording(RecordingProject project)
+    {
+        IsLoading = true;
+        
+        var cached = await project.ConvertToCachedProject();
+        Project = ProjectViewModel.FromModel(cached, this);
+
+        InitializePreview();
+
+        IsLoading = false;
+    }
+
 
     internal void InitializePreview()
     {
@@ -292,12 +314,12 @@ public partial class EditorViewModel : BaseViewModel, IPreviewerViewModel
 
         var target = new RenderTargetBitmap(Project.Width, Project.Height, Project.HorizontalDpi, Project.VerticalDpi, PixelFormats.Pbgra32);
         target.Render(drawingVisual);
-
+        
         //Size * channels * Bytes per pixel + (height * stride padding?);
         //var buffer = new byte[RenderedImage.BackBufferStride * RenderedImage.PixelHeight];
         //target.CopyPixels(buffer, RenderedImage.BackBufferStride, 0);
 
-        target.CopyPixels(new Int32Rect(0, 0, Project.Width, Project.Height), _renderedImageBackBuffer, RenderedImage.BackBufferStride * RenderedImage.PixelHeight, RenderedImage.BackBufferStride);
+        target.CopyPixels(new Int32Rect(0, 0, Project.Width, Project.Height), _renderedImageBackBuffer, _renderedImageStride * _renderedImagePixelHeight, _renderedImageStride);
 
         //How to cache this?
         //Maybe simply store in a byte array and leave in memory.

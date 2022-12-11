@@ -26,6 +26,7 @@
                                     <RectangleGeometry Rect="0,0 100,100"/>
                                 </GeometryDrawing.Geometry>
                             </GeometryDrawing>
+
                             <GeometryDrawing Brush="LightGray">
                                 <GeometryDrawing.Geometry>
                                     <GeometryGroup>

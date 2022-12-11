@@ -5,6 +5,11 @@ namespace ScreenToGif.Domain.Models.Project.Cached.Sequences.SubSequences;
 public class FrameSubSequence : RasterSubSequence
 {
     /// <summary>
+    /// The number of bytes of the compressed capture content.
+    /// </summary>
+    public long CompressedDataLength { get; set; }
+
+    /// <summary>
     /// The position of the data stream after the headers of this sub sequence.
     /// The size of the headers is 55 bytes.
     /// </summary>

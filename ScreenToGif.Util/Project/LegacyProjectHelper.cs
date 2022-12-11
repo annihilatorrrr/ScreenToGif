@@ -35,6 +35,7 @@ public static class LegacyProjectHelper
 
         var project = new RecordingProject
         {
+            RootCachePath = basePath,
             PropertiesCachePath = Path.Combine(basePath, "Properties.cache"),
             FramesCachePath = Path.Combine(basePath, "Frames.cache"),
             KeyboardEventsCachePath = Path.Combine(basePath, "KeyboardEvents.cache"),
@@ -78,13 +79,13 @@ public static class LegacyProjectHelper
                 var reader = new PixelUtil(framePath.SourceFrom());
                 reader.LockBits();
 
-                project.Frames.Add(new RecordingFrame
+                var recFrame = new RecordingFrame
                 {
                     StreamPosition = framesFileStream.Position,
                     TimeStampInTicks = timeStamp,
                     ExpectedDelay = delay,
-                    DataLength = reader.Pixels.LongLength
-                });
+                    DataLength = reader.Pixels.LongLength,
+                };
 
                 //Sub-sequence.
                 framesBinaryWriter.Write((byte)SubSequenceTypes.Frame); //1 byte.
@@ -122,6 +123,9 @@ public static class LegacyProjectHelper
                 framesFileStream.Position = start;
                 framesBinaryWriter.Write(compressedLength); //8 bytes, compressed length.
                 framesFileStream.Position = end;
+
+                recFrame.CompressedDataLength = compressedLength;
+                project.Frames.Add(recFrame);
 
                 reader.UnlockBitsWithoutCommit();
             }

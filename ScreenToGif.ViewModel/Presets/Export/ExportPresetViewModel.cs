@@ -358,7 +358,7 @@ public abstract class ExportPresetViewModel : BaseViewModel, IExportPreset
 
     public abstract ExportPreset ToModel();
 
-    public abstract ExportPresetViewModel Reset();
+    public abstract void Reset();
 
     public ExportPresetViewModel ShallowCopy()
     {

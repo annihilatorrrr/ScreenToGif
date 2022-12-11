@@ -1,5 +1,7 @@
 using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
+using ScreenToGif.Domain.Models.Preset.Export.Video.Mkv;
+using ScreenToGif.Util;
 
 namespace ScreenToGif.ViewModel.Presets.Export.Video.Mkv;
 
@@ -56,8 +58,100 @@ public class FfmpegMkvPresetViewModel : MkvPresetViewModel, IFfmpegPreset
         }
     };
 
-    public override ExportPresetViewModel Reset()
+    public override FfmpegMkvPreset ToModel()
     {
-        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+        return new FfmpegMkvPreset
+        {
+            Title = Title,
+            TitleKey = TitleKey,
+            Description = Description,
+            DescriptionKey = DescriptionKey,
+            IsSelected = IsSelected,
+            IsSelectedForEncoder = IsSelectedForEncoder,
+            IsDefault = IsDefault,
+            HasAutoSave = HasAutoSave,
+            CreationDate = CreationDate,
+            PickLocation = PickLocation,
+            OverwriteMode = OverwriteMode,
+            ExportAsProjectToo = ExportAsProjectToo,
+            UploadFile = UploadFile,
+            UploadService = UploadService,
+            SaveToClipboard = SaveToClipboard,
+            CopyType = CopyType,
+            ExecuteCustomCommands = ExecuteCustomCommands,
+            CustomCommands = CustomCommands,
+            OutputFolder = OutputFolder,
+            OutputFilename = OutputFilename,
+            OutputFilenameKey = OutputFilenameKey,
+            Extension = Extension,
+            SettingsMode = SettingsMode,
+            Parameters = Parameters,
+            VideoCodec = VideoCodec,
+            CodecPreset = CodecPreset,
+            HardwareAcceleration = HardwareAcceleration,
+            Pass = Pass,
+            IsVariableBitRate = IsVariableBitRate,
+            ConstantRateFactor = ConstantRateFactor,
+            BitRate = BitRate,
+            QualityLevel = QualityLevel,
+            BitRateUnit = BitRateUnit,
+            MinimumBitRate = MinimumBitRate,
+            MinimumBitRateUnit = MinimumBitRateUnit,
+            MaximumBitRate = MaximumBitRate,
+            MaximumBitRateUnit = MaximumBitRateUnit,
+            RateControlBuffer = RateControlBuffer,
+            RateControlBufferUnit = RateControlBufferUnit,
+            PixelFormat = PixelFormat,
+            Framerate = Framerate,
+            CustomFramerate = CustomFramerate,
+            Vsync = Vsync,
+        };
+    }
+
+    public override void Reset()
+    {
+        var preset = Defaults.First(f => f.TitleKey == TitleKey);
+
+        Title = LocalizationHelper.Get(preset.TitleKey).Replace("{0}", preset.DefaultExtension);
+        Description = LocalizationHelper.Get(preset.DescriptionKey);
+        IsSelected = preset.IsSelected;
+        IsSelectedForEncoder = preset.IsSelectedForEncoder;
+        IsDefault = preset.IsDefault;
+        HasAutoSave = preset.HasAutoSave;
+        CreationDate = preset.CreationDate;
+        PickLocation = preset.PickLocation;
+        OverwriteMode = preset.OverwriteMode;
+        ExportAsProjectToo = preset.ExportAsProjectToo;
+        UploadFile = preset.UploadFile;
+        UploadService = preset.UploadService;
+        SaveToClipboard = preset.SaveToClipboard;
+        CopyType = preset.CopyType;
+        ExecuteCustomCommands = preset.ExecuteCustomCommands;
+        CustomCommands = preset.CustomCommands;
+        OutputFolder = preset.OutputFolder;
+        OutputFilename = preset.OutputFilename;
+        OutputFilenameKey = preset.OutputFilenameKey;
+        Extension = preset.Extension;
+        SettingsMode = preset.SettingsMode;
+        Parameters = preset.Parameters;
+        VideoCodec = preset.VideoCodec;
+        CodecPreset = preset.CodecPreset;
+        HardwareAcceleration = preset.HardwareAcceleration;
+        Pass = preset.Pass;
+        IsVariableBitRate = preset.IsVariableBitRate;
+        ConstantRateFactor = preset.ConstantRateFactor;
+        BitRate = preset.BitRate;
+        QualityLevel = preset.QualityLevel;
+        BitRateUnit = preset.BitRateUnit;
+        MinimumBitRate = preset.MinimumBitRate;
+        MinimumBitRateUnit = preset.MinimumBitRateUnit;
+        MaximumBitRate = preset.MaximumBitRate;
+        MaximumBitRateUnit = preset.MaximumBitRateUnit;
+        RateControlBuffer = preset.RateControlBuffer;
+        RateControlBufferUnit = preset.RateControlBufferUnit;
+        PixelFormat = preset.PixelFormat;
+        Framerate = preset.Framerate;
+        CustomFramerate = preset.CustomFramerate;
+        Vsync = preset.Vsync;
     }
 }

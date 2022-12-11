@@ -5,6 +5,8 @@ namespace ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Gif;
 
 public class FfmpegGifPreset : GifPreset
 {
+    public bool UseGlobalColorTable { get; set; }
+
     public VideoSettingsModes SettingsMode { get; set; }
 
     [DataMember(EmitDefaultValue = false)]
@@ -18,7 +20,7 @@ public class FfmpegGifPreset : GifPreset
 
     public Framerates Framerate { get; set; }
 
-    public double CustomFramerate { get; set; }
+    public decimal CustomFramerate { get; set; }
 
     public Vsyncs Vsync { get; set; }
 

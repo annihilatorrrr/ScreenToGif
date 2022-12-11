@@ -958,7 +958,10 @@ public class DirectCapture : ScreenCapture
         FramesBinaryWriter.WriteTwice(BitConverter.GetBytes(Convert.ToSingle(Project.Dpi))); //4+4 bytes.
         FramesBinaryWriter.Write(Project.ChannelCount); //1 byte.
         FramesBinaryWriter.Write(Project.BitsPerChannel); //1 byte.
-        FramesBinaryWriter.Write(info.Pixels.LongLength); //8 bytes.
+
+        FramesBinaryWriter.Write(info.Pixels.LongLength); //8 bytes, uncompressed length.
+        var start = FramesFileStream.Position;
+        FramesBinaryWriter.Write(0L); //8 bytes, compressed length.
 
         using var compressStream = new DeflateStream(FramesFileStream, UserSettings.All.CaptureCompression, true);
         {
@@ -966,7 +969,15 @@ public class DirectCapture : ScreenCapture
             compressStream.Flush();
         }
 
+        var end = FramesFileStream.Position;
+        var compressedLength = end - start - 8;
+
+        FramesFileStream.Position = start;
+        FramesBinaryWriter.Write(compressedLength); //8 bytes, compressed length.
+        FramesFileStream.Position = end;
+
         info.DataLength = info.Pixels.LongLength;
+        info.CompressedDataLength = compressedLength;
         info.Pixels = null;
 
         Project.Frames.Add(info);

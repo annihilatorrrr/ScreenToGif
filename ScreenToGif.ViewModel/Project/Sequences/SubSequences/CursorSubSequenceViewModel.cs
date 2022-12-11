@@ -87,10 +87,15 @@ public class CursorSubSequenceViewModel : RasterSubSequenceViewModel
     public bool IsMiddleScroll => IsMiddleScrollUp || IsMiddleScrollDown;
 
     /// <summary>
+    /// The data position will be different in a RecordingProject than in a CachedProject.
+    /// </summary>
+    public bool IsFromRecording { get; set; }
+
+    /// <summary>
     /// The position of the data stream after the headers of this sub sequence.
     /// The size of the headers is 59 bytes.
     /// </summary>
-    public override long DataStreamPosition => StreamPosition + 42;// + 59; //TODO: Fix for cached
+    public override long DataStreamPosition => StreamPosition + (IsFromRecording ? 42 : 59);
 
     public static CursorSubSequenceViewModel FromModel(CursorSubSequence sequence)
     {

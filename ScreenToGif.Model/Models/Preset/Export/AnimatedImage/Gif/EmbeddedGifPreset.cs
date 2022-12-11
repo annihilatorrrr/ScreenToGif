@@ -5,6 +5,8 @@ namespace ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Gif;
 
 public class EmbeddedGifPreset: GifPreset
 {
+    public bool UseGlobalColorTable { get; set; }
+    
     public ColorQuantizationTypes Quantizer { get; set; }
 
     public int SamplingFactor { get; set; }

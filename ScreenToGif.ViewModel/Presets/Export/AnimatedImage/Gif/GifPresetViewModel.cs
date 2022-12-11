@@ -6,14 +6,6 @@ namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 
 public abstract class GifPresetViewModel : AnimatedImagePresetViewModel
 {
-    private bool _useGlobalColorTable;
-    
-    public bool UseGlobalColorTable
-    {
-        get => _useGlobalColorTable;
-        set => SetProperty(ref _useGlobalColorTable, value);
-    }
-
     protected GifPresetViewModel()
     {
         Type = ExportFormats.Gif;

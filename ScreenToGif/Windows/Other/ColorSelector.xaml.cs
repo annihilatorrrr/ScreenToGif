@@ -157,7 +157,7 @@ public partial class ColorSelector : Window
 
     private void ValueBox_MouseWheel(object sender, MouseWheelEventArgs e)
     {
-        if (!(sender is IntegerUpDown textBox))
+        if (sender is not IntegerUpDown textBox)
             return;
 
         textBox.Value = e.Delta > 0 ? textBox.Value + 1 : textBox.Value - 1;

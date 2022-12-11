@@ -18,7 +18,7 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
     private double _opacity = 1;
     private Brush _background = null;
     private ObservableCollection<object> _effects = new();
-    private ulong _streamPosition = 0;
+    private long _streamPosition = 0;
     private string _cachePath = "";
     private IPreviewerViewModel _previewerViewModel = null;
 
@@ -84,7 +84,7 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
         set => SetProperty(ref _effects, value);
     }
 
-    public ulong StreamPosition
+    public long StreamPosition
     {
         get => _streamPosition;
         set => SetProperty(ref _streamPosition, value);
@@ -116,6 +116,8 @@ public abstract class SequenceViewModel : BaseViewModel, ISequence
             //    return KeySequenceViewModel.FromModel(key, baseViewModel);
 
             //TODO: Copy all data.
+            //StrokeSequence
+            //?
         }
 
         return null;

@@ -235,6 +235,18 @@ public partial class PresetSettings : ExWindow
         _viewModel.RemovePreset();
     }
 
+    private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    {
+        try
+        {
+            ProcessHelper.StartWithShell(e.Uri.AbsoluteUri);
+        }
+        catch (Exception ex)
+        {
+            LogWriter.Log(ex, $"Error while trying to navigate to a given URI: '{e?.Uri?.AbsoluteUri}'.");
+        }
+    }
+
     private void Window_Closing(object sender, CancelEventArgs e)
     {
         _viewModel.PersistSettings();

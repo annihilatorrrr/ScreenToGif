@@ -16,7 +16,7 @@ public class FfmpegApngPreset : ApngPreset
 
     public Framerates Framerate { get; set; }
 
-    public double CustomFramerate { get; set; }
+    public decimal CustomFramerate { get; set; }
 
     public Vsyncs Vsync { get; set; }
     

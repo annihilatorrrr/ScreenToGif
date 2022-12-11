@@ -104,8 +104,26 @@
         </Setter>
     </Style>
 
+    <!--IntegerBox-->
     <Style TargetType="{x:Type c:IntegerBox}" BasedOn="{StaticResource {x:Type c:ExTextBox}}">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="MaxLength" Value="6"/>
     </Style>
+
+    <!--NullableIntegerBox-->
+    <Style TargetType="{x:Type c:NullableIntegerBox}" BasedOn="{StaticResource {x:Type c:ExTextBox}}">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="MaxLength" Value="6"/>
+    </Style>
+
+    <!--DoubleBox-->
+    <Style TargetType="{x:Type c:DoubleBox}" BasedOn="{StaticResource {x:Type c:ExTextBox}}"></Style>
+
+    <!--DecimalBox-->
+    <Style TargetType="{x:Type c:DecimalBox}" BasedOn="{StaticResource {x:Type c:ExTextBox}}"></Style>
+
+    <!--HexadecimalBox-->
+    <Style TargetType="{x:Type c:HexadecimalBox}" BasedOn="{StaticResource {x:Type c:ExTextBox}}"></Style>
 </ResourceDictionary>

@@ -6,6 +6,8 @@ public class GifskiGifPreset : GifPreset
 {
     public bool Fast { get; set; }
 
+    public bool ExtraEffort { get; set; }
+
     public int Quality { get; set; }
     
     public GifskiGifPreset()

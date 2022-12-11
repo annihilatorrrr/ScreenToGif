@@ -38,8 +38,6 @@ public partial class Startup : ExWindow
             new CommandBinding(_viewModel.RemoveProjectCommand, RemoveProjects_Executed)
         });
 
-        _viewModel.LoadRecentCommand.Execute(null, this);
-
         SystemEvents.DisplaySettingsChanged += System_DisplaySettingsChanged;
     }
 
@@ -47,6 +45,14 @@ public partial class Startup : ExWindow
     {
         if (!UpdatePositioning())
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
+    }
+
+    private void Startup_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (!IsVisible)
+            return;
+
+        _viewModel.LoadRecentCommand.Execute(null, this);
     }
 
     private void System_DisplaySettingsChanged(object sender, EventArgs e)
@@ -61,14 +67,16 @@ public partial class Startup : ExWindow
 
     private void ExportProjects_Executed(object sender, ExecutedRoutedEventArgs e)
     {
-        App.ShowExporter(null, e.Parameter as RecentProjectViewModel);
+        Hide();
+
+        App.ShowExporter(this, e.Parameter as RecentProjectViewModel);
     }
 
-    private async void EditProjects_Executed(object sender, ExecutedRoutedEventArgs e)
+    private void EditProjects_Executed(object sender, ExecutedRoutedEventArgs e)
     {
-        var parameter = e.Parameter as RecentProjectViewModel;
+        Hide();
 
-        await App.ShowEditor(null, parameter?.Path);
+        App.ShowEditor(this, e.Parameter as RecentProjectViewModel);
     }
 
     private void RemoveProjects_Executed(object sender, ExecutedRoutedEventArgs e)

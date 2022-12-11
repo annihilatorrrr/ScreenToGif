@@ -64,6 +64,9 @@ internal class Migration2_37_0To3_0_0
                 presetsChild.NameSpace = presetsChild.NameSpace.Replace("ScreenToGif.ViewModel.ExportPresets", "ScreenToGif.Domain.Models.Preset.Export")
                     .Replace("assembly=ScreenToGif.ViewModel", "assembly=ScreenToGif.Domain");
 
+                if (presetsChild.Type == "SystemGifPreset" || presetsChild.Type == "GifskiGifPreset" || presetsChild.Type == "KGySoftGifPreset")
+                    presetsChild.Attributes.RemoveAll(r => r.Key == "UseGlobalColorTable");
+
                 presetsChild.Attributes.RemoveAll(r => r.Key == "DefaultExtension" ||
                                                        r.Key == "IsEncoderExpanded" ||
                                                        r.Key == "IsEncoderOptionsExpanded" ||

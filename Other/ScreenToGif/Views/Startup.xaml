@@ -7,7 +7,7 @@
             Title="{DynamicResource S.StartUp.Title}" Height="380" Width="700"
             MinHeight="380" MinWidth="700" MaxHeight="600" MaxWidth="900" UseLayoutRounding="True"
             ShowCustomCaptionButtons="True" WindowStyle="None" ShowMaximizeButton="False" ShowMinimizeButton="False"
-            Initialized="Startup_Initialized" Closing="Startup_Closing">
+            Initialized="Startup_Initialized" IsVisibleChanged="Startup_IsVisibleChanged" Closing="Startup_Closing">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -47,7 +47,7 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Margin="0" FontSize="16" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Foreground}">
+                <TextBlock Grid.Row="0" Margin="5" FontSize="16" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Foreground}">
                     <Run Text="ScreenToGif "/>
                     <Run Text="{Binding Source={x:Static u:UserSettings.All}, Path=VersionText, Mode=OneWay}"/>
                 </TextBlock>
@@ -126,29 +126,29 @@
                                         </Grid.ColumnDefinitions>
 
                                         <c:SymbolIcon Grid.Column="0" x:Name="SymbolIcon" Symbol="{Binding Symbol}" Margin="5,0" VerticalAlignment="Center"
-                                                  Foreground="{DynamicResource Brush.InfoBar.Glyph}"/>
+                                                      Foreground="{DynamicResource Brush.InfoBar.Glyph}"/>
 
                                         <TextBlock Grid.Column="1" x:Name="TitleTextBlock" Text="{Binding Title}" FontSize="14" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,0"/>
+                                                   Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" TextWrapping="WrapWithOverflow" Margin="5,0"/>
 
                                         <TextBlock Grid.Column="2" Text="{Binding CreationDate, StringFormat='{}{0:g}'}" Margin="10,0"
-                                               VerticalAlignment="Center" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                                                   VerticalAlignment="Center" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
 
                                         <c:ExButton Grid.Column="3" Padding="4,0" Style="{DynamicResource Style.Button.Borderless}"
-                                                Command="{Binding ExportProjectCommand}" CommandParameter="{Binding .}"
-                                                ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                                                    Command="{Binding ExportProjectCommand}" CommandParameter="{Binding .}"
+                                                    ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
                                             <c:SymbolIcon Symbol="Save" FontSize="18"/>
                                         </c:ExButton>
 
                                         <c:ExButton Grid.Column="4" Padding="4,0" Style="{DynamicResource Style.Button.Borderless}"
-                                                Command="{Binding EditProjectCommand}" CommandParameter="{Binding .}"
-                                                ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                                                    Command="{Binding EditProjectCommand}" CommandParameter="{Binding .}"
+                                                    ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
                                             <c:SymbolIcon Symbol="Edit" FontSize="18"/>
                                         </c:ExButton>
 
                                         <c:ExButton Grid.Column="5" Padding="4,0" Style="{DynamicResource Style.Button.Borderless}"
-                                                Command="{Binding RemoveProjectCommand}" CommandParameter="{Binding .}"
-                                                ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
+                                                    Command="{Binding RemoveProjectCommand}" CommandParameter="{Binding .}"
+                                                    ToolTip="{DynamicResource S.Suppress}" ToolTipService.Placement="Top" ToolTipService.HorizontalOffset="-5">
                                             <c:SymbolIcon Symbol="Delete" FontSize="18"/>
                                         </c:ExButton>
                                     </Grid>

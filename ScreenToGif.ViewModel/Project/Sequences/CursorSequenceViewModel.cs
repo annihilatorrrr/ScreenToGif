@@ -55,7 +55,8 @@ public class CursorSequenceViewModel : RasterSequenceViewModel
         {
             var sub = new CursorSubSequenceViewModel
             {
-                TimeStampInTicks = (entry?.TimeStampInTicks ?? 0)
+                TimeStampInTicks = (entry?.TimeStampInTicks ?? 0),
+                IsFromRecording = true
             };
 
             //If only data, ignore press states

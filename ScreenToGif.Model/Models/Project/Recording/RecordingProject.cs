@@ -53,6 +53,11 @@ public class RecordingProject
     #region Path
 
     /// <summary>
+    /// The root folder.
+    /// </summary>
+    public string RootCachePath { get; set; }
+
+    /// <summary>
     /// A binary cache containing a simple structure with the details of the project.
     /// </summary>
     public string PropertiesCachePath { get; set; }

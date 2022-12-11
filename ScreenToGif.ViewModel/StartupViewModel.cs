@@ -93,9 +93,10 @@ public class StartupViewModel : BaseViewModel, IDisposable
         _tokenSource?.Cancel();
         _tokenSource = new CancellationTokenSource();
 
+        RecentProjects.Clear();
+
         await Task.Factory.StartNew(() =>
         {
-            RecentProjects.Clear();
             var found = new List<RecentProjectViewModel>();
 
             try

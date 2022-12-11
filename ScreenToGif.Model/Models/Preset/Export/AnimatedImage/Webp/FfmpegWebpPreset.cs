@@ -20,7 +20,7 @@ public class FfmpegWebpPreset : WebpPreset
 
     public Framerates Framerate { get; set; }
 
-    public double CustomFramerate { get; set; }
+    public decimal CustomFramerate { get; set; }
 
     public Vsyncs Vsync { get; set; }
     

@@ -9,6 +9,13 @@
             xmlns:animatedImage="clr-namespace:ScreenToGif.ViewModel.Presets.Export.AnimatedImage;assembly=ScreenToGif.ViewModel"
             xmlns:image="clr-namespace:ScreenToGif.ViewModel.Presets.Export.Image;assembly=ScreenToGif.ViewModel"
             xmlns:video="clr-namespace:ScreenToGif.ViewModel.Presets.Export.Video;assembly=ScreenToGif.ViewModel"
+            xmlns:codecs="clr-namespace:ScreenToGif.ViewModel.Presets.Export.Video.Codecs;assembly=ScreenToGif.ViewModel"
+            xmlns:m="clr-namespace:ScreenToGif.Domain.Models;assembly=ScreenToGif.Domain"
+            xmlns:v="clr-namespace:ScreenToGif.Util.Converters;assembly=ScreenToGif.Util"
+            xmlns:other="clr-namespace:ScreenToGif.ViewModel.Presets.Export.Other;assembly=ScreenToGif.ViewModel"
+            xmlns:comp="clr-namespace:System.IO.Compression;assembly=System.IO.Compression"
+            xmlns:webp="clr-namespace:ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Webp;assembly=ScreenToGif.ViewModel"
+            xmlns:gif="clr-namespace:ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;assembly=ScreenToGif.ViewModel"
             Title="Preset Settings" Icon="../Resources/Logo.ico" Height="760" Width="1150" MinHeight="600" MinWidth="1150"
             WindowStartupLocation="CenterOwner" ExtendIntoTitleBar="False" Closing="Window_Closing">
 
@@ -356,7 +363,7 @@
                                         <c:SymbolIcon Symbol="FolderOpen" FontSize="15"/>
                                     </c:ExButton>
                                 </Grid>
-                                
+
                                 <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
 
                                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Filename" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
@@ -633,7 +640,6 @@
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
@@ -661,7 +667,7 @@
                                                 <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
 
                                                 <!--Repeats Forever-->
-                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center" IsEnabled="{Binding Looped, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center" IsEnabled="{Binding Looped, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition/>
                                                         <RowDefinition/>
@@ -678,10 +684,10 @@
                                                                 IsChecked="{Binding RepeatForever, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                                 </Grid>
 
-                                                <Separator Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+                                                <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
 
                                                 <!--Repeat Count-->
-                                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Repeat Count" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Repeat Count" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
                                                            IsEnabled="{Binding Looped, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                                                 <c:IntegerStepper Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" Margin="10,10,2,10"
                                                                   StepValue="1" Minimum="1" Maximum="100" Value="{Binding RepeatCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -690,12 +696,28 @@
                                         </DataTemplate>
 
                                         <DataTemplate DataType="{x:Type image:ImagePresetViewModel}">
-                                            <Grid>
+                                            <!--Zip Files-->
+                                            <Grid Margin="60,10" VerticalAlignment="Center">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.ImageOptions.Zip}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.ImageOptions.Zip.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                IsChecked="{Binding ZipFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type video:VideoPresetViewModel}">
+                                            <Grid Grid.IsSharedSizeScope="True">
+                                                <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
@@ -705,8 +727,446 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <!--Zip Files-->
-                                                <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                                <!--UI Mode-->
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Mode}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <c:ExComboBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag" 
+                                                              SelectedValue="{Binding SettingsMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                              ToolTip="{DynamicResource S.SaveAs.VideoOptions.Mode.Info}">
+                                                    <ComboBoxItem Tag="{x:Static e:VideoSettingsModes.Normal}" Content="{DynamicResource S.SaveAs.VideoOptions.Mode.Normal}"/>
+                                                    <ComboBoxItem Tag="{x:Static e:VideoSettingsModes.Advanced}" Content="{DynamicResource S.SaveAs.VideoOptions.Mode.Advanced}"/>
+                                                </c:ExComboBox>
+
+                                                <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Advanced-->
+                                                <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding AdvancedVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Parameters-->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Parameters" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExTextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap" AcceptsReturn="True"
+                                                                 Text="{Binding Parameters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{DynamicResource S.SaveAs.Ffmpeg.Parameters.Info}"/>
+
+                                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Output Command-->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Preview" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExTextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap" IsReadOnly="True"
+                                                                 Text="{Binding CommandResolved, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="Full command as it will be sent to FFmpeg"/>
+
+                                                    <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Help Links-->
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" VerticalAlignment="Center" TextAlignment="Center" Margin="10">
+                                                        <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Parameters.Pass}"/>
+
+                                                        <LineBreak/>
+
+                                                        <Hyperlink NavigateUri="https://ffmpeg.org/ffmpeg-formats.html" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Help.Format}"/>
+                                                        </Hyperlink>
+
+                                                        <Run Text="/"/>
+
+                                                        <Hyperlink NavigateUri="http://www.ffmpeg.org/ffmpeg-filters.html" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Help.Filters}"/>
+                                                        </Hyperlink>
+                                                    </TextBlock>
+                                                </Grid>
+
+                                                <!--Normal-->
+                                                <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding NormalVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Video Codec-->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Codec}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Type"
+                                                                  ItemsSource="{Binding FilteredVideoCodecs, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  SelectedValue="{Binding VideoCodec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+                                                                  ToolTip="{DynamicResource S.SaveAs.VideoOptions.Codec.Info}">
+                                                        <c:ExComboBox.ItemTemplate>
+                                                            <DataTemplate DataType="{x:Type codecs:VideoCodecViewModel}">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="1"/>
+                                                                        <ColumnDefinition/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <TextBlock Grid.Column="0" Margin="1,1,5,1" Text="{Binding Name}" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                                                                    <Separator Grid.Column="1" Width="1" Margin="0"/>
+
+                                                                    <TextBlock Grid.Column="2" Margin="5,1,3,1" Text="{Binding Command}" Foreground="{DynamicResource Brush.Foreground.Medium}" 
+                                                                               TextTrimming="CharacterEllipsis" FontSize="11" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </c:ExComboBox.ItemTemplate>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Codec Preset-->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource S.SaveAs.WebpOptions.CodecPreset}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Type"
+                                                                  ItemsSource="{Binding SelectedVideoCodec.CodecPresets, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  SelectedValue="{Binding CodecPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+                                                                  ToolTip="{DynamicResource S.SaveAs.VideoOptions.CodecPreset.Info}">
+                                                        <c:ExComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="1"/>
+                                                                        <ColumnDefinition/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <Grid.Resources>
+                                                                        <v:StringToStaticResource x:Key="StringToStaticResource"/>
+                                                                    </Grid.Resources>
+
+                                                                    <TextBlock Grid.Column="0" Margin="1,1,5,1" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center">
+                                                                        <TextBlock.Text>
+                                                                            <PriorityBinding>
+                                                                                <Binding Path="NameKey" Converter="{StaticResource StringToStaticResource}"/>
+                                                                                <Binding Path="Name"/>
+                                                                            </PriorityBinding>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+
+                                                                    <Separator Grid.Column="1" Width="1" Margin="0"/>
+
+                                                                    <TextBlock Grid.Column="2" Margin="5,1,3,1" Text="{Binding Parameter}" Foreground="{DynamicResource Brush.Foreground.Medium}" 
+                                                                               TextTrimming="CharacterEllipsis" FontSize="11" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </c:ExComboBox.ItemTemplate>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Hardware Acceleration-->
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding HardwareAcceleration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  ToolTip="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration.Info}">
+                                                        <ComboBoxItem Tag="{x:Static e:HardwareAccelerationModes.Off}" Content="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration.Off}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:HardwareAccelerationModes.On}" Content="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration.On}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:HardwareAccelerationModes.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration.Auto}"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Pixel Format-->
+                                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.PixelFormat}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Type"
+                                                                  ItemsSource="{Binding SelectedVideoCodec.PixelFormats, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  SelectedValue="{Binding PixelFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}">
+                                                        <c:ExComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="1"/>
+                                                                        <ColumnDefinition/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <Grid.Resources>
+                                                                        <v:StringToStaticResource x:Key="StringToStaticResource"/>
+                                                                    </Grid.Resources>
+
+                                                                    <TextBlock Grid.Column="0" Margin="1,1,5,1" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center">
+                                                                        <TextBlock.Text>
+                                                                            <PriorityBinding>
+                                                                                <Binding Path="NameKey" Converter="{StaticResource StringToStaticResource}"/>
+                                                                                <Binding Path="Name"/>
+                                                                            </PriorityBinding>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+
+                                                                    <Separator Grid.Column="1" Width="1" Margin="0"/>
+
+                                                                    <TextBlock Grid.Column="2" Margin="5,1,3,1" Text="{Binding Parameter}" Foreground="{DynamicResource Brush.Foreground.Medium}" 
+                                                                               TextTrimming="CharacterEllipsis" FontSize="11" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </c:ExComboBox.ItemTemplate>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Vsync-->
+                                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Vsync}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="8" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding Vsync, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  ToolTip="{DynamicResource S.SaveAs.VideoOptions.Vsync.Info}">
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Off}" Content="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration.Off}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.PixelFormat.Auto}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Passthrough}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Passthrough}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Cfr}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Cfr}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Vfr}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Vfr}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Drop}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Drop}"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Framerate-->
+                                                    <TextBlock Grid.Row="10" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Framerate}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <Grid Grid.Row="10" Grid.Column="1" Margin="10,10,60,10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <c:ExComboBox Grid.Column="0" VerticalAlignment="Center" SelectedValuePath="Tag"
+                                                                      SelectedValue="{Binding Framerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.PixelFormat.Auto}"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Film}" Content="{DynamicResource S.SaveAs.VideoOptions.Framerate.Film}"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Pal}" Content="PAL"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Ntsc}" Content="NTSC"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Custom}" Content="{DynamicResource S.SaveAs.VideoOptions.Framerate.Custom}"/>
+                                                        </c:ExComboBox>
+
+                                                        <c:IntegerStepper Grid.Column="1" Margin="4,0,0,0" MinWidth="90" StepValue="1" Minimum="1" Maximum="1000"
+                                                                          Value="{Binding CustomFramerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          Visibility="{Binding CustomFramerateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                        <TextBlock Grid.Column="2" Text="{DynamicResource S.Recorder.Fps.Short}" Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                                   Visibility="{Binding CustomFramerateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    </Grid>
+
+                                                    <Separator Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Pass-->
+                                                    <TextBlock Grid.Row="12" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Pass}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:IntegerStepper Grid.Row="12" Grid.Column="1" Margin="10,10,60,10" MinWidth="120" HorizontalAlignment="Left" StepValue="1" Minimum="1" Maximum="2"
+                                                                      Value="{Binding Pass, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                    <Separator Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                                               Visibility="{Binding ConstantRateFactorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                    <!--CRF-->
+                                                    <TextBlock Grid.Row="14" Grid.Column="0" Text="CRF" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                               Visibility="{Binding ConstantRateFactorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <c:NullableIntegerStepper Grid.Row="14" Grid.Column="1" Margin="10,10,60,10" MinWidth="120" HorizontalAlignment="Left" StepValue="1"
+                                                                              Minimum="{Binding SelectedVideoCodec.MinimumCrf, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                              Maximum="{Binding SelectedVideoCodec.MaximumCrf, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                              Value="{Binding ConstantRateFactor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                              Visibility="{Binding ConstantRateFactorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                              ToolTip="{DynamicResource S.SaveAs.VideoOptions.Crf.Info}"/>
+
+                                                    <Separator Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Bitrate Mode-->
+                                                    <TextBlock Grid.Row="16" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Mode}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="16" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding IsVariableBitRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                        <ComboBoxItem Tag="False" Content="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Mode.Constant}"/>
+                                                        <ComboBoxItem Tag="True" Content="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Mode.Variable}"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Quality Level-->
+                                                    <TextBlock Grid.Row="18" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.QualityLevel}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                               Visibility="{Binding QualityLevelVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <c:IntegerStepper Grid.Row="18" Grid.Column="1" Margin="10,10,60,10" HorizontalAlignment="Left" MinWidth="90" StepValue="1" Minimum="0" Maximum="31"
+                                                                      Value="{Binding QualityLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                      EmptyIfValue="0" ToolTip="{DynamicResource S.SaveAs.VideoOptions.QualityLevel.Info}"
+                                                                      Visibility="{Binding QualityLevelVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                    <!--Bitrate-->
+                                                    <TextBlock Grid.Row="18" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Bitrate}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                               Visibility="{Binding BitRateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <Grid Grid.Row="18" Grid.Column="1" Margin="10,10,60,10" Visibility="{Binding BitRateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <c:DecimalStepper Grid.Column="0" MinWidth="120" StepValue="1" Minimum="0" Maximum="999999"
+                                                                          Value="{Binding BitRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          EmptyIfValue="0" ToolTip="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Info}"/>
+
+                                                        <c:ExComboBox Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" SelectedValuePath="Tag"
+                                                                      SelectedValue="{Binding BitRateUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Bits}" Content="Bits"/>
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Kilobits}" Content="Kilobits"/>
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Megabits}" Content="Megabits"/>
+                                                        </c:ExComboBox>
+                                                    </Grid>
+
+                                                    <Separator Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Minimum rate-->
+                                                    <TextBlock Grid.Row="20" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Minimum}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <Grid Grid.Row="20" Grid.Column="1" Margin="10,10,60,10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <c:DecimalStepper Grid.Column="0" MinWidth="120" StepValue="1" Minimum="0" Maximum="999999"
+                                                                          Value="{Binding MinimumBitRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          EmptyIfValue="0" ToolTip="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Minimum.Info}"/>
+
+                                                        <c:ExComboBox Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" SelectedValuePath="Tag"
+                                                                      SelectedValue="{Binding MinimumBitRateUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Bits}" Content="Bits"/>
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Kilobits}" Content="Kilobits"/>
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Megabits}" Content="Megabits"/>
+                                                        </c:ExComboBox>
+                                                    </Grid>
+
+                                                    <Separator Grid.Row="21" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Maximum rate-->
+                                                    <TextBlock Grid.Row="22" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Maximum}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <Grid Grid.Row="22" Grid.Column="1" Margin="10,10,60,10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <c:DecimalStepper Grid.Column="0" MinWidth="120" StepValue="1" Minimum="0" Maximum="999999"
+                                                                          Value="{Binding MaximumBitRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          EmptyIfValue="0" ToolTip="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Maximum.Info}"/>
+
+                                                        <c:ExComboBox Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" SelectedValuePath="Tag"
+                                                                      SelectedValue="{Binding MaximumBitRateUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Bits}" Content="Bits"/>
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Kilobits}" Content="Kilobits"/>
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Megabits}" Content="Megabits"/>
+                                                        </c:ExComboBox>
+                                                    </Grid>
+
+                                                    <Separator Grid.Row="23" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Maximum rate-->
+                                                    <TextBlock Grid.Row="24" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Buffer}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <Grid Grid.Row="24" Grid.Column="1" Margin="10,10,60,10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <c:DecimalStepper Grid.Column="0" MinWidth="120" StepValue="1" Minimum="0" Maximum="999999"
+                                                                          Value="{Binding RateControlBuffer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          EmptyIfValue="0" ToolTip="{DynamicResource S.SaveAs.VideoOptions.Bitrate.Buffer.Info}"/>
+
+                                                        <c:ExComboBox Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" SelectedValuePath="Tag"
+                                                                      SelectedValue="{Binding RateControlBufferUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Bits}" Content="Bits"/>
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Kilobits}" Content="Kilobits"/>
+                                                            <ComboBoxItem Tag="{x:Static e:RateUnits.Megabits}" Content="Megabits"/>
+                                                        </c:ExComboBox>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type other:StgPresetViewModel}">
+                                            <!--Compression Level-->
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0" Text="{DynamicResource S.Options.Recorder.Compression}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <c:ExComboBox Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                              SelectedValue="{Binding CompressionLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <ComboBoxItem Tag="{x:Static comp:CompressionLevel.SmallestSize}" Content="{DynamicResource S.Options.Recorder.Compression.SmallestSize}"/>
+                                                    <ComboBoxItem Tag="{x:Static comp:CompressionLevel.Optimal}" Content="{DynamicResource S.Options.Recorder.Compression.Optimal}"/>
+                                                    <ComboBoxItem Tag="{x:Static comp:CompressionLevel.Fastest}" Content="{DynamicResource S.Options.Recorder.Compression.Fastest}"/>
+                                                    <ComboBoxItem Tag="{x:Static comp:CompressionLevel.NoCompression}" Content="{DynamicResource S.Options.Recorder.Compression.NoCompression}"/>
+                                                </c:ExComboBox>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type other:PsdPresetViewModel}">
+                                            <!--Compress Image-->
+                                            <Grid Grid.Row="0" Margin="60,10" VerticalAlignment="Center">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.PsdOptions.Compress}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.PsdOptions.Compress.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                IsChecked="{Binding CompressImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
+
+                                <ContentPresenter Content="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  Visibility="{Binding ExtendedSettingsVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ContentPresenter.Resources>
+                                        <DataTemplate DataType="{x:Type apng:EmbeddedApngPresetViewModel}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Separator Grid.Row="0" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Detect Unchanged-->
+                                                <Grid Grid.Row="1" Margin="60,10" VerticalAlignment="Center">
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition/>
                                                         <RowDefinition/>
@@ -716,18 +1176,237 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
 
-                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.ImageOptions.Zip}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
-                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.ImageOptions.Zip.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.ApngOptions.DetectUnchanged}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Scans and removed unecessary parts of the frames which didn't change between frames" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
 
                                                     <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
-                                                                IsChecked="{Binding ZipFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    IsChecked="{Binding DetectUnchanged, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Paint Transparent-->
+                                                <Grid Grid.Row="3" Margin="60,10" VerticalAlignment="Center" IsEnabled="{Binding Looped, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.ApngOptions.PaintTransparent}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Replaces pixels that didn't change from frame to frame to a transparent color" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                    IsChecked="{Binding PaintTransparent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                                 </Grid>
                                             </Grid>
                                         </DataTemplate>
 
-                                        <DataTemplate DataType="{x:Type video:VideoPresetViewModel}">
+                                        <DataTemplate DataType="{x:Type apng:FfmpegApngPresetViewModel}">
+                                            <Grid Grid.IsSharedSizeScope="True">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--UI Mode-->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Mode}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <c:ExComboBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag" 
+                                                              SelectedValue="{Binding SettingsMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                              ToolTip="{DynamicResource S.SaveAs.VideoOptions.Mode.Info}">
+                                                    <ComboBoxItem Tag="{x:Static e:VideoSettingsModes.Normal}" Content="{DynamicResource S.SaveAs.VideoOptions.Mode.Normal}"/>
+                                                    <ComboBoxItem Tag="{x:Static e:VideoSettingsModes.Advanced}" Content="{DynamicResource S.SaveAs.VideoOptions.Mode.Advanced}"/>
+                                                </c:ExComboBox>
+
+                                                <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Advanced-->
+                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding AdvancedVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Parameters-->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Parameters" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExTextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap" AcceptsReturn="True"
+                                                                 Text="{Binding Parameters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{DynamicResource S.SaveAs.Ffmpeg.Parameters.Info}"/>
+
+                                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Output Command-->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Preview" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExTextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap" IsReadOnly="True"
+                                                                 Text="{Binding CommandResolved, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="Full command as it will be sent to FFmpeg"/>
+
+                                                    <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Help Links-->
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" VerticalAlignment="Center" TextAlignment="Center" Margin="10">
+                                                        <Hyperlink NavigateUri="https://www.w3.org/TR/PNG-Filters.html" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="PNG Filters"/>
+                                                        </Hyperlink>
+
+                                                        <Run Text="/"/>
+
+                                                        <Hyperlink NavigateUri="https://ffmpeg.org/ffmpeg-formats.html" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Help.Format}"/>
+                                                        </Hyperlink>
+
+                                                        <Run Text="/"/>
+
+                                                        <Hyperlink NavigateUri="http://www.ffmpeg.org/ffmpeg-filters.html" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Help.Filters}"/>
+                                                        </Hyperlink>
+                                                    </TextBlock>
+                                                </Grid>
+
+                                                <!--Normal-->
+                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding NormalVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Prediction Method-->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.ApngOptions.Prediction}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding PredictionMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                        <ComboBoxItem Tag="{x:Static e:PredictionMethods.None}" Content="{DynamicResource S.SaveAs.ApngOptions.Prediction.None}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:PredictionMethods.Sub}" Content="{DynamicResource S.SaveAs.ApngOptions.Prediction.Sub}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:PredictionMethods.Up}" Content="{DynamicResource S.SaveAs.ApngOptions.Prediction.Up}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:PredictionMethods.Avg}" Content="{DynamicResource S.SaveAs.ApngOptions.Prediction.Average}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:PredictionMethods.Paeth}" Content="Paeth"/>
+                                                        <ComboBoxItem Tag="{x:Static e:PredictionMethods.Mixed}" Content="{DynamicResource S.SaveAs.ApngOptions.Prediction.Mixed}"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Pixel Format-->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.PixelFormat}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Type"
+                                                                  ItemsSource="{Binding PixelFormats, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  SelectedValue="{Binding PixelFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}">
+                                                        <c:ExComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="1"/>
+                                                                        <ColumnDefinition/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <Grid.Resources>
+                                                                        <v:StringToStaticResource x:Key="StringToStaticResource"/>
+                                                                    </Grid.Resources>
+
+                                                                    <TextBlock Grid.Column="0" Margin="1,1,5,1" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center">
+                                                                        <TextBlock.Text>
+                                                                            <PriorityBinding>
+                                                                                <Binding Path="NameKey" Converter="{StaticResource StringToStaticResource}"/>
+                                                                                <Binding Path="Name"/>
+                                                                            </PriorityBinding>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+
+                                                                    <Separator Grid.Column="1" Width="1" Margin="0"/>
+
+                                                                    <TextBlock Grid.Column="2" Margin="5,1,3,1" Text="{Binding Parameter}" Foreground="{DynamicResource Brush.Foreground.Medium}" 
+                                                                               TextTrimming="CharacterEllipsis" FontSize="11" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </c:ExComboBox.ItemTemplate>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Vsync-->
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Vsync}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding Vsync, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  ToolTip="{DynamicResource S.SaveAs.VideoOptions.Vsync.Info}">
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Off}" Content="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration.Off}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.PixelFormat.Auto}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Passthrough}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Passthrough}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Cfr}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Cfr}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Vfr}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Vfr}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Drop}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Drop}"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Framerate-->
+                                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Framerate}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <Grid Grid.Row="6" Grid.Column="1" Margin="10,10,60,10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <c:ExComboBox Grid.Column="0" VerticalAlignment="Center" SelectedValuePath="Tag"
+                                                                      SelectedValue="{Binding Framerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.PixelFormat.Auto}"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Film}" Content="{DynamicResource S.SaveAs.VideoOptions.Framerate.Film}"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Pal}" Content="PAL"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Ntsc}" Content="NTSC"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Custom}" Content="{DynamicResource S.SaveAs.VideoOptions.Framerate.Custom}"/>
+                                                        </c:ExComboBox>
+
+                                                        <c:IntegerStepper Grid.Column="1" Margin="4,0,0,0" MinWidth="90" StepValue="1" Minimum="1" Maximum="1000"
+                                                                          Value="{Binding CustomFramerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          Visibility="{Binding CustomFramerateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                        <TextBlock Grid.Column="2" Text="{DynamicResource S.Recorder.Fps.Short}" Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                                   Visibility="{Binding CustomFramerateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type gif:EmbeddedGifPresetViewModel}">
                                             <Grid>
                                                 <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
@@ -741,18 +1420,805 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Mode" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
-                                                <!--Mode: Normal/Advanced-->
+                                                <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                                           Visibility="{Binding GlobalColorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Parameters" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
-                                                <!--Parameters: string-->
+                                                <!--Use Global Color Table-->
+                                                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center"
+                                                      Visibility="{Binding GlobalColorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
 
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.GlobalColorTable}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.GlobalColorTable.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                    IsChecked="{Binding UseGlobalColorTable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Quantizer-->
+                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Quantizer" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <c:ExComboBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" Height="50" SelectedValuePath="Value"
+                                                              SelectedValue="{Binding Quantizer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              ToolTip="{DynamicResource S.SaveAs.GifOptions.Quantizer.Info}">
+                                                    <c:ExComboBox.ItemTemplate>
+                                                        <DataTemplate DataType="{x:Type c:ExComboBoxItem}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="1"/>
+                                                                    <ColumnDefinition/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition/>
+                                                                    <RowDefinition/>
+                                                                </Grid.RowDefinitions>
+
+                                                                <c:SymbolIcon Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="30" Margin="0,2,6,2" Symbol="{Binding Symbol}" Foreground="{DynamicResource Brush.Foreground}"/>
+
+                                                                <Separator Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Margin="0"/>
+                                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Header}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center"/>
+
+                                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Description}" Margin="10,0,2,0" Foreground="{DynamicResource Brush.Foreground.Medium}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </c:ExComboBox.ItemTemplate>
+
+                                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.GifOptions.Quantizer.Neural}" Description="{DynamicResource S.SaveAs.GifOptions.Quantizer.Neural.Info}" Symbol="Gif" Value="{x:Static e:ColorQuantizationTypes.Neural}"/>
+                                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.GifOptions.Quantizer.Octree}" Description="{DynamicResource S.SaveAs.GifOptions.Quantizer.Octree.Info}" Symbol="Gif" Value="{x:Static e:ColorQuantizationTypes.Octree}"/>
+                                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.GifOptions.Quantizer.MedianCut}" Description="{DynamicResource S.SaveAs.GifOptions.Quantizer.MedianCut.Info}" Symbol="Gif" Value="{x:Static e:ColorQuantizationTypes.MedianCut}"/>
+                                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.GifOptions.Quantizer.Grayscale}" Description="{DynamicResource S.SaveAs.GifOptions.Quantizer.Grayscale.Info}" Symbol="Gif" Value="{x:Static e:ColorQuantizationTypes.Grayscale}"/>
+                                                    <c:ExComboBoxItem Header="{DynamicResource S.SaveAs.GifOptions.Quantizer.MostUsed}" Description="{DynamicResource S.SaveAs.GifOptions.Quantizer.MostUsed.Info}" Symbol="Gif" Value="{x:Static e:ColorQuantizationTypes.MostUsed}"/>
+                                                </c:ExComboBox>
+
+                                                <Separator Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                                           Visibility="{Binding SamplingVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Sampling-->
+                                                <TextBlock Grid.Row="5" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Sampling}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                           Visibility="{Binding SamplingVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <Grid Grid.Row="5" Grid.Column="1" Margin="10,10,60,10" VerticalAlignment="Center" ToolTip="{DynamicResource S.SaveAs.GifOptions.Sampling.Info}"
+                                                      Visibility="{Binding SamplingVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Slider Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,3" AutoToolTipPlacement="TopLeft" TickPlacement="BottomRight" 
+                                                                Minimum="1" Maximum="20" Value="{Binding SamplingFactor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                SmallChange="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" FontSize="11" Margin="3,0">
+                                                            <Run Text="1"/>
+                                                            <Run Text="•"/>
+                                                            <Run Text="{DynamicResource S.SaveAs.GifOptions.Best}"/>
+                                                    </TextBlock>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" FontSize="11" Margin="3,0">
+                                                            <Run Text="{DynamicResource S.SaveAs.GifOptions.Fastest}"/>
+                                                            <Run Text="•"/>
+                                                            <Run Text="20"/>
+                                                    </TextBlock>
+                                                </Grid>
+
+                                                <Separator Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Maximum Color Count-->
+                                                <TextBlock Grid.Row="7" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Colors}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <c:IntegerStepper Grid.Row="7" Grid.Column="1" Margin="10,10,60,10" MinWidth="120" HorizontalAlignment="Left" StepValue="1" Minimum="2" Maximum="256" 
+                                                                  Value="{Binding MaximumColorCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{DynamicResource S.SaveAs.GifOptions.Colors.Info}"/>
+
+                                                <Separator Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Transparency-->
+                                                <Grid Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Transparency.Enable}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Transparency.Enable.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"
+                                                               TextWrapping="WrapWithOverflow"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center" Margin="10,0,0,0"
+                                                                    IsChecked="{Binding EnableTransparency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                                           Visibility="{Binding SelectTransparencyColorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Select Transparent Color-->
+                                                <Grid Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center"
+                                                      Visibility="{Binding SelectTransparencyColorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Transparency.Pick}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Transparency.Pick.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"
+                                                               TextWrapping="WrapWithOverflow"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center" Margin="10,0,0,0"
+                                                                    IsChecked="{Binding SelectTransparencyColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                                           Visibility="{Binding TransparencyColorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Transparent Color-->
+                                                <TextBlock Grid.Row="13" Grid.Column="0" Text="{DynamicResource S.Caption.Color}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                           Visibility="{Binding TransparencyColorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <c:ColorBox Grid.Row="13" Grid.Column="1" Margin="10,10,60,10" MinWidth="120" HorizontalAlignment="Left"
+                                                            SelectedColor="{Binding TransparencyColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            Visibility="{Binding TransparencyColorVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <Separator Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <Grid Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.DetectUnchanged}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.DetectUnchanged.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"
+                                                               TextWrapping="WrapWithOverflow"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center" Margin="10,0,0,0"
+                                                                    IsChecked="{Binding DetectUnchanged, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                    IsEnabled="{Binding DetectUnchangedEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="16" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                                           Visibility="{Binding PaintTransparentVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <Grid Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center"
+                                                      Visibility="{Binding PaintTransparentVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.PaintWithChroma}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.PaintWithChroma.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"
+                                                               TextWrapping="WrapWithOverflow"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center" Margin="10,0,0,0"
+                                                                    IsChecked="{Binding PaintTransparent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                                           Visibility="{Binding ChromaKeyVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <!--Chroma Key Color-->
+                                                <TextBlock Grid.Row="19" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.ChromaKey}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                           Visibility="{Binding ChromaKeyVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <c:ColorBox Grid.Row="19" Grid.Column="1" Margin="10,10,60,10" MinWidth="120" HorizontalAlignment="Left"
+                                                            SelectedColor="{Binding ChromaKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            Visibility="{Binding ChromaKeyVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type gif:FfmpegGifPresetViewModel}">
+                                            <Grid Grid.IsSharedSizeScope="True">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--UI Mode-->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Mode}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <c:ExComboBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag" 
+                                                              SelectedValue="{Binding SettingsMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                              ToolTip="{DynamicResource S.SaveAs.VideoOptions.Mode.Info}">
+                                                    <ComboBoxItem Tag="{x:Static e:VideoSettingsModes.Normal}" Content="{DynamicResource S.SaveAs.VideoOptions.Mode.Normal}"/>
+                                                    <ComboBoxItem Tag="{x:Static e:VideoSettingsModes.Advanced}" Content="{DynamicResource S.SaveAs.VideoOptions.Mode.Advanced}"/>
+                                                </c:ExComboBox>
+
+                                                <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Advanced-->
+                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding AdvancedVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Parameters-->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Parameters" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExTextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap" AcceptsReturn="True"
+                                                                 Text="{Binding Parameters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{DynamicResource S.SaveAs.Ffmpeg.Parameters.Info}"/>
+
+                                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Output Command-->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Preview" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExTextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap" IsReadOnly="True"
+                                                                 Text="{Binding CommandResolved, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="Full command as it will be sent to FFmpeg"/>
+
+                                                    <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Help Links-->
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" VerticalAlignment="Center" TextAlignment="Center" Margin="10">
+                                                        <Hyperlink NavigateUri="https://ffmpeg.org/ffmpeg-formats.html#gif-2" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Help.Format}"/>
+                                                        </Hyperlink>
+
+                                                        <Run Text="/"/>
+
+                                                        <Hyperlink NavigateUri="http://www.ffmpeg.org/ffmpeg-filters.html#palettegen-1" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Help.Filters}"/>
+                                                        </Hyperlink>
+                                                    </TextBlock>
+                                                </Grid>
+
+                                                <!--Normal-->
+                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding NormalVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Dither-->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Dither}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding Dither, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                        <ComboBoxItem Tag="{x:Static e:DitherMethods.None}" Content="{DynamicResource S.SaveAs.WebpOptions.CodecPreset.None}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:DitherMethods.Bayer}" Content="Bayer"/>
+                                                        <ComboBoxItem Tag="{x:Static e:DitherMethods.Heckbert}" Content="Heckbert"/>
+                                                        <ComboBoxItem Tag="{x:Static e:DitherMethods.FloydSteinberg}" Content="Floyd Steinberg"/>
+                                                        <ComboBoxItem Tag="{x:Static e:DitherMethods.Sierra2}" Content="Sierra 2"/>
+                                                        <ComboBoxItem Tag="{x:Static e:DitherMethods.Sierra2Lite}" Content="Sierra 2 Lite"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"
+                                                               Visibility="{Binding BayerScaleVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                    <!--Bayer Scale-->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Dither.Scale}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"
+                                                               Visibility="{Binding BayerScaleVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <c:IntegerStepper Grid.Row="2" Grid.Column="1" Margin="10,10,60,10" MinWidth="120" HorizontalAlignment="Left" StepValue="1" Minimum="0" Maximum="5"
+                                                                      Value="{Binding BayerScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                      Visibility="{Binding BayerScaleVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                    <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Pixel Format-->
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.PixelFormat}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Type"
+                                                                  ItemsSource="{Binding PixelFormats, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  SelectedValue="{Binding PixelFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}">
+                                                        <c:ExComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="1"/>
+                                                                        <ColumnDefinition/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <Grid.Resources>
+                                                                        <v:StringToStaticResource x:Key="StringToStaticResource"/>
+                                                                    </Grid.Resources>
+
+                                                                    <TextBlock Grid.Column="0" Margin="1,1,5,1" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center">
+                                                                        <TextBlock.Text>
+                                                                            <PriorityBinding>
+                                                                                <Binding Path="NameKey" Converter="{StaticResource StringToStaticResource}"/>
+                                                                                <Binding Path="Name"/>
+                                                                            </PriorityBinding>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+
+                                                                    <Separator Grid.Column="1" Width="1" Margin="0"/>
+
+                                                                    <TextBlock Grid.Column="2" Margin="5,1,3,1" Text="{Binding Parameter}" Foreground="{DynamicResource Brush.Foreground.Medium}" 
+                                                                               TextTrimming="CharacterEllipsis" FontSize="11" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </c:ExComboBox.ItemTemplate>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Vsync-->
+                                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Vsync}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding Vsync, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  ToolTip="{DynamicResource S.SaveAs.VideoOptions.Vsync.Info}">
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Off}" Content="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration.Off}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.PixelFormat.Auto}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Passthrough}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Passthrough}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Cfr}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Cfr}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Vfr}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Vfr}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Drop}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Drop}"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Framerate-->
+                                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Framerate}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <Grid Grid.Row="8" Grid.Column="1" Margin="10,10,60,10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <c:ExComboBox Grid.Column="0" VerticalAlignment="Center" SelectedValuePath="Tag"
+                                                                      SelectedValue="{Binding Framerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.PixelFormat.Auto}"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Film}" Content="{DynamicResource S.SaveAs.VideoOptions.Framerate.Film}"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Pal}" Content="PAL"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Ntsc}" Content="NTSC"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Custom}" Content="{DynamicResource S.SaveAs.VideoOptions.Framerate.Custom}"/>
+                                                        </c:ExComboBox>
+
+                                                        <c:IntegerStepper Grid.Column="1" Margin="4,0,0,0" MinWidth="90" StepValue="1" Minimum="1" Maximum="1000"
+                                                                          Value="{Binding CustomFramerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          Visibility="{Binding CustomFramerateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                        <TextBlock Grid.Column="2" Text="{DynamicResource S.Recorder.Fps.Short}" Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                                   Visibility="{Binding CustomFramerateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type gif:GifskiGifPresetViewModel}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Use Faster Encoding-->
+                                                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Gifski.Faster}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Gifski.Faster.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                    IsChecked="{Binding Fast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Use Extra Effort-->
+                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Extra effort" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="The encoding will be significantly slower, but it may result in a bit better gifs" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                    IsChecked="{Binding ExtraEffort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+
+                                                <Separator Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Quality-->
+                                                <TextBlock Grid.Row="5" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Quality}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <Grid Grid.Row="5" Grid.Column="1" Margin="10,10,60,10" VerticalAlignment="Center">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Slider Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,3" AutoToolTipPlacement="TopLeft" TickPlacement="BottomRight" 
+                                                                Minimum="0" Maximum="100" Value="{Binding Quality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                SmallChange="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" FontSize="11" Margin="3,0">
+                                                            <Run Text="0"/>
+                                                            <Run Text="•"/>
+                                                            <Run Text="{DynamicResource S.SaveAs.GifOptions.Fastest}"/>
+                                                    </TextBlock>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" FontSize="11" Margin="3,0">
+                                                            <Run Text="{DynamicResource S.SaveAs.GifOptions.Best}"/>
+                                                            <Run Text="•"/>
+                                                            <Run Text="100"/>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <!--TODO-->
+                                        <DataTemplate DataType="{x:Type gif:KGySoftGifPresetViewModel}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Quantizer (ComboBox)-->
+                                                <!--Quantizer Options-->
+                                                <!--Ditherer (ComboBox)-->
+                                                <!--Ditherer Options-->
+                                                <!--Animation options-->
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type gif:SystemGifPresetViewModel}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Separator Grid.Row="0" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Use Global Color Table-->
+                                                <Grid Grid.Row="1" Margin="60,10" VerticalAlignment="Center">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.GlobalColorTable}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.GlobalColorTable.Info}" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                    <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center" IsEnabled="False" IsChecked="True"/>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+
+                                        <DataTemplate DataType="{x:Type webp:FfmpegWebpPresetViewModel}">
+                                            <Grid Grid.IsSharedSizeScope="True">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--UI Mode-->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Mode}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                <c:ExComboBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag" 
+                                                              SelectedValue="{Binding SettingsMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                              ToolTip="{DynamicResource S.SaveAs.VideoOptions.Mode.Info}">
+                                                    <ComboBoxItem Tag="{x:Static e:VideoSettingsModes.Normal}" Content="{DynamicResource S.SaveAs.VideoOptions.Mode.Normal}"/>
+                                                    <ComboBoxItem Tag="{x:Static e:VideoSettingsModes.Advanced}" Content="{DynamicResource S.SaveAs.VideoOptions.Mode.Advanced}"/>
+                                                </c:ExComboBox>
+
+                                                <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                <!--Advanced-->
+                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding AdvancedVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Parameters-->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Parameters" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExTextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap" AcceptsReturn="True"
+                                                                 Text="{Binding Parameters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{DynamicResource S.SaveAs.Ffmpeg.Parameters.Info}"/>
+
+                                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Output Command-->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Preview" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExTextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" TextWrapping="Wrap" IsReadOnly="True"
+                                                                 Text="{Binding CommandResolved, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="Full command as it will be sent to FFmpeg"/>
+
+                                                    <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Help Links-->
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" VerticalAlignment="Center" TextAlignment="Center" Margin="10">
+                                                        <Hyperlink NavigateUri="https://ffmpeg.org/ffmpeg-formats.html#libwebp" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Help.Format}"/>
+                                                        </Hyperlink>
+
+                                                        <Run Text="/"/>
+
+                                                        <Hyperlink NavigateUri="http://www.ffmpeg.org/ffmpeg-filters.html" RequestNavigate="Hyperlink_RequestNavigate">
+                                                            <Run Text="{DynamicResource S.SaveAs.Ffmpeg.Help.Filters}"/>
+                                                        </Hyperlink>
+                                                    </TextBlock>
+                                                </Grid>
+
+                                                <!--Normal-->
+                                                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding NormalVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="TitleGroup"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--Video Codec-->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.WebpOptions.CodecPreset}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding CodecPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}">
+                                                        <ComboBoxItem Tag="{x:Static e:VideoCodecPresets.None}" Content="{DynamicResource S.SaveAs.WebpOptions.CodecPreset.None}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:VideoCodecPresets.Default}" Content="{DynamicResource S.SaveAs.WebpOptions.CodecPreset.Default}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:VideoCodecPresets.Drawing}" Content="{DynamicResource S.SaveAs.WebpOptions.CodecPreset.Drawing}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:VideoCodecPresets.Icon}" Content="{DynamicResource S.SaveAs.WebpOptions.CodecPreset.Icon}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:VideoCodecPresets.Picture}" Content="{DynamicResource S.SaveAs.WebpOptions.CodecPreset.Picture}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:VideoCodecPresets.Photo}" Content="{DynamicResource S.SaveAs.WebpOptions.CodecPreset.Photo}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:VideoCodecPresets.Text}" Content="{DynamicResource S.SaveAs.WebpOptions.CodecPreset.Text}"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Pixel Format-->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.PixelFormat}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Type"
+                                                                  ItemsSource="{Binding PixelFormats, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  SelectedValue="{Binding PixelFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}">
+                                                        <c:ExComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="1"/>
+                                                                        <ColumnDefinition/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <Grid.Resources>
+                                                                        <v:StringToStaticResource x:Key="StringToStaticResource"/>
+                                                                    </Grid.Resources>
+
+                                                                    <TextBlock Grid.Column="0" Margin="1,1,5,1" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center">
+                                                                        <TextBlock.Text>
+                                                                            <PriorityBinding>
+                                                                                <Binding Path="NameKey" Converter="{StaticResource StringToStaticResource}"/>
+                                                                                <Binding Path="Name"/>
+                                                                            </PriorityBinding>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+
+                                                                    <Separator Grid.Column="1" Width="1" Margin="0"/>
+
+                                                                    <TextBlock Grid.Column="2" Margin="5,1,3,1" Text="{Binding Parameter}" Foreground="{DynamicResource Brush.Foreground.Medium}" 
+                                                                               TextTrimming="CharacterEllipsis" FontSize="11" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </c:ExComboBox.ItemTemplate>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Quality-->
+                                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource S.SaveAs.GifOptions.Quality}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <Grid Grid.Row="4" Grid.Column="1" Margin="10,10,60,10" VerticalAlignment="Center">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Slider Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,3" AutoToolTipPlacement="TopLeft" TickPlacement="BottomRight" 
+                                                                Minimum="0" Maximum="100" Value="{Binding Quality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                SmallChange="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True"/>
+
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" FontSize="11" Margin="3,0">
+                                                            <Run Text="0"/>
+                                                            <Run Text="•"/>
+                                                            <Run Text="{DynamicResource S.SaveAs.GifOptions.Fastest}"/>
+                                                        </TextBlock>
+
+                                                        <TextBlock Grid.Row="1" Grid.Column="2" FontSize="11" Margin="3,0">
+                                                            <Run Text="{DynamicResource S.SaveAs.GifOptions.Best}"/>
+                                                            <Run Text="•"/>
+                                                            <Run Text="100"/>
+                                                        </TextBlock>
+                                                    </Grid>
+
+                                                    <Separator Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Lossless Mode-->
+                                                    <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="60,10" VerticalAlignment="Center">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource S.SaveAs.WebpOptions.Lossless}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Maximum quality, without color degradation" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
+
+                                                        <c:ToggleSwitch Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" IsContentBefore="True" VerticalAlignment="Center"
+                                                                        IsChecked="{Binding Lossless, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    </Grid>
+
+                                                    <Separator Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Vsync-->
+                                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Vsync}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <c:ExComboBox Grid.Row="8" Grid.Column="1" VerticalAlignment="Center" Margin="10,10,60,10" SelectedValuePath="Tag"
+                                                                  SelectedValue="{Binding Vsync, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  ToolTip="{DynamicResource S.SaveAs.VideoOptions.Vsync.Info}">
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Off}" Content="{DynamicResource S.SaveAs.VideoOptions.HardwareAcceleration.Off}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.PixelFormat.Auto}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Passthrough}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Passthrough}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Cfr}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Cfr}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Vfr}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Vfr}"/>
+                                                        <ComboBoxItem Tag="{x:Static e:Vsyncs.Drop}" Content="{DynamicResource S.SaveAs.VideoOptions.Vsync.Drop}"/>
+                                                    </c:ExComboBox>
+
+                                                    <Separator Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Height="1" Margin="0" Background="{DynamicResource Brush.Stroke.Card.Default}"/>
+
+                                                    <!--Framerate-->
+                                                    <TextBlock Grid.Row="10" Grid.Column="0" Text="{DynamicResource S.SaveAs.VideoOptions.Framerate}" FontSize="14" Foreground="{DynamicResource Brush.Foreground}" VerticalAlignment="Center" Margin="60,0,10,0"/>
+                                                    <Grid Grid.Row="10" Grid.Column="1" Margin="10,10,60,10">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <c:ExComboBox Grid.Column="0" VerticalAlignment="Center" SelectedValuePath="Tag"
+                                                                      SelectedValue="{Binding Framerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Auto}" Content="{DynamicResource S.SaveAs.VideoOptions.PixelFormat.Auto}"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Film}" Content="{DynamicResource S.SaveAs.VideoOptions.Framerate.Film}"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Pal}" Content="PAL"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Ntsc}" Content="NTSC"/>
+                                                            <ComboBoxItem Tag="{x:Static e:Framerates.Custom}" Content="{DynamicResource S.SaveAs.VideoOptions.Framerate.Custom}"/>
+                                                        </c:ExComboBox>
+
+                                                        <c:IntegerStepper Grid.Column="1" Margin="4,0,0,0" MinWidth="90" StepValue="1" Minimum="1" Maximum="1000"
+                                                                          Value="{Binding CustomFramerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          Visibility="{Binding CustomFramerateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                        <TextBlock Grid.Column="2" Text="{DynamicResource S.Recorder.Fps.Short}" Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                                   Visibility="{Binding CustomFramerateVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    </Grid>
+                                                </Grid>
                                             </Grid>
                                         </DataTemplate>
                                     </ContentPresenter.Resources>
                                 </ContentPresenter>
-
-
                             </StackPanel>
                         </Expander>
                     </StackPanel>

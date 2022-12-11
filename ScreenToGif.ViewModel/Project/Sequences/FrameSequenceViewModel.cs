@@ -51,7 +51,7 @@ public class FrameSequenceViewModel : RasterSequenceViewModel
             BitsPerChannel = sequence.BitsPerChannel,
             HorizontalDpi = sequence.HorizontalDpi,
             VerticalDpi = sequence.VerticalDpi,
-            Frames = new ObservableCollection<FrameSubSequenceViewModel>(sequence.Frames.Select(FrameSubSequenceViewModel.FromModel).ToList())
+            Frames = new ObservableCollection<FrameSubSequenceViewModel>(sequence.Frames.Select((s, i) => FrameSubSequenceViewModel.FromModel(s, i == 0)).ToList())
         };
     }
 

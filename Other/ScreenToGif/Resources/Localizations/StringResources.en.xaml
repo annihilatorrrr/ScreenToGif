@@ -63,11 +63,16 @@
     <s:String x:Key="S.AndOr">and/or</s:String>
 
     <!--Imperative-->
+    <s:String x:Key="S.Imperative.Select">Select</s:String>
     <s:String x:Key="S.Imperative.Discard">Discard</s:String>
     <s:String x:Key="S.Imperative.Keep">Keep</s:String>
     <s:String x:Key="S.Imperative.SeeMore">See more</s:String>
     <s:String x:Key="S.Imperative.Exit">Exit</s:String>
     <s:String x:Key="S.Imperative.KeepOpen">Keep Open</s:String>
+
+    <!--Status-->
+    <s:String x:Key="S.Status.On">On</s:String>
+    <s:String x:Key="S.Status.Off">Off</s:String>
 
     <!--Warnings-->
     <s:String x:Key="S.Crash">Oh no, the app crashed :(</s:String>
@@ -330,6 +335,8 @@
     <s:String x:Key="S.Options.Recorder.Cache">Memory&#10;cache</s:String>
     <s:String x:Key="S.Options.Recorder.Cache.Info">Each frame captured will be stored as a pixel array on memory first (may be compressed before).</s:String>
     <s:String x:Key="S.Options.Recorder.Compression">Compression:</s:String>
+    <s:String x:Key="S.Options.Recorder.Compression.SmallestSize">Smallest Size</s:String>
+    <s:String x:Key="S.Options.Recorder.Compression.SmallestSize.Info">(Creates an output as small as possible, even if it takes longer to complete)</s:String>
     <s:String x:Key="S.Options.Recorder.Compression.Optimal">Optimal</s:String>
     <s:String x:Key="S.Options.Recorder.Compression.Optimal.Info">(Slower but likely more optimal compression)</s:String>
     <s:String x:Key="S.Options.Recorder.Compression.Fastest">Fastest</s:String>

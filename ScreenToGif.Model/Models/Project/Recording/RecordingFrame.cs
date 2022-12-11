@@ -29,6 +29,11 @@ public class RecordingFrame
     public long DataLength { get; set; }
 
     /// <summary>
+    /// The number of bytes of the compressed capture content.
+    /// </summary>
+    public long CompressedDataLength { get; set; }
+
+    /// <summary>
     /// For some reason, the frame capture failed.
     /// </summary>
     public bool WasFrameSkipped { get; set; }

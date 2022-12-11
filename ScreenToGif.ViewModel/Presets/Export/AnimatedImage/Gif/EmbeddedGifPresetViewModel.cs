@@ -3,6 +3,8 @@ using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Gif;
+using ScreenToGif.Util;
+using System.Windows;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 
@@ -11,6 +13,7 @@ namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
 /// </summary>
 public class EmbeddedGifPresetViewModel : GifPresetViewModel
 {
+    private bool _useGlobalColorTable;
     private ColorQuantizationTypes _quantizer = ColorQuantizationTypes.Neural;
     private int _samplingFactor = 1;
     private int _maximumColorCount = 256;
@@ -20,12 +23,28 @@ public class EmbeddedGifPresetViewModel : GifPresetViewModel
     private bool _detectUnchanged = true;
     private bool _paintTransparent = true;
     private Color _chromaKey = Color.FromRgb(50, 205, 50);
-    
+
+    public bool UseGlobalColorTable
+    {
+        get => _useGlobalColorTable;
+        set => SetProperty(ref _useGlobalColorTable, value);
+    }
+
     public ColorQuantizationTypes Quantizer
     {
         get => _quantizer;
-        set => SetProperty(ref _quantizer, value);
+        set
+        {
+            SetProperty(ref _quantizer, value);
+
+            OnPropertyChanged(nameof(SamplingVisibility));
+            OnPropertyChanged(nameof(GlobalColorVisibility));
+        }
     }
+
+    public Visibility SamplingVisibility => Quantizer == ColorQuantizationTypes.Neural ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility GlobalColorVisibility => Quantizer is ColorQuantizationTypes.Neural or ColorQuantizationTypes.MedianCut or ColorQuantizationTypes.MostUsed ? Visibility.Visible : Visibility.Collapsed;
 
     public int SamplingFactor
     {
@@ -42,14 +61,32 @@ public class EmbeddedGifPresetViewModel : GifPresetViewModel
     public bool EnableTransparency
     {
         get => _enableTransparency;
-        set => SetProperty(ref _enableTransparency, value);
+        set
+        {
+            SetProperty(ref _enableTransparency, value);
+
+            if (_enableTransparency)
+                DetectUnchanged = false;
+
+            OnPropertyChanged(nameof(SelectTransparencyColorVisibility));
+            OnPropertyChanged(nameof(DetectUnchangedEnabled));
+        }
     }
 
+    public Visibility SelectTransparencyColorVisibility => EnableTransparency ? Visibility.Visible : Visibility.Collapsed;
+    
     public bool SelectTransparencyColor
     {
         get => _selectTransparencyColor;
-        set => SetProperty(ref _selectTransparencyColor, value);
+        set
+        {
+            SetProperty(ref _selectTransparencyColor, value);
+
+            OnPropertyChanged(nameof(TransparencyColorVisibility));
+        }
     }
+
+    public Visibility TransparencyColorVisibility => SelectTransparencyColor ? Visibility.Visible : Visibility.Collapsed;
 
     public Color TransparencyColor
     {
@@ -60,14 +97,31 @@ public class EmbeddedGifPresetViewModel : GifPresetViewModel
     public bool DetectUnchanged
     {
         get => _detectUnchanged;
-        set => SetProperty(ref _detectUnchanged, value);
+        set
+        {
+            SetProperty(ref _detectUnchanged, value);
+
+            OnPropertyChanged(nameof(PaintTransparentVisibility));
+            OnPropertyChanged(nameof(ChromaKeyVisibility));
+        }
     }
+
+    public bool DetectUnchangedEnabled => !EnableTransparency;
+
+    public Visibility PaintTransparentVisibility => DetectUnchanged ? Visibility.Visible : Visibility.Collapsed;
 
     public bool PaintTransparent
     {
         get => _paintTransparent;
-        set => SetProperty(ref _paintTransparent, value);
+        set
+        {
+            SetProperty(ref _paintTransparent, value);
+
+            OnPropertyChanged(nameof(ChromaKeyVisibility));
+        }
     }
+
+    public Visibility ChromaKeyVisibility => DetectUnchanged && PaintTransparent ? Visibility.Visible : Visibility.Collapsed;
 
     public Color ChromaKey
     {
@@ -219,8 +273,42 @@ public class EmbeddedGifPresetViewModel : GifPresetViewModel
         };
     }
 
-    public override ExportPresetViewModel Reset()
+    public override void Reset()
     {
-        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+        var preset = Defaults.First(f => f.TitleKey == TitleKey);
+
+        Title = LocalizationHelper.Get(preset.TitleKey).Replace("{0}", preset.DefaultExtension);
+        Description = LocalizationHelper.Get(preset.DescriptionKey);
+        IsSelected = preset.IsSelected;
+        IsSelectedForEncoder = preset.IsSelectedForEncoder;
+        IsDefault = preset.IsDefault;
+        HasAutoSave = preset.HasAutoSave;
+        CreationDate = preset.CreationDate;
+        PickLocation = preset.PickLocation;
+        OverwriteMode = preset.OverwriteMode;
+        ExportAsProjectToo = preset.ExportAsProjectToo;
+        UploadFile = preset.UploadFile;
+        UploadService = preset.UploadService;
+        SaveToClipboard = preset.SaveToClipboard;
+        CopyType = preset.CopyType;
+        ExecuteCustomCommands = preset.ExecuteCustomCommands;
+        CustomCommands = preset.CustomCommands;
+        OutputFolder = preset.OutputFolder;
+        OutputFilename = preset.OutputFilename;
+        OutputFilenameKey = preset.OutputFilenameKey;
+        Extension = preset.Extension;
+        Looped = preset.Looped;
+        RepeatForever = preset.RepeatForever;
+        RepeatCount = preset.RepeatCount;
+        UseGlobalColorTable = preset.UseGlobalColorTable;
+        Quantizer = preset.Quantizer;
+        SamplingFactor = preset.SamplingFactor;
+        MaximumColorCount = preset.MaximumColorCount;
+        EnableTransparency = preset.EnableTransparency;
+        SelectTransparencyColor = preset.SelectTransparencyColor;
+        TransparencyColor = preset.TransparencyColor;
+        DetectUnchanged = preset.DetectUnchanged;
+        PaintTransparent = preset.PaintTransparent;
+        ChromaKey = preset.ChromaKey;
     }
 }

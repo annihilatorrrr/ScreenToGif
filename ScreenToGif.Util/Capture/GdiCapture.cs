@@ -164,9 +164,8 @@ public class GdiCapture : ScreenCapture
         FramesBinaryWriter.Write(Project.BitsPerChannel); //1 byte.
 
         FramesBinaryWriter.Write(info.Pixels.LongLength); //8 bytes, uncompressed length.
-
         var start = FramesFileStream.Position;
-        FramesBinaryWriter.Write(0L); //8 bytes.
+        FramesBinaryWriter.Write(0L); //8 bytes, compressed length.
 
         using (var compressStream = new DeflateStream(FramesFileStream, UserSettings.All.CaptureCompression, true))
         {
@@ -182,7 +181,7 @@ public class GdiCapture : ScreenCapture
         FramesFileStream.Position = end;
 
         info.DataLength = info.Pixels.LongLength;
-        //info.CompressedDataLength = compressedLength;
+        info.CompressedDataLength = compressedLength;
         info.Pixels = null;
 
         Project.Frames.Add(info);

@@ -5,17 +5,28 @@ namespace ScreenToGif.ViewModel.Project.Sequences.SubSequences;
 
 public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
 {
+    private long _compressedDataLength;
+
+    /// <summary>
+    /// The number of bytes of the capture content.
+    /// </summary>
+    public long CompressedDataLength
+    {
+        get => _compressedDataLength;
+        set => SetProperty(ref _compressedDataLength, value);
+    }
+
     /// <summary>
     /// The position of the data stream after the headers of this sub sequence.
     /// The size of the headers is 55 bytes.
     /// </summary>
     public override long DataStreamPosition => StreamPosition + 51; //55;
 
-    public static FrameSubSequenceViewModel FromModel(FrameSubSequence sequence)
+    public static FrameSubSequenceViewModel FromModel(FrameSubSequence sequence, bool adjustTiming)
     {
         return new FrameSubSequenceViewModel
         {
-            TimeStampInTicks = sequence.TimeStampInTicks,
+            TimeStampInTicks = adjustTiming ? 0 : sequence.TimeStampInTicks,
             ExpectedDelay = sequence.ExpectedDelay,
             StreamPosition = sequence.StreamPosition,
             Left = sequence.Left,
@@ -30,6 +41,7 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
             ChannelCount = sequence.ChannelCount,
             BitsPerChannel = sequence.BitsPerChannel,
             DataLength = sequence.DataLength,
+            CompressedDataLength = sequence.CompressedDataLength,
         };
     }
 
@@ -52,6 +64,7 @@ public class FrameSubSequenceViewModel : RasterSubSequenceViewModel
             ChannelCount = project.ChannelCount,
             BitsPerChannel = project.BitsPerChannel,
             DataLength = frame.DataLength,
+            CompressedDataLength = frame.CompressedDataLength,
         };
     }
 }

@@ -61,7 +61,12 @@ public class PresetSettingsViewModel : BaseViewModel
     public ExportPresetViewModel SelectedPreset
     {
         get => _selectedPreset;
-        set => SetProperty(ref _selectedPreset, value);
+        set
+        {
+            SetProperty(ref _selectedPreset, value);
+
+            OnPropertyChanged(nameof(ExtendedSettingsVisibility));
+        }
     }
 
     public List<EncoderTypes> AvailableEncoders => ExportFormat switch
@@ -120,7 +125,9 @@ public class PresetSettingsViewModel : BaseViewModel
         }
     }
 
-    public bool IsUploadComboBoxEnabled => FilteredUploadPresets != null && !FilteredUploadPresets.IsEmpty;
+    public bool IsUploadComboBoxEnabled => FilteredUploadPresets is { IsEmpty: false };
+
+    public Visibility ExtendedSettingsVisibility => SelectedPreset is { Type: ExportFormats.Apng or ExportFormats.Gif or ExportFormats.Webp } ? Visibility.Visible : Visibility.Collapsed;
 
     #region Commands
 
@@ -189,7 +196,7 @@ public class PresetSettingsViewModel : BaseViewModel
         if (!SelectedPreset.IsDefault)
             return;
 
-        SelectedPreset = SelectedPreset.Reset();
+        SelectedPreset.Reset();
     }
 
     public void RemovePreset()

@@ -13,6 +13,13 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-
+        <!--General-->
+        <!--Screen Recorder-->
+        <!--Sketchboard Recorder?-->
+        <!--Webcam Recorder?-->
+        <!--Shortcuts-->
+        <!--Storage-->
+        <!--Extras-->
+        <!--About/Updates-->
     </Grid>
 </c:ExWindow>

@@ -8,7 +8,7 @@
             xmlns:u="clr-namespace:ScreenToGif.ViewModel.Presets.Upload;assembly=ScreenToGif.ViewModel"
             Title="ScreenToGif • Exporter" Icon="../Resources/Logo.ico" ExtendIntoTitleBar="False"
             Height="650" Width="1000" MinWidth="1000" MinHeight="650"
-            Loaded="Window_Loaded" Closing="Window_Closing">
+            Initialized="Window_Initialized" Closing="Window_Closing">
 
     <Grid>
         <Grid.RowDefinitions>

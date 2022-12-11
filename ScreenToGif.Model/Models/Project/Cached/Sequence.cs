@@ -1,5 +1,4 @@
 using ScreenToGif.Domain.Enums;
-using ScreenToGif.Domain.Models.Project.Cached.Sequences.Effects;
 using System.Windows.Media;
 
 namespace ScreenToGif.Domain.Models.Project.Cached;
@@ -49,13 +48,13 @@ public abstract class Sequence
     /// A list of effects that can be applied to the entire sequence.
     /// Such as shadow, color filters, etc.
     /// </summary>
-    public List<Shadow> Effects { get; set; } = new();
+    public List<object> Effects { get; set; } = new();
 
     /// <summary>
     /// The position of the stream in the cache file.
     /// It's the stream position before the first parameter of this class (Id) was written to the cache.
     /// </summary>
-    public ulong StreamPosition { get; set; }
+    public long StreamPosition { get; set; }
 
     /// <summary>
     /// A binary cache containing a simple structure with the details of the sequence.

@@ -2,7 +2,7 @@ namespace ScreenToGif.Domain.Enums;
 
 public enum RecordingEvents
 {
-    Cursor,
+    Cursor = 0,
     CursorData,
     Key
 }

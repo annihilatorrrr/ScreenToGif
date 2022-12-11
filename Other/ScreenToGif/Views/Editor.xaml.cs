@@ -1,5 +1,6 @@
 using ScreenToGif.Controls;
 using ScreenToGif.Controls.Recorder;
+using ScreenToGif.Dialogs;
 using ScreenToGif.Domain.Models.Project.Recording;
 using ScreenToGif.Util;
 using ScreenToGif.Util.Native;
@@ -140,11 +141,6 @@ public partial class Editor : ExWindow
         UserSettings.Save();
     }
 
-    private void ShowClipboardButton_Click(object sender, RoutedEventArgs e)
-    {
-
-    }
-
     //Panning/Zooming events for the previewer (maybe embed this in the previewer itself).
 
     #endregion
@@ -232,6 +228,41 @@ public partial class Editor : ExWindow
         return true;
     }
 
+    public async void LoadRecordingProjectPath(string path)
+    {
+        Activate();
+
+        await _viewModel.ImportFromRecording(path);
+
+        ShowInTaskbar = true;
+        WindowState = WindowState == WindowState.Minimized ? WindowState.Normal : WindowState;
+    }
+
+    public async void LoadCachedProjectPath(string path)
+    {
+        Activate();
+
+        await _viewModel.ImportFromCached(path);
+
+        ShowInTaskbar = true;
+        WindowState = WindowState == WindowState.Minimized ? WindowState.Normal : WindowState;
+    }
+
+    public async void LoadLegacyProjectPath(string path)
+    {
+        //TODO: Localize.
+        var delete = Dialog.AskStatic("Delete old project?",
+            "The selected project will be converted to the new format.\r\nDo you want to delete the old one afterwards?",
+            "Delete", "Keep");
+
+        Activate();
+
+        await _viewModel.ImportFromLegacyProject(path, delete);
+
+        ShowInTaskbar = true;
+        WindowState = WindowState == WindowState.Minimized ? WindowState.Normal : WindowState;
+    }
+
     public async Task LoadFromProject(RecordingProject project)
     {
         Activate();
@@ -241,20 +272,6 @@ public partial class Editor : ExWindow
         if (project?.Any == true)
             await _viewModel.ImportFromRecording(project);
 
-        //Encoder.Restore();
-        ShowInTaskbar = true;
-        WindowState = WindowState == WindowState.Minimized ? WindowState.Normal : WindowState;
-    }
-
-    public async Task LoadFromPath(string path)
-    {
-        Activate();
-
-        //TODO: Possible to be cancelled.
-
-        await _viewModel.ImportFromRecording(path);
-
-        //Encoder.Restore();
         ShowInTaskbar = true;
         WindowState = WindowState == WindowState.Minimized ? WindowState.Normal : WindowState;
     }

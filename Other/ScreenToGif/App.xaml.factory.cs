@@ -887,14 +887,14 @@ public partial class App
         }
     }
 
-    internal static async Task ShowEditor(RecordingProject project = null, string path = null, bool openMedia = false)
+    private static Editor OpenEditor(Window caller = null)
     {
         var editor = Current.Windows.OfType<Editor>().FirstOrDefault(f => !f.HasProjectLoaded);
 
         if (editor == null)
         {
             editor = new Editor();
-            editor.Closed += (_, _) => CloseOrNot();
+            editor.Closed += (_, _) => EditorCallback(editor, caller);
             editor.Show();
         }
         else
@@ -904,10 +904,15 @@ public partial class App
                 editor.WindowState = WindowState.Normal;
         }
 
+        return editor;
+    }
+
+    internal static async Task ShowEditor(RecordingProject project = null, bool openMedia = false)
+    {
+        var editor = OpenEditor();
+
         if (project != null)
             await editor.LoadFromProject(project);
-        else if (path != null)
-            await editor.LoadFromPath(path);
         else if (openMedia)
             editor.LoadFromArguments();
 
@@ -915,6 +920,27 @@ public partial class App
         editor.Activate();
     }
     
+    internal static void ShowEditor(Window caller, RecentProjectViewModel recent)
+    {
+        var editor = OpenEditor(caller);
+
+        switch (recent.Type)
+        {
+            case RecentProjectTypes.Recording:
+                editor.LoadRecordingProjectPath(recent.Path);
+                break;
+            case RecentProjectTypes.Project:
+                editor.LoadCachedProjectPath(recent.Path);
+                break;
+            default:
+                editor.LoadLegacyProjectPath(recent.Path);
+                break;
+        }
+
+        Current.MainWindow = editor;
+        editor.Activate();
+    }
+
     internal static void ShowExporter(Window caller, RecordingProject project)
     {
         var exporter = new Exporter();
@@ -957,15 +983,15 @@ public partial class App
         //When called by editor/startup (recent projects):
         //  Display again the editor, since it should be still be opened.
 
-        if (caller is { IsLoaded: true })
-        {
-            caller.Show();
-            return;
-        }
-
         if (exporter.OpenInEditor)
         {
             await ShowEditor(project);
+            return;
+        }
+        
+        if (caller is { IsLoaded: true })
+        {
+            caller.Show();
             return;
         }
 
@@ -987,6 +1013,19 @@ public partial class App
                 Launch(StartupWindows.Welcome);
                 break;
         }
+
+        //Or maybe just call CloseOrNot();
+    }
+
+    private static void EditorCallback(Editor editor, Window caller)
+    {
+        if (caller is { IsLoaded: true })
+        {
+            caller.Show();
+            return;
+        }
+
+        CloseOrNot();
     }
 
     private static void Interact(NotificationIconActions action, StartupWindows open)

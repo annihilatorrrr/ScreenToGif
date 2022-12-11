@@ -204,14 +204,14 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <c:IntegerBox Grid.Column="0" x:Name="WidthIntegerBox" Padding="4,0" Margin="3,5,1,2" Minimum="40" Maximum="10000" HorizontalContentAlignment="Center" MinWidth="35"
+                    <c:IntegerBox Grid.Column="0" x:Name="WidthIntegerBox" Padding="4,0" Margin="3,5,1,2" Minimum="40" Maximum="10000" MinWidth="35"
                                   Value="{Binding PixelWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanSelectRegion, Mode=OneWay}"
                                   MinHeight="23" ToolTip="Width, in pixels" ToolTipService.Placement="Bottom" ToolTipService.HorizontalOffset="-5"
                                   PropagateWheelEvent="True" ValueChanged="Size_ValueChanged" MouseWheel="SizeIntegerBox_MouseWheel"/>
 
                     <TextBlock Grid.Column="1" Text="×" FontSize="16" FontFamily="Segoe Script" Margin="1" VerticalAlignment="Center" Padding="0" Foreground="{DynamicResource Brush.Foreground.Medium}"/>
 
-                    <c:IntegerBox Grid.Column="2" Padding="4,0" Margin="1,5,3,2" Minimum="40" Maximum="10000" HorizontalContentAlignment="Center" MinWidth="35"
+                    <c:IntegerBox Grid.Column="2" Padding="4,0" Margin="1,5,3,2" Minimum="40" Maximum="10000" MinWidth="35"
                                   Value="{Binding PixelHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanSelectRegion, Mode=OneWay}"
                                   MinHeight="23" ToolTip="Height, in pixels" ToolTipService.Placement="Bottom" ToolTipService.HorizontalOffset="-5"
                                   PropagateWheelEvent="True" ValueChanged="Size_ValueChanged" MouseWheel="SizeIntegerBox_MouseWheel"/>

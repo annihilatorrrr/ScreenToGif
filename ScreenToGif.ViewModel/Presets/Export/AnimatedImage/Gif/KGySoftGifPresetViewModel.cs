@@ -3,6 +3,7 @@ using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.AnimatedImage.Gif;
+using ScreenToGif.Util;
 using System.Windows.Media;
 
 namespace ScreenToGif.ViewModel.Presets.Export.AnimatedImage.Gif;
@@ -254,7 +255,6 @@ public class KGySoftGifPresetViewModel : GifPresetViewModel
             Looped = preset.Looped,
             RepeatForever = preset.RepeatForever,
             RepeatCount = preset.RepeatCount,
-            UseGlobalColorTable = preset.UseGlobalColorTable,
             QuantizerId = preset.QuantizerId,
             BackColor = preset.BackColor,
             AlphaThreshold = preset.AlphaThreshold,
@@ -301,7 +301,6 @@ public class KGySoftGifPresetViewModel : GifPresetViewModel
             Looped = Looped,
             RepeatForever = RepeatForever,
             RepeatCount = RepeatCount,
-            UseGlobalColorTable = UseGlobalColorTable,
             QuantizerId = QuantizerId,
             BackColor = BackColor,
             AlphaThreshold = AlphaThreshold,
@@ -319,8 +318,46 @@ public class KGySoftGifPresetViewModel : GifPresetViewModel
         };
     }
 
-    public override ExportPresetViewModel Reset()
+    public override void Reset()
     {
-        return Defaults.FirstOrDefault(f => f.TitleKey == TitleKey);
+        var preset = Defaults.First(f => f.TitleKey == TitleKey);
+
+        Title = LocalizationHelper.Get(preset.TitleKey).Replace("{0}", preset.DefaultExtension);
+        Description = LocalizationHelper.Get(preset.DescriptionKey);
+        IsSelected = preset.IsSelected;
+        IsSelectedForEncoder = preset.IsSelectedForEncoder;
+        IsDefault = preset.IsDefault;
+        HasAutoSave = preset.HasAutoSave;
+        CreationDate = preset.CreationDate;
+        PickLocation = preset.PickLocation;
+        OverwriteMode = preset.OverwriteMode;
+        ExportAsProjectToo = preset.ExportAsProjectToo;
+        UploadFile = preset.UploadFile;
+        UploadService = preset.UploadService;
+        SaveToClipboard = preset.SaveToClipboard;
+        CopyType = preset.CopyType;
+        ExecuteCustomCommands = preset.ExecuteCustomCommands;
+        CustomCommands = preset.CustomCommands;
+        OutputFolder = preset.OutputFolder;
+        OutputFilename = preset.OutputFilename;
+        OutputFilenameKey = preset.OutputFilenameKey;
+        Extension = preset.Extension;
+        Looped = preset.Looped;
+        RepeatForever = preset.RepeatForever;
+        RepeatCount = preset.RepeatCount;
+        QuantizerId = preset.QuantizerId;
+        BackColor = preset.BackColor;
+        AlphaThreshold = preset.AlphaThreshold;
+        WhiteThreshold = preset.WhiteThreshold;
+        DirectMapping = preset.DirectMapping;
+        PaletteSize = preset.PaletteSize;
+        BitLevel = preset.BitLevel;
+        DithererId = preset.DithererId;
+        Strength = preset.Strength;
+        Seed = preset.Seed;
+        IsSerpentineProcessing = preset.IsSerpentineProcessing;
+        AllowDeltaFrames = preset.AllowDeltaFrames;
+        AllowClippedFrames = preset.AllowClippedFrames;
+        DeltaTolerance = preset.DeltaTolerance;
     }
 }

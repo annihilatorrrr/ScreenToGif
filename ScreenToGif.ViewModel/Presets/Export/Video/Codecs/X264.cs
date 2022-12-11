@@ -1,4 +1,5 @@
 using ScreenToGif.Domain.Enums;
+using ScreenToGif.Domain.Models;
 
 namespace ScreenToGif.ViewModel.Presets.Export.Video.Codecs;
 

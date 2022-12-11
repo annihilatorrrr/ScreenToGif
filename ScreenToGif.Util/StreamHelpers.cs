@@ -3,6 +3,7 @@ using System.Text;
 
 namespace ScreenToGif.Util;
 
+//TODO: Remove this
 [Obsolete("Use BinaryWriter/Reader")]
 public static class StreamHelpers
 {

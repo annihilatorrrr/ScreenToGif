@@ -39,6 +39,8 @@ namespace ScreenToGif.ViewModel;
 
 public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
 {
+    #region Variables
+
     private readonly AutoResetEvent _event = new(false);
     private readonly BackgroundWorker _renderWorker = new() { WorkerReportsProgress = true, WorkerSupportsCancellation = true };
     private readonly BackgroundWorker _playbackWorker = new() { WorkerSupportsCancellation = true };
@@ -66,6 +68,10 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     private ExportPresetViewModel _selectedExportPreset;
     private List<UploadPresetViewModel> _uploadPresets;
     private ICollectionView _filteredUploadPresets;
+
+    #endregion
+
+    #region Properties
 
     public bool IsLoading
     {
@@ -340,6 +346,8 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         _ => new List<string>()
     };
 
+    #endregion
+
     public ExporterViewModel()
     {
         LoadSettings();
@@ -350,7 +358,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
 
         _playbackWorker.DoWork += PlaybackWorder_DoWork;
     }
-
+    
     #region Commands
 
     public RoutedUICommand PlayPauseCommand { get; set; } = new()
@@ -502,6 +510,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         var project = await Task.Factory.StartNew(() => RecordingProjectHelper.ReadFromPath(path));
 
         Project = ProjectViewModel.FromModel(project, this);
+        ProjectSource = project;
         ShowEditButton = true;
 
         InitializePreview();
@@ -516,6 +525,7 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
         var project = await Task.Factory.StartNew(() => LegacyProjectHelper.ReadFromPath(path, deleteOld));
 
         Project = ProjectViewModel.FromModel(project, this);
+        ProjectSource = project;
         ShowEditButton = true;
 
         InitializePreview();
@@ -527,11 +537,9 @@ public class ExporterViewModel : BaseViewModel, IPreviewerViewModel, IDisposable
     {
         IsLoading = true;
 
-        var project = await Task.Factory.StartNew(() => RecordingProjectHelper.ReadFromPath(path));
-
+        var project = await Task.Factory.StartNew(() => CachedProjectHelper.ReadFromPath(path));
         Project = ProjectViewModel.FromModel(project, this);
-        ShowEditButton = true;
-
+        
         InitializePreview();
 
         IsLoading = false;

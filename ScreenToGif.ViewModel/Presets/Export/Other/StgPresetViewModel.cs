@@ -2,6 +2,7 @@ using ScreenToGif.Domain.Enums;
 using ScreenToGif.Domain.Interfaces;
 using ScreenToGif.Domain.Models.Preset.Export;
 using ScreenToGif.Domain.Models.Preset.Export.Other;
+using ScreenToGif.Util;
 using System.IO.Compression;
 
 namespace ScreenToGif.ViewModel.Presets.Export.Other;
@@ -95,8 +96,28 @@ public class StgPresetViewModel : ExportPresetViewModel
         };
     }
 
-    public override ExportPresetViewModel Reset()
+    public override void Reset()
     {
-        return Default;
+        Title = LocalizationHelper.Get(Default.TitleKey).Replace("{0}", Default.DefaultExtension);
+        Description = LocalizationHelper.Get(Default.DescriptionKey);
+        IsSelected = Default.IsSelected;
+        IsSelectedForEncoder = Default.IsSelectedForEncoder;
+        IsDefault = Default.IsDefault;
+        HasAutoSave = Default.HasAutoSave;
+        CreationDate = Default.CreationDate;
+        PickLocation = Default.PickLocation;
+        OverwriteMode = Default.OverwriteMode;
+        ExportAsProjectToo = Default.ExportAsProjectToo;
+        UploadFile = Default.UploadFile;
+        UploadService = Default.UploadService;
+        SaveToClipboard = Default.SaveToClipboard;
+        CopyType = Default.CopyType;
+        ExecuteCustomCommands = Default.ExecuteCustomCommands;
+        CustomCommands = Default.CustomCommands;
+        OutputFolder = Default.OutputFolder;
+        OutputFilename = Default.OutputFilename;
+        OutputFilenameKey = Default.OutputFilenameKey;
+        Extension = Default.Extension;
+        CompressionLevel = Default.CompressionLevel;
     }
 }

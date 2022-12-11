@@ -123,7 +123,7 @@ public partial class Exporter : ExWindow
     private void Edit_Executed(object sender, ExecutedRoutedEventArgs e)
     {
         OpenInEditor = true;
-
+        
         Close();
     }
 
@@ -369,7 +369,7 @@ public partial class Exporter : ExWindow
     }
 
 
-    private void Window_Loaded(object sender, RoutedEventArgs e)
+    private void Window_Initialized(object sender, EventArgs e)
     {
         //Tries to adjust the position/size of the window, centers on screen otherwise.
         if (!UpdatePositioning())
@@ -411,6 +411,11 @@ public partial class Exporter : ExWindow
         await _viewModel.ImportFromRecording(path);
     }
 
+    public async void LoadCachedProjectPath(string path)
+    {
+        await _viewModel.ImportFromEditor(path);
+    }
+    
     public async void LoadLegacyProjectPath(string path)
     {
         //TODO: Localize.
@@ -419,11 +424,6 @@ public partial class Exporter : ExWindow
             "Delete", "Keep");
 
         await _viewModel.ImportFromLegacyProject(path, delete);
-    }
-
-    public async void LoadCachedProjectPath(string path)
-    {
-        await _viewModel.ImportFromEditor(path);
     }
 
     public void LoadCachedProject(CachedProject project)

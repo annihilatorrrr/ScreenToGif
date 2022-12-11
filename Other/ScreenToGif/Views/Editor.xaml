@@ -9,6 +9,7 @@
 
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition MinHeight="100"/>
             <RowDefinition Height="Auto"/>
@@ -16,7 +17,7 @@
                            MinHeight="{Binding MinTimelineHeight, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" MaxHeight="500"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="1" Margin="10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
@@ -50,12 +51,12 @@
 
             <!--Right: Special action buttons: Export, Update, etc.-->
             <Grid Grid.Column="2" Margin="3">
-                <!--<c:ExButton Content="Export..." Command="{Binding ExportCommand}" IsAccented="True"/>-->
+                <c:ExButton Content="Export" Command="{Binding ExportCommand}" IsAccented="True"/>
             </Grid>
         </Grid>
 
         <!--Background="{StaticResource Checker.DrawingBrush}"-->
-        <Grid Grid.Row="1" x:Name="MiddleGrid">
+        <Grid Grid.Row="2" x:Name="MiddleGrid">
             <!--Welcome screen-->
             <!--Decorator layer for displaying UI elements (rubber band selection [click and drag to select elements], selection rectangle, elements [TextBox])-->
 
@@ -69,11 +70,11 @@
         </Grid>
 
         <!--Configurable height?-->
-        <GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" IsTabStop="False" Visibility="{Binding Visibility, ElementName=Timeline, Mode=OneWay}"/>
+        <GridSplitter Grid.Row="3" Height="4" HorizontalAlignment="Stretch" IsTabStop="False" Visibility="{Binding Visibility, ElementName=Timeline, Mode=OneWay}"/>
 
         <!--Timeline with multiple tracks and sequences-->
         <!--Visibility="{Binding HasProject, Converter={StaticResource Bool2Visibility}, FallbackValue=False}"-->
-        <t:Timeline Grid.Row="3" x:Name="Timeline" 
+        <t:Timeline Grid.Row="4" x:Name="Timeline" 
                     Tracks="{Binding Project.Tracks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Current="{Binding Current, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>

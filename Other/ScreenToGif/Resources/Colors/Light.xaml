@@ -173,7 +173,17 @@
     <SolidColorBrush x:Key="Brush.InfoBar.Border.Success" Color="#0F000000"/>
     <SolidColorBrush x:Key="Brush.InfoBar.Glyph.Success" Color="#0F7B0F"/>
 
-    <!--Slider-->
+    <!--All-->
+    <SolidColorBrush x:Key="Brush.Fill.Control.Default" Color="#B2FFFFFF"/>
+    <SolidColorBrush x:Key="Brush.Fill.Control.Secondary" Color="#80F9F9F9"/>
+    <SolidColorBrush x:Key="Brush.Fill.Control.Tertiary" Color="#4DF9F9F9"/>
+    <SolidColorBrush x:Key="Brush.Fill.Control.Disabled" Color="#4DF9F9F9"/>
+
+    <LinearGradientBrush x:Key="Brush.Elevation.Control.Border" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#0F000000" Offset="0.96"/>
+        <GradientStop Color="#72000000" Offset="0.98"/>
+    </LinearGradientBrush>
+
     <SolidColorBrush x:Key="Brush.Fill.Accent.Default" Color="#005FB8"/>
     <SolidColorBrush x:Key="Brush.Fill.Accent.Secondary" Color="#005FB8"/>
     <SolidColorBrush x:Key="Brush.Fill.Accent.Tertiary" Color="#CC005FB8"/>
